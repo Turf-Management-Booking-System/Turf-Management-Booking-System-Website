@@ -1,10 +1,15 @@
 const express = require("express");
 const connectDB = require("./config/database");
+const cors = require("cors");
 const app = express();
 // defines the ports
 const PORT =  process.env.PORT || 4000;
 // for json data to accept
 app.use(express.json());
+app.use(cors({ origin: 'http://localhost:5173', 
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    credentials:true
+}))
 require("dotenv").config();
 // import the routes
 const authRoutes = require("./routes/auth-routes");

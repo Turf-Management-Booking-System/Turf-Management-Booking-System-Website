@@ -43,6 +43,7 @@ const App = () => {
 
   return (
     <>
+<<<<<<< HEAD
       {!isOtpPage && !isForgetPasswordPage && !isUpdatePasswordPage && !isChangePasswordPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
@@ -55,6 +56,25 @@ const App = () => {
         <Route path="/about" element={<About />} />
       </Routes>
       {!isLoginPage && !isOtpPage && !isForgetPasswordPage && !isUpdatePasswordPage && !isChangePasswordPage && <Footer />}
+=======
+      {loading && <Preloader />} {/* Show preloader while loading */}
+      {!loading && (
+        <>
+          {!isOtpPage && !isForgetPasswordPage && !isUpdatePasswordPage && !isChangePasswordPage && <Navbar />}
+          <Routes>
+              <Route path="/" element={<Home/>}/>
+              <Route path="/login" element={<Login/>}/>
+              <Route path= "/otp"element={<Otp/>}/>
+              <Route path = "/forgetpassword" element={<ForgetPassword/>}/>
+              <Route path="/updatepassword" element={<UpdatePassword/>}/>
+              <Route path="/changepassword" element={<ChangePassword/>}/>
+              <Route path="/contact" element={<Contact/>}/>
+              <Route path="/about" element={<About/>}/>
+          </Routes>
+          {  !isOtpPage && !isForgetPasswordPage && !isUpdatePasswordPage && !isChangePasswordPage && <Footer/>}
+        </>
+      )}
+>>>>>>> 9989934be8a87acd5d7e15d472fdf62688a4aa77
     </>
   );
 };

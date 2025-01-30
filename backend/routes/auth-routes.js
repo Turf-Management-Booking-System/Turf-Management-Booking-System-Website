@@ -8,8 +8,8 @@ const router = express.Router();
 router.post("/signup",signup);
 router.post("/login",login);
 router.post("/changePassword",auth,isUser,changePassword);
-router.post("/sendOtp",auth,isUser,isAdmin,sendOtp);
-router.post("/verifyOtp",auth,isUser,verifyOtp);
+router.post("/sendOtp",sendOtp);
+router.post("/verifyOtp",verifyOtp);
 router.post("/forgetPassword",auth,isUser,forgetPassword);
 
 // protected routes 
