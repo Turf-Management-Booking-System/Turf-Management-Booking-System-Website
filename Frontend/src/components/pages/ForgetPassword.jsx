@@ -1,21 +1,23 @@
 import React ,{useState}from "react";
+import { useNavigate } from "react-router-dom";
 
     const ForgetPassword = () => {
         const [email, setEmail] = useState("");
         const [isEmailValid, setIsEmailValid] = useState(false);
+
+        const navigate = useNavigate();
       
         // Handle email input change
         const handleEmailChange = (e) => {
           setEmail(e.target.value);
-          // Validate email and enable button if email is not empty
           setIsEmailValid(e.target.value !== "");
         };
       
         // Handle form submission
         const handleSubmit = (e) => {
-          e.preventDefault(); // Prevent page refresh
+          e.preventDefault(); 
           if (isEmailValid) {
-            window.location.href = '/updatepassword'; // Redirect to update password page
+            navigate('/updatepassword');
           }
         };
       
@@ -23,7 +25,7 @@ import React ,{useState}from "react";
   return (
     <div className="flex justify-center items-center min-h-screen bg-deepForestGreen">
       <div className="bg-white shadow-lg rounded-xl w-full max-w-md p-8 mx-4">
-        <h2 className="text-2xl font-bold text-green-600 text-center mb-4">
+        <h2 className="text-2xl font-bold text-deepForestGreen text-center mb-4">
           Forgot Password?
         </h2>
         <p className="text-gray-600 text-center mb-6">
@@ -48,7 +50,7 @@ import React ,{useState}from "react";
           {/* Submit Button */}
           <button
             type="submit"
-            onClick={() => window.location.href = '/updatepassword'}
+            onClick={() => handleSubmit}
             className={`bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition duration-200 ${!isEmailValid ? "opacity-50 cursor-not-allowed" : ""}`}
             disabled={!isEmailValid}
           >

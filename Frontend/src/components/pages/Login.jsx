@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const [isActive, setIsActive] = useState(false);
@@ -36,14 +37,14 @@ const Login = () => {
                 <i className="bx bxs-lock-alt absolute right-5 top-[50%] transform -translate-y-[50%] text-xl text-[#888]"></i>
               </div>
               <div className="-mt-[15px] mb-[15px]">
-                <a href="/forgetpassword" className="text-[14.5px] text-green-700  no-underline" >
+                <Link to="/forgetpassword" className="text-[14.5px] text-green-700  no-underline" >
                   Forgot password ?
-                </a>
+                </Link>
               </div>
               <button
                 type="submit"
-                className="w-[100%] h-[48px] bg-gradient-to-r from-green-300 via-lime-400 to-green-500 rounded-lg border-none cursor-pointer text-[16px] text-[#fff] font-semibold"
-                style={{ boxShadow: "0 0 10px rgba(0,0.0,.2)" }}
+                className="w-[100%] h-[48px] bg-deepForestGreen rounded-lg border-none cursor-pointer text-[16px] text-[#fff] font-semibold"
+                style={{ boxShadow: "0 0 10px rgba(0,0,0,0.2)" }}
               >
                 Login
               </button>
@@ -51,18 +52,18 @@ const Login = () => {
                 or login with social platforms
               </p>
               <div className="flex justify-center">
-                <a href="#">
+                <Link to="https://www.google.com/">
                   <i className="bx bxl-google inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
-                <a href="#">
+                </Link>
+                <Link to="https://www.facebook.com/">
                   <i className="bx bxl-facebook inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
-                <a href="#">
+                </Link>
+                <Link to="https://www.github.com/">
                   <i className="bx bxl-github inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
-                <a href="#">
+                </Link>
+                <Link to="https://www.linkedin.com/">
                   <i className="bx bxl-linkedin inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
+                </Link>
               </div>
             </form>
           </div>
@@ -113,7 +114,7 @@ const Login = () => {
               <button
                 type="submit"
                 className="w-[100%] h-[48px] bg-deepForestGreen rounded-lg border-none cursor-pointer text-[16px] text-[#fff] font-semibold"
-                style={{ boxShadow: "0 0 30px rgba(0,0.0,.2" }}
+                style={{ boxShadow: "0 0 30px rgba(0,0,0,0.2" }}
               >
                 Register
               </button>
@@ -121,18 +122,18 @@ const Login = () => {
                 or register with social platforms
               </p>
               <div className="flex justify-center">
-                <a href="#">
+              <Link to="https://www.google.com/">
                   <i className="bx bxl-google inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
-                <a href="#">
+                </Link>
+                <Link to="https://www.facebook.com/">
                   <i className="bx bxl-facebook inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
-                <a href="#">
+                </Link>
+                <Link to="https://www.github.com/">
                   <i className="bx bxl-github inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
-                <a href="#">
+                </Link>
+                <Link to="https://www.linkedin.com/">
                   <i className="bx bxl-linkedin inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
+                </Link>
               </div>
             </form>
           </div>

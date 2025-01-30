@@ -1,7 +1,8 @@
 import React, { useState,useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRightToBracket, faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
-import {useNavigate} from 'react-router-dom'
+import {useNavigate , Link} from 'react-router-dom'
+
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -31,15 +32,15 @@ const handleLoginClick = () => {
   return (
     <nav className=" p-3 flex bg-[#065F46] text-white justify-between items-center fixed top-0 left-0 right-0 z-20 shadow-md">
       {/* Logo(Desktop) */}
-      <a href="#" className=" flex gap-2 items-center flex-1">
+      <Link to="/" className=" flex gap-2 items-center flex-1">
         <span className="text-lg font-orbitron font-bold">KickOnTurf</span>
-      </a>
+      </Link>
 
       {/* Navbar(Desktop) */}
       <div id="nav-menu" className="hidden lg:flex gap-12">
-        <a href="/" className="font-medium font-bebas hover:text-green-800">Home</a>
-        <a href="/about" className="font-medium font-montserrat hover:text-green-800">About</a>
-        <a href="/contact" className="font-medium font-orbitron hover:text-green-800">Contact</a>
+        <Link to="/" className="font-medium font-bebas hover:text-green-800">Home</Link>
+        <Link to="/about" className="font-medium font-montserrat hover:text-green-800">About</Link>
+        <Link to="/contact" className="font-medium font-orbitron hover:text-green-800">Contact</Link>
       </div>
 
    
