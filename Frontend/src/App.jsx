@@ -63,7 +63,7 @@ useEffect(() => {
               <Route path="/contact" element={<Contact/>}/>
               <Route path="/about" element={<About/>}/>
           </Routes>
-          {!isLoginPage && !isOtpPage && !isForgetPasswordPage && !isUpdatePasswordPage && !isChangePasswordPage && <Footer/>}
+          {  !isOtpPage && !isForgetPasswordPage && !isUpdatePasswordPage && !isChangePasswordPage && <Footer/>}
         </>
       )}
     </>
