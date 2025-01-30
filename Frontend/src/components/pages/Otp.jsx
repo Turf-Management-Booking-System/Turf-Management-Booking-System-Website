@@ -1,8 +1,20 @@
-import React, { useState } from 'react';
-
+import React, { useId, useState } from 'react';
+import { useSelector } from 'react-redux';
+import axios from "axios";
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { registerUser } from '../../slices/authSlice';
 const Otp = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
-
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+  console.log("user from redux",user.email)
+  if (!user?.email) {
+    toast.error("Email not found. Please ensure you are logged in.");
+    return;
+  }
+  const navigate= useNavigate();
   // Handle input change
   const handleChange = (element, index) => {
     const value = element.value.replace(/[^0-9]/g, "");
@@ -35,11 +47,49 @@ const Otp = () => {
   };
 
   // Handle OTP submission
-  const handleSubmit = (event) => {
+   const newOtp=`${otp.join("")}`
+   const requestData = {
+    otp:newOtp,
+    email:user.email
+   }
+  console.log(requestData)
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    alert(`Entered OTP: ${otp.join("")}`);
+    try {
+      const response = await axios.post("http://localhost:4000/api/v1/auth/verifyOtp", requestData, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      });
+  
+      if (response.data.success) {
+        toast.success("OTP verified successfully!");
+        localStorage.setItem("userData", JSON.stringify(user));
+  
+        // Call Signup API with correct structure
+        const signupResponse = await axios.post(
+          "http://localhost:4000/api/v1/auth/signup",
+          { ...user }, // Ensure correct payload
+          { headers: { "Content-Type": "application/json" }, withCredentials: true }
+        );
+        console.log("signup response ",signupResponse);
+        if (signupResponse.data?.success) {
+          console.log("Signup Response Data:", signupResponse.data); // Debugging log
+          console.log("Signup block executing...");
+          dispatch(registerUser(signupResponse.data.user));
+          setTimeout(()=>{
+            toast.success("User created successfully!")
+          },2000)
+          navigate("/login")
+        } 
+      } else {
+        console.log(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Error sending data to backend");
+    }
   };
-
+  
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-green-100 via-lime-200 to-green-300">
       <div className="bg-white shadow-lg rounded-xl w-full max-w-md p-8 mx-4">

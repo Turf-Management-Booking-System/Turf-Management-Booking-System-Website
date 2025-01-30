@@ -1,29 +1,28 @@
-require("dotenv").config();
 const nodemailer = require("nodemailer");
+require("dotenv").config();
+// Create a transporter
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "kadarbishaikh56@gmail.com", // Your Gmail
+    pass:"hqwunynrpljhrfhx", // Use an App Password, not your Gmail password
+  },
+});
 
-const mailSender = async (email, title, body) => {
-    try {
-        const transporter = nodemailer.createTransport({
-            host: process.env.MAIL_HOST,
-            secure: false,
-            auth: {
-                user: process.env.MAIL_USER,
-                pass: process.env.MAIL_PASSWORD,
-            },
-            logger: true, // Enable logging
-            debug:true
-        });
+// Function to send an email
+const sendEmail = async (to, subject, html) => {
+  try {
+    const mailOptions = {
+      from: "kadarbishaikh56@gmail.com",
+      to: to,
+      subject: subject,
+      html:html,
+    };
 
-        await transporter.sendMail({
-            from: '"StudyNotion || CodeHelp - by Sabina"',
-            to: email,
-            subject: title,
-            html: body,
-        });
-        console.log("Mail sent successfully!");
-    } catch (error) {
-        console.error("Error sending email:", error);
-        throw error; // Optional: rethrow for further handling
-    }
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent:", info.response);
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
 };
-module.exports = mailSender;
+module.exports = sendEmail

@@ -2,24 +2,19 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Otp = require("../models/otp");
-const mailSender = require("../config/nodeMailer");
 const Profile = require("../models/additionalFields");
+const sendEmail = require("../config/nodeMailer");
+const { sendOTPEmail } = require("../mail/templates/sendOTPEmail");
 require("dotenv").config();
 // signup controller
 exports.signup = async(req,res)=>{
     try{
         // extract the data from the user
-        const {firstName,lastName,email,password,confirmPassword,role}= req.body;
+        const {firstName,lastName,email,password,role}= req.body;
         // validate the data
-        if(!firstName||!lastName||!email||!password||!confirmPassword||!role){
+        if(!firstName||!lastName||!email||!password||!role){
             return res.status(400).json({
                 message:"please fill all the fields!"
-            })
-        }
-        // check the password and confirmPassword is same or not
-        if(password!==confirmPassword){
-            return res.status(400).json({
-                message:"Please check the password and confirmPassword"
             })
         }
         // check if user exits in the databse
@@ -57,18 +52,13 @@ exports.signup = async(req,res)=>{
         });
         console.log("new user",user);
         // return the response
-        res.status(201).json({
+        res.status(200).json({
+            success:true,
             message:"User created successfully",
             user:user
         })
 
     }catch(error){
-        if(error.name === "ValidationError"){
-            return res.status(400).json({
-                message:"Data provided is not proper",
-                error:error.message
-            })
-        }
         console.log("Error",error);
         res.status(500).json({
             status:false,
@@ -221,9 +211,9 @@ exports.changePassword = async(req,res)=>{
 exports.sendOtp = async(req,res)=>{
     try{ 
         // extract data
-        const {email,token} = req.body;
+        const {email} = req.body;
         // validate the data
-        if(!email||!token){
+        if(!email){
             return res.status(400).json({
                 success:false,
                 message:"Please enter the correct email"
@@ -245,10 +235,14 @@ exports.sendOtp = async(req,res)=>{
         console.log("otp saved",otp);
         // send otp Via email
         try{
-          await mailSender(email,"otp send",`${otp}`)
+         const emailContent = sendOTPEmail(otp);
+         await sendEmail(email,"Otp send successfully",emailContent);
         }catch(error){
-            console.log("email not sent successfully!");
-            console.log("error",error)
+        console.log("error",error);
+        return res.status(500).json({
+            success:false,
+            message:error.message
+        })
         }
         // return the response
         return res.status(200).json({
@@ -274,10 +268,10 @@ exports.verifyOtp = async (req, res) => {
         const { email, otp } = req.body;
 
         // Validate the data
-        if (!email || !otp) {
+        if ( !email||!otp) {
             return res.status(400).json({
                 success: false,
-                message: "Please provide both email and OTP",
+                message: "Please provide OTP",
             });
         }
 
@@ -291,7 +285,7 @@ exports.verifyOtp = async (req, res) => {
         }
 
         // Check if OTP is expired
-        if (otpRecord.expiresAt < new Date()) {
+        if (otpRecord.expiresAt < Date.now()) {
             await Otp.deleteOne({ email });
             return res.status(400).json({
                 success: false,
@@ -300,7 +294,7 @@ exports.verifyOtp = async (req, res) => {
         }
 
         // Check if OTP matches
-        if (otp !== otpRecord.otpCode) {
+        if (otp!== otpRecord.otpCode) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid OTP. Please try again",
