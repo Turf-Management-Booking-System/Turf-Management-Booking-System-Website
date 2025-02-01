@@ -11,40 +11,14 @@ import ForgetPassword from "./components/pages/ForgetPassword";
 import UpdatePassword from "./components/pages/UpdatePassword";
 import ChangePassword from "./components/pages/ChangePassword";
 
-// Preloader Component
-const Preloader = () => (
-  <div className="flex justify-center items-center h-screen bg-black">
-    <h1 className="text-7xl font-bold text-white animate-writing">Loading Turf Management...</h1>
-  </div>
-);
-
 const App = () => {
-  const [loading, setLoading] = useState(true); // For initial load
   const location = useLocation();
 
-  const isLoginPage = location.pathname === "/login";
-  const isOtpPage = location.pathname === "/otp";
-  const isForgetPasswordPage = location.pathname === "/forgetpassword";
-  const isUpdatePasswordPage = location.pathname === "/updatepassword";
-  const isChangePasswordPage = location.pathname === "/changepassword";
-
-  // Handle initial load
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false); // Set loading to false after 1.5 seconds
-    }, 1500);
-
-    return () => clearTimeout(timer); // Cleanup the timer
-  }, []); // Runs only once on component mount
-
-  if (loading) {
-    return <Preloader />; // Show preloader only on initial load
-  }
+  const isAuthPage = ["/login", "/otp", "/forgetpassword", "/updatepassword", "/changepassword"].includes(location.pathname);
 
   return (
     <>
-<<<<<<< HEAD
-      {!isOtpPage && !isForgetPasswordPage && !isUpdatePasswordPage && !isChangePasswordPage && <Navbar />}
+      {!isAuthPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -55,26 +29,7 @@ const App = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
       </Routes>
-      {!isLoginPage && !isOtpPage && !isForgetPasswordPage && !isUpdatePasswordPage && !isChangePasswordPage && <Footer />}
-=======
-      {loading && <Preloader />} {/* Show preloader while loading */}
-      {!loading && (
-        <>
-          {!isOtpPage && !isForgetPasswordPage && !isUpdatePasswordPage && !isChangePasswordPage && <Navbar />}
-          <Routes>
-              <Route path="/" element={<Home/>}/>
-              <Route path="/login" element={<Login/>}/>
-              <Route path= "/otp"element={<Otp/>}/>
-              <Route path = "/forgetpassword" element={<ForgetPassword/>}/>
-              <Route path="/updatepassword" element={<UpdatePassword/>}/>
-              <Route path="/changepassword" element={<ChangePassword/>}/>
-              <Route path="/contact" element={<Contact/>}/>
-              <Route path="/about" element={<About/>}/>
-          </Routes>
-          {  !isOtpPage && !isForgetPasswordPage && !isUpdatePasswordPage && !isChangePasswordPage && <Footer/>}
-        </>
-      )}
->>>>>>> 9989934be8a87acd5d7e15d472fdf62688a4aa77
+      {!isAuthPage && <Footer />}
     </>
   );
 };
