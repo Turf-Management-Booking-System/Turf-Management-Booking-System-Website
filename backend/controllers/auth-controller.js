@@ -104,12 +104,19 @@ exports.login = async(req,res)=>{
             "expiresIn":"6h"
         });
         console.log("token",token);
-        // return the response
-        return res.status(200).json({
-            status:true,
-            message:"user logged in successfully!",
-            token,
-        })
+       // return the response
+res.cookie('token', token, {
+    httpOnly: true, // Ensures cookie is only accessible by the server
+    secure: false, // Only sends cookie over HTTPS in production
+    maxAge: 24 * 60 * 60 * 1000, // Cookie expiration: 1 day
+    sameSite: 'Lax', 
+  }).status(200).json({
+    success: true,
+    message: "User logged in successfully!",
+    token,
+    user:userExit
+  });
+  
 
     }catch(error){
         if(error.name === "ValidationError"){
@@ -381,10 +388,10 @@ exports.resetPassword = async(req,res)=>{
 exports.forgetPassword = async (req, res) => {
     try {
         // Extract email from the request body
-        const { email ,token} = req.body;
+        const { email} = req.body;
 
         // Validate the email
-        if (!email ||!token) {
+        if (!email) {
             return res.status(400).json({
                 success: false,
                 message: "Please provide a valid email address",
@@ -412,11 +419,22 @@ exports.forgetPassword = async (req, res) => {
             expiresAt,
         });
 
-        // TODO: Send the OTP via email (integrate your email service here)
+        // TODO: Send the OTP via email (integrate your email service here
+        try{
+            const emailContent = sendOTPEmail(otpCode);
+            await sendEmail(email,"Otp send successfully",emailContent);
+           }catch(error){
+           console.log("error",error);
+           return res.status(500).json({
+               success:false,
+               message:error.message
+           })
+           }
 
         return res.status(200).json({
             success: true,
             message: "OTP has been sent to your email address",
+            otp:otpCode,
         });
     } catch (error) {
         console.error("Error during forget password:", error);

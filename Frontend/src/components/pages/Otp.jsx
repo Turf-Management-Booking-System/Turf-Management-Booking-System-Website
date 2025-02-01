@@ -5,12 +5,12 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { registerUser } from '../../slices/authSlice';
+import { setLoader } from '../../slices/authSlice';
 const Otp = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
-  const user = useSelector((state) => state.auth.user);
+  const registeredUser = useSelector((state) => state.auth.registeredUser);
   const dispatch = useDispatch();
-  console.log("user from redux",user.email)
-  if (!user?.email) {
+  if (!registeredUser?.email) {
     toast.error("Email not found. Please ensure you are logged in.");
     return;
   }
@@ -50,12 +50,13 @@ const Otp = () => {
    const newOtp=`${otp.join("")}`
    const requestData = {
     otp:newOtp,
-    email:user.email
+    email:registeredUser.email
    }
   console.log(requestData)
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      dispatch(setLoader(true));
       const response = await axios.post("http://localhost:4000/api/v1/auth/verifyOtp", requestData, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
@@ -63,18 +64,16 @@ const Otp = () => {
   
       if (response.data.success) {
         toast.success("OTP verified successfully!");
-        localStorage.setItem("userData", JSON.stringify(user));
   
         // Call Signup API with correct structure
         const signupResponse = await axios.post(
           "http://localhost:4000/api/v1/auth/signup",
-          { ...user }, // Ensure correct payload
+          { ...registeredUser }, // Ensure correct payload
           { headers: { "Content-Type": "application/json" }, withCredentials: true }
         );
         console.log("signup response ",signupResponse);
         if (signupResponse.data?.success) {
           console.log("Signup Response Data:", signupResponse.data); // Debugging log
-          console.log("Signup block executing...");
           dispatch(registerUser(signupResponse.data.user));
           setTimeout(()=>{
             toast.success("User created successfully!")
@@ -87,6 +86,8 @@ const Otp = () => {
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
       toast.error(error.response?.data?.message || "Error sending data to backend");
+    }finally{
+      dispatch(setLoader(false));
     }
   };
   

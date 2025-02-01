@@ -2,12 +2,13 @@ import React, { useState,useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRightToBracket, faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
 import {useNavigate , Link} from 'react-router-dom'
-
-
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../slices/authSlice';
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [darkMode,setDarkMode] = useState(false);
-
+ const isAuthenticated = useSelector(state=>state.auth.isAuthenticated);
+ const dispatch= useDispatch();
 const navigate = useNavigate();
 const handleLoginClick = () => {
   navigate("/login")
@@ -28,7 +29,10 @@ const handleLoginClick = () => {
     setDarkMode((prev) => !prev )
   }
 
-
+ const handleLogoutClick=(event)=>{
+  event.preventDefault();
+  dispatch(logout());
+ }
   return (
     <nav className=" p-3 flex bg-[#065F46] text-white justify-between items-center fixed top-0 left-0 right-0 z-20 shadow-md">
       {/* Logo(Desktop) */}
@@ -54,10 +58,21 @@ const handleLoginClick = () => {
         >
           {darkMode ? <i className='bx bxs-moon'></i> : <i class='bx bxs-sun'></i>}
         </button>
-
-        <button onClick={handleLoginClick} className="flex gap-2 items-center border border-green-600 px-6 py-2 rounded-lg hover:border-green-800">
-          <span className="font-display font-medium">Login</span>
-        </button>
+         {
+          !isAuthenticated && (
+            <button onClick={handleLoginClick} className="flex gap-2 items-center border border-green-600 px-6 py-2 rounded-lg hover:border-green-800">
+            <span className="font-display font-medium">Login</span>
+          </button>
+          )
+         }
+         {
+          isAuthenticated && (
+            <button onClick={handleLogoutClick} className="flex gap-2 items-center border border-green-600 px-6 py-2 rounded-lg hover:border-green-800">
+            <span className="font-display font-medium">Logout</span>
+          </button>
+          )
+         }
+        
       </div>
 
       {/* toggle button*/}

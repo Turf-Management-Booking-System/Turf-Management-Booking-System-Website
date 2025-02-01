@@ -10,25 +10,71 @@ import Otp from "./components/pages/Otp";
 import ForgetPassword from "./components/pages/ForgetPassword";
 import UpdatePassword from "./components/pages/UpdatePassword";
 import ChangePassword from "./components/pages/ChangePassword";
+import Spinner from "./components/common/Spinner";
+import { useSelector, useDispatch } from "react-redux";
+import { login } from "./slices/authSlice";
+import Dashboard from "./components/pages/Dashboard";
+import "../src/App.css";
+import PrivateRoute from "./routes/PrivateRoute";
+import PageNotFound from "./components/pages/PageNotFound";
 
 const App = () => {
+<<<<<<< HEAD
+=======
+  const dispatch = useDispatch(); 
+  const [loading, setLoading] = useState(true);
+>>>>>>> 567c8181214571acc162877a0973f3358095ef48
   const location = useLocation();
+  const loader = useSelector((state) => state.auth.loader);
 
+<<<<<<< HEAD
   const isAuthPage = ["/login", "/otp", "/forgetpassword", "/updatepassword", "/changepassword"].includes(location.pathname);
 
   return (
     <>
+=======
+  // Check if current page is authentication-related
+  const isAuthPage = ["/login", "/otp", "/forgetpassword", "/updatepassword", "/changepassword"].includes(location.pathname);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("userData");
+    const user = storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null;
+    if (token && user) {
+      dispatch(login({ user, token }));
+    }
+  }, [dispatch]); 
+
+  if (loading) return <Preloader />;
+
+  return (
+    <>
+      {loader && <Spinner />}
+>>>>>>> 567c8181214571acc162877a0973f3358095ef48
       {!isAuthPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/otp" element={<Otp />} />
         <Route path="/forgetpassword" element={<ForgetPassword />} />
-        <Route path="/updatepassword" element={<UpdatePassword />} />
-        <Route path="/changepassword" element={<ChangePassword />} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/changepassword" element={<ChangePassword />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
         <Route path="/contact" element={<Contact />} />
+        <Route path="/updatepassword" element={<UpdatePassword/>}/>
         <Route path="/about" element={<About />} />
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 567c8181214571acc162877a0973f3358095ef48
       {!isAuthPage && <Footer />}
     </>
   );
