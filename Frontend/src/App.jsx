@@ -24,7 +24,7 @@ const App = () => {
   const loader = useSelector((state) => state.auth.loader);
 
   // Check if current page is authentication-related
-  const isAuthPage = ["/login", "/otp", "/forgetpassword", "/updatepassword", "/changepassword"].includes(location.pathname);
+  const isAuthPage = ["/otp", "/forgetpassword", "/updatepassword", "/changepassword"].includes(location.pathname);
 
   useEffect(() => {
     const token = localStorage.getItem("token");

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser } from "../../slices/authSlice";
-import { setLoading } from "../../slices/authSlice";
+import { registerUser, setLoader } from "../../slices/authSlice";
 const Login = () => {
   const [isActive, setIsActive] = useState(false);
   const loading = useSelector(state=>state.auth.loading);
@@ -36,7 +36,7 @@ const Login = () => {
     };
   
     try {
-      dispatch(setLoading(true));
+      dispatch(setLoader(true));
       console.log("loading state",loading);
       const response = await axios.post("http://localhost:4000/api/v1/auth/sendOtp", requestData, {
         headers: {
@@ -61,7 +61,7 @@ const Login = () => {
       toast.error(error.response?.data?.message || "Error sending data to backend");
     }
     finally {
-      dispatch(setLoading(false));
+      dispatch(setLoader(false));
     }
     setFormData({
       firstName: "",
