@@ -5,10 +5,14 @@ import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser, setLoader } from "../../slices/authSlice";
+import { login } from "../../slices/authSlice";
+import { setUser } from "../../slices/authSlice";
 const Login = () => {
   const [isActive, setIsActive] = useState(false);
-  const loading = useSelector(state=>state.auth.loading);
-  console.log("loading value ",loading)
+  const loader = useSelector(state=>state.auth.loader);
+  console.log("loading value ",loader);
+  const [email,setEmail] = useState("");
+  const [password,setPassword]=useState("")
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData,setFormData] = useState({
@@ -26,6 +30,48 @@ const Login = () => {
         }
       })
   }
+  // In your LoginHandler
+const LoginHandler = async (event) => {
+  event.preventDefault();
+  if (!email || !password) {
+    return toast.error("Please enter the required fields!");
+  }
+  const requestData = {
+    email: email,
+    password: password,
+  };
+
+  try {
+    dispatch(setLoader(true));
+    const response = await axios.post("http://localhost:4000/api/v1/auth/login", requestData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    });
+
+    console.log("Response from backend:", response.data);
+    if (response.data.success) {
+      toast.success("User Logged in Successfully!");
+      dispatch(login({
+        token: response.data.token,
+        user: response.data.user, 
+      }));
+      dispatch(setUser(response.data.user));
+      navigate("/dashboard");
+    } else {
+      toast.error(response.data.message || "Something went wrong");
+    }
+  } catch (error) {
+    console.error("Error:", error.response?.data || error.message);
+    toast.error(error.response?.data?.message || "Error sending data to backend");
+  } finally {
+    dispatch(setLoader(false));
+  }
+  setEmail("");
+  setPassword("");
+};
+
   const SignupHandler = async (event) => {
     event.preventDefault();
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
@@ -37,7 +83,7 @@ const Login = () => {
   
     try {
       dispatch(setLoader(true));
-      console.log("loading state",loading);
+      console.log("loading state",loader);
       const response = await axios.post("http://localhost:4000/api/v1/auth/sendOtp", requestData, {
         headers: {
           "Content-Type": "application/json", 
@@ -80,7 +126,7 @@ const Login = () => {
           style={{ boxShadow: "0 0 30px rgba(0,0,0,0.2)" }}
         >
           <div className={`${isActive? "right-[50%] delay-[1200ms] max650:right-0 max650:bottom-[30%]" : "right-0 delay-[1000ms]"} login  max650:w-[100%] max650:h-[70%] max650:bottom-0 absolute w-[50%] h-[100%] bg-[#fff] flex items-center text-gray-700 text-center p-[40px] z-[1] transition-all ease-in-out duration-[600ms], visibility`}>
-            <form className=" w-[100%]" action="">
+            <form className=" w-[100%]" onSubmit={LoginHandler}>
               <h1 className="text-4xl -mt-[10px] -mb-[10px]">
                 <b>Login</b>
               </h1>
@@ -90,6 +136,9 @@ const Login = () => {
                   type="text"
                   placeholder="Username"
                   required
+                  onChange={(e)=>setEmail(e.target.value)}
+                  name="email"
+                  value={email}
                 />
                 <i className="bx bxs-user absolute right-5 top-[50%] transform -translate-y-[50%] text-xl text-[#888]"></i>
               </div>
@@ -99,6 +148,9 @@ const Login = () => {
                   type="password"
                   placeholder="Password"
                   required
+                  onChange={(e)=>setPassword(e.target.value)}
+                  name="password"
+                  value={password}
                 />
                 <i className="bx bxs-lock-alt absolute right-5 top-[50%] transform -translate-y-[50%] text-xl text-[#888]"></i>
               </div>

@@ -33,6 +33,7 @@ const ForgetPassword = () => {
 
       if (response.data.success) {
         localStorage.setItem("email", email);
+        localStorage.setItem("isForgetPassword",true);
         toast.success("Sent OTP Successfully!");
         navigate("/otp");
       } else {
