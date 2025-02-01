@@ -1,10 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
+const storedUser = localStorage.getItem("userData");
+const userData = storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null
 
 const initialState = {
-  user: null,
-  token: null,
-  isAuthenticated: false,
-  loading:false,
+  user:userData,
+  token: localStorage.getItem("token") || null,
+  isAuthenticated: !!localStorage.getItem("token") && storedUser,
+  loader: false,
+  registeredUser:null,
 };
 
 const authSlice = createSlice({
@@ -12,27 +15,36 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action) => {
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      state.isAuthenticated = true;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.user= action.payload.user;
+        localStorage.setItem("token", action.payload.token);
+        localStorage.setItem("userData",JSON.stringify(action.payload.user));
     },
     logout: (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
+      localStorage.removeItem("userData");
+      localStorage.removeItem("token");
     },
     setUser: (state, action) => {
+      if(state.registeredUser){
       state.user = action.payload;
+      localStorage.setItem("userData", JSON.stringify(action.payload));
+      }
     },
     registerUser: (state, action) => {
-        state.user = action.payload; 
-      },
-    setLoading: (state, action) => {
-        state.loading = action.payload; 
-      },
+      state.registeredUser = action.payload;
+    },
+
+    setLoader: (state, action) => {
+      state.loader = action.payload;
+    },
   },
 });
 
-export const { login, logout, setUser,registerUser,setLoading,loading } = authSlice.actions;
+// Export actions
+export const { login, logout, setUser, registerUser, setLoader } = authSlice.actions;
 
 export default authSlice.reducer;

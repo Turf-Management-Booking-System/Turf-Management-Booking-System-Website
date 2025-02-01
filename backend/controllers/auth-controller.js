@@ -104,12 +104,19 @@ exports.login = async(req,res)=>{
             "expiresIn":"6h"
         });
         console.log("token",token);
-        // return the response
-        return res.status(200).json({
-            status:true,
-            message:"user logged in successfully!",
-            token,
-        })
+       // return the response
+res.cookie('token', token, {
+    httpOnly: true, // Ensures cookie is only accessible by the server
+    secure: false, // Only sends cookie over HTTPS in production
+    maxAge: 24 * 60 * 60 * 1000, // Cookie expiration: 1 day
+    sameSite: 'Lax', 
+  }).status(200).json({
+    success: true,
+    message: "User logged in successfully!",
+    token,
+    user:userExit
+  });
+  
 
     }catch(error){
         if(error.name === "ValidationError"){
