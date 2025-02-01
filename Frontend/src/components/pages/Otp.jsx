@@ -10,7 +10,6 @@ const Otp = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const registeredUser = useSelector((state) => state.auth.registeredUser);
   const dispatch = useDispatch();
-  console.log("user from redux",registeredUser.email)
   if (!registeredUser?.email) {
     toast.error("Email not found. Please ensure you are logged in.");
     return;

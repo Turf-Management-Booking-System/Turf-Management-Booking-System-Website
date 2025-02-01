@@ -32,7 +32,7 @@ const App = () => {
   const loader = useSelector((state) => state.auth.loader);
 
   // Check if current page is authentication-related
-  const isAuthPage = ["/login", "/otp", "/forgetPassword", "/updatePassword", "/changePassword"].includes(location.pathname);
+  const isAuthPage = ["/login", "/otp", "/forgetpassword", "/updatepassword", "/changepassword"].includes(location.pathname);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1500);
@@ -58,13 +58,13 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/otp" element={<Otp />} />
-        <Route path="/forgetPassword" element={<ForgetPassword />} />
+        <Route path="/forgetpassword" element={<ForgetPassword />} />
         <Route element={<PrivateRoute />}>
-          <Route path="/updatePassword" element={<UpdatePassword />} />
-          <Route path="/changePassword" element={<ChangePassword />} />
+          <Route path="/changepassword" element={<ChangePassword />} />
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
         <Route path="/contact" element={<Contact />} />
+        <Route path="/updatepassword" element={<UpdatePassword/>}/>
         <Route path="/about" element={<About />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>

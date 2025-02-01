@@ -10,7 +10,7 @@ router.post("/login",login);
 router.post("/changePassword",auth,isUser,changePassword);
 router.post("/sendOtp",sendOtp);
 router.post("/verifyOtp",verifyOtp);
-router.post("/forgetPassword",auth,isUser,forgetPassword);
+router.post("/forgetPassword",forgetPassword);
 
 // protected routes 
 router.get("/admin",auth,isAdmin,(req,res)=>{
