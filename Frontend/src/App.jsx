@@ -19,27 +19,12 @@ import PrivateRoute from "./routes/PrivateRoute";
 import PageNotFound from "./components/pages/PageNotFound";
 
 const App = () => {
-<<<<<<< HEAD
-=======
   const dispatch = useDispatch(); 
-  const [loading, setLoading] = useState(true);
->>>>>>> 567c8181214571acc162877a0973f3358095ef48
   const location = useLocation();
   const loader = useSelector((state) => state.auth.loader);
 
-<<<<<<< HEAD
-  const isAuthPage = ["/login", "/otp", "/forgetpassword", "/updatepassword", "/changepassword"].includes(location.pathname);
-
-  return (
-    <>
-=======
   // Check if current page is authentication-related
   const isAuthPage = ["/login", "/otp", "/forgetpassword", "/updatepassword", "/changepassword"].includes(location.pathname);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1500);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -50,12 +35,9 @@ const App = () => {
     }
   }, [dispatch]); 
 
-  if (loading) return <Preloader />;
-
   return (
     <>
       {loader && <Spinner />}
->>>>>>> 567c8181214571acc162877a0973f3358095ef48
       {!isAuthPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
@@ -71,10 +53,7 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
-<<<<<<< HEAD
-=======
         
->>>>>>> 567c8181214571acc162877a0973f3358095ef48
       {!isAuthPage && <Footer />}
     </>
   );

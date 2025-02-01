@@ -4,14 +4,11 @@ import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../../slices/authSlice";
-import { setLoader } from "../../slices/authSlice";
-import { login } from "../../slices/authSlice";
-import { setUser } from "../../slices/authSlice";
+import { setLoading } from "../../slices/authSlice";
 const Login = () => {
   const [isActive, setIsActive] = useState(false);
-  const loader = useSelector(state=>state.auth.loader);
-  const[email,setEmail]=useState('');
-  const[password,setPassword]=useState("");
+  const loading = useSelector(state=>state.auth.loading);
+  console.log("loading value ",loading)
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData,setFormData] = useState({
@@ -29,49 +26,6 @@ const Login = () => {
         }
       })
   }
-  // login handler
-  const LoginHandler = async (event) => {
-    event.preventDefault();
-    if ( !email || !password) {
-      return toast.error("Please enter the required fields!");
-    }
-    const requestData = {
-      email: email, 
-      password:password
-    };
-  
-    try {
-      dispatch(setLoader(true));
-      const response = await axios.post("http://localhost:4000/api/v1/auth/login", requestData, {
-        headers: {
-          "Content-Type": "application/json", 
-        },
-        withCredentials: true 
-
-      });
-      console.log("Response from backend:", response.data);
-      if (response.data.success) {
-        toast.success("User Logged in Successfully!");
-        dispatch(login({
-          token:response.data.token,
-          user:response.data.user,
-        }));
-        dispatch(setUser(response.data.user));
-        navigate("/dashboard");
-      } else {
-        toast.error(response.data.message || "Something went wrong");
-      }
-    } catch (error) {
-      console.error("Error:", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Error sending data to backend");
-    }
-    finally {
-      dispatch(setLoader(false));
-    }
-    setEmail("");
-    setPassword("");
-  };
-  // signup handler
   const SignupHandler = async (event) => {
     event.preventDefault();
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
@@ -82,8 +36,8 @@ const Login = () => {
     };
   
     try {
-      dispatch(setLoader(true));
-      console.log("loading state",loader);
+      dispatch(setLoading(true));
+      console.log("loading state",loading);
       const response = await axios.post("http://localhost:4000/api/v1/auth/sendOtp", requestData, {
         headers: {
           "Content-Type": "application/json", 
@@ -97,7 +51,7 @@ const Login = () => {
       if (response.data.success) {
         toast.success("OTP sent successfully!");
         dispatch(registerUser(formData));
-        console.log("registerDtaa",registerUser);
+        console.log("registerDtaa",formData);
         navigate("/otp");
       } else {
         toast.error(response.data.message || "Something went wrong");
@@ -107,7 +61,7 @@ const Login = () => {
       toast.error(error.response?.data?.message || "Error sending data to backend");
     }
     finally {
-      dispatch(setLoader(false));
+      dispatch(setLoading(false));
     }
     setFormData({
       firstName: "",
@@ -126,7 +80,7 @@ const Login = () => {
           style={{ boxShadow: "0 0 30px rgba(0,0,0,0.2)" }}
         >
           <div className={`${isActive? "right-[50%] delay-[1200ms] max650:right-0 max650:bottom-[30%]" : "right-0 delay-[1000ms]"} login  max650:w-[100%] max650:h-[70%] max650:bottom-0 absolute w-[50%] h-[100%] bg-[#fff] flex items-center text-gray-700 text-center p-[40px] z-[1] transition-all ease-in-out duration-[600ms], visibility`}>
-            <form className=" w-[100%]" onSubmit={LoginHandler}>
+            <form className=" w-[100%]" action="">
               <h1 className="text-4xl -mt-[10px] -mb-[10px]">
                 <b>Login</b>
               </h1>
@@ -135,9 +89,6 @@ const Login = () => {
                   className="w-[100%] pl-[20px] pr-[50px] pt-[13px] pb-[13px] bg-[#eee] rounded-xl border-none outline-none text-[16px] text-[#333] font-medium"
                   type="text"
                   placeholder="Username"
-                  onChange={(e)=>setEmail(e.target.value)}
-                  value={email}
-                  name="email"
                   required
                 />
                 <i className="bx bxs-user absolute right-5 top-[50%] transform -translate-y-[50%] text-xl text-[#888]"></i>
@@ -148,21 +99,18 @@ const Login = () => {
                   type="password"
                   placeholder="Password"
                   required
-                  onChange={(e)=>setPassword(e.target.value)}
-                  value={password}
-                  name="password"
                 />
                 <i className="bx bxs-lock-alt absolute right-5 top-[50%] transform -translate-y-[50%] text-xl text-[#888]"></i>
               </div>
               <div className="-mt-[15px] mb-[15px]">
-                <a href="/forgetpassword" className="text-[14.5px] text-green-700  no-underline" >
+                <Link to="/forgetpassword" className="text-[14.5px] text-green-700  no-underline" >
                   Forgot password ?
-                </a>
+                </Link>
               </div>
               <button
                 type="submit"
-                className="w-[100%] h-[48px] bg-gradient-to-r from-green-300 via-lime-400 to-green-500 rounded-lg border-none cursor-pointer text-[16px] text-[#fff] font-semibold"
-                style={{ boxShadow: "0 0 10px rgba(0,0.0,.2)" }}
+                className="w-[100%] h-[48px] bg-deepForestGreen rounded-lg border-none cursor-pointer text-[16px] text-[#fff] font-semibold"
+                style={{ boxShadow: "0 0 10px rgba(0,0,0,0.2)" }}
               >
                 Login
               </button>
@@ -170,18 +118,18 @@ const Login = () => {
                 or login with social platforms
               </p>
               <div className="flex justify-center">
-                <a href="#">
+                <Link to="https://www.google.com/">
                   <i className="bx bxl-google inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
-                <a href="#">
+                </Link>
+                <Link to="https://www.facebook.com/">
                   <i className="bx bxl-facebook inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
-                <a href="#">
+                </Link>
+                <Link to="https://www.github.com/">
                   <i className="bx bxl-github inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
-                <a href="#">
+                </Link>
+                <Link to="https://www.linkedin.com/">
                   <i className="bx bxl-linkedin inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
+                </Link>
               </div>
             </form>
           </div>
@@ -245,7 +193,7 @@ const Login = () => {
               <button
                 type="submit"
                 className="w-[100%] h-[48px] bg-deepForestGreen rounded-lg border-none cursor-pointer text-[16px] text-[#fff] font-semibold"
-                style={{ boxShadow: "0 0 30px rgba(0,0.0,.2" }}
+                style={{ boxShadow: "0 0 30px rgba(0,0,0,0.2" }}
               >
                 Register
               </button>
@@ -253,18 +201,18 @@ const Login = () => {
                 or register with social platforms
               </p>
               <div className="flex justify-center">
-                <a href="#">
+              <Link to="https://www.google.com/">
                   <i className="bx bxl-google inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
-                <a href="#">
+                </Link>
+                <Link to="https://www.facebook.com/">
                   <i className="bx bxl-facebook inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
-                <a href="#">
+                </Link>
+                <Link to="https://www.github.com/">
                   <i className="bx bxl-github inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
-                <a href="#">
+                </Link>
+                <Link to="https://www.linkedin.com/">
                   <i className="bx bxl-linkedin inline-flex p-[10px] border-2 border-gray-300 rounded-lg text-[24px] text-[#333] no-underline ml-[8px] mr-[8px]"></i>
-                </a>
+                </Link>
               </div>
             </form>
           </div>
