@@ -1,4 +1,4 @@
-const { deleteModel } = require("mongoose");
+
 const Turf = require("../models/turf")
 // create turf
 exports.createTurf=async(req,res)=>{
@@ -187,3 +187,20 @@ exports.viewBookingById = async(req,res)=>{
 }
 // cancel booking
 // confirmation booking
+exports.getAllTurfLocations = async(req,res)=>{
+    try{
+      const turfLocations = await Turf.find({}).select("turfLocation");
+      console.log("turf locations",turfLocations);
+      return res.status(200).json({
+        success:true,
+        message:"Fetch the Turf Locations",
+        turf:turfLocations,
+      })
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Failed to Fetch Turf Locations",
+            error:error.message
+        })
+    }
+}

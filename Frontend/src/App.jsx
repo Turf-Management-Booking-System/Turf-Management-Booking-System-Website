@@ -17,6 +17,8 @@ import Dashboard from "./components/pages/Dashboard";
 import "../src/App.css";
 import PrivateRoute from "./routes/PrivateRoute";
 import PageNotFound from "./components/pages/PageNotFound";
+import { fetchTurfLocations } from "./components/common/turfLocation";
+import LocationPopup from "./components/common/locationPopup";
 
 const App = () => {
   const dispatch = useDispatch(); 
@@ -37,9 +39,12 @@ const App = () => {
       }));
     }
   }, [dispatch]); 
-
+   useEffect( ()=>{
+     dispatch(fetchTurfLocations()); 
+   },[dispatch])
   return (
     <>
+       <LocationPopup/>
       {loader && <Spinner />}
       {!isAuthPage && <Navbar />}
       <Routes>
