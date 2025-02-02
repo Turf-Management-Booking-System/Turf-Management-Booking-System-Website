@@ -328,12 +328,12 @@ exports.verifyOtp = async (req, res) => {
 exports.resetPassword = async(req,res)=>{
     try{
     // extract the data from the user
-    const {email,otp} = req.body;
+    const {newPassword,confirmPassword,email} = req.body;
     // validate the data
-    if(!email||!otp){
+    if(!email||!newPassword||!confirmPassword){
         return res.status(400).json({
             success:false,
-            message:"PLease enter the mail properly!"
+            message:"PLease enter the data properly!"
         })
     }
     // check if the user exits 
@@ -344,37 +344,17 @@ exports.resetPassword = async(req,res)=>{
             message:"user not exits or found"
         })
     }
-    // find otp in the databse
-    const otpRecord = await Otp.findOne({
-        email,
-    });
-    if(!otpRecord){
-        return res.status(400).json({
-            success:false,
-            message:"No recoed found!"
-        })
-    }
-    // check the otp is expries 
-    if( otpRecord.expiresAt < new Date()
-    ){
-      await Otp.deleteOne({email})
-      return res.status(400).json({
-        success:false,
-        message:"Otp expired Please request a new one"
-      })
-     }
-    // check if otp matches
-     if(otp!==otpRecord.otpCode){{
-        return res.status(400).json({
-            success:false,
-            message:"OTP does not match"
-        })
-     }}
-    //  otp is valid
-    await Otp.deleteOne({email});
     // hashed the password and update in the databse
-
+    const hashedPassword= await bcrypt.hash(newPassword,10);
+    // update in the databse
+    userExit.password = hashedPassword;
+    await userExit.save();
     // return the response
+    return res.status(200).json({
+        success:true,
+        message:"password reset successfully",
+        password:hashedPassword,
+    })
      
     }catch(error){
         return res.status(500).json({

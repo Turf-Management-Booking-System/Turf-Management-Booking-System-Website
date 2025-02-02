@@ -1,20 +1,23 @@
-import React, { useId, useState } from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import axios from "axios";
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { registerUser } from '../../slices/authSlice';
-import { setLoader } from '../../slices/authSlice';
+import { registerUser, setLoader } from '../../slices/authSlice';
+
 const Otp = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
-  const registeredUser = useSelector((state) => state.auth.registeredUser);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const registeredUser = useSelector((state) => state.auth.registeredUser);
+  const isForgetPassword = localStorage.getItem("isForgetPassword") === "true";
+
   if (!registeredUser?.email) {
     toast.error("Email not found. Please ensure you are logged in.");
     return;
   }
-  const navigate= useNavigate();
+
   // Handle input change
   const handleChange = (element, index) => {
     const value = element.value.replace(/[^0-9]/g, "");
@@ -47,50 +50,62 @@ const Otp = () => {
   };
 
   // Handle OTP submission
-   const newOtp=`${otp.join("")}`
-   const requestData = {
-    otp:newOtp,
-    email:registeredUser.email
-   }
-  console.log(requestData)
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const newOtp = otp.join("");
+    const requestData = {
+      otp: newOtp,
+      email: registeredUser.email,
+    };
+
     try {
       dispatch(setLoader(true));
       const response = await axios.post("http://localhost:4000/api/v1/auth/verifyOtp", requestData, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
-  
+
       if (response.data.success) {
         toast.success("OTP verified successfully!");
-  
-        // Call Signup API with correct structure
-        const signupResponse = await axios.post(
-          "http://localhost:4000/api/v1/auth/signup",
-          { ...registeredUser }, // Ensure correct payload
-          { headers: { "Content-Type": "application/json" }, withCredentials: true }
-        );
-        console.log("signup response ",signupResponse);
-        if (signupResponse.data?.success) {
-          console.log("Signup Response Data:", signupResponse.data); // Debugging log
-          dispatch(registerUser(signupResponse.data.user));
-          setTimeout(()=>{
-            toast.success("User created successfully!")
-          },2000)
-          navigate("/login")
-        } 
+        if (isForgetPassword) {
+          navigate("/updatePassword");
+        } else {
+          await signupVerification();
+        }
       } else {
-        console.log(response.data.message);
+        toast.error("Invalid OTP");
       }
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
       toast.error(error.response?.data?.message || "Error sending data to backend");
-    }finally{
+    } finally {
       dispatch(setLoader(false));
     }
   };
-  
+
+  const signupVerification = async () => {
+    try {
+      const signupResponse = await axios.post(
+        "http://localhost:4000/api/v1/auth/signup",
+        { ...registeredUser }, // Ensure correct payload
+        { headers: { "Content-Type": "application/json" }, withCredentials: true }
+      );
+
+      if (signupResponse.data?.success) {
+        dispatch(registerUser(signupResponse.data.user));
+        setTimeout(() => {
+          toast.success("User created successfully!");
+        }, 2000);
+        navigate("/login");
+      } else {
+        toast.error(signupResponse.data.message);
+      }
+    } catch (error) {
+      console.error("Signup Error:", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Signup failed");
+    }
+  };
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-green-100 via-lime-200 to-green-300">
       <div className="bg-white shadow-lg rounded-xl w-full max-w-md p-8 mx-4">

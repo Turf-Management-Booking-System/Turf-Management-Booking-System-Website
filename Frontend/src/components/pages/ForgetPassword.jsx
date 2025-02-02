@@ -6,21 +6,23 @@ import { toast } from "react-hot-toast";
 import axios from "axios";
 
 const ForgetPassword = () => {
-  const [email, setEmail] = useState(""); // Get email value
+  const [email, setEmail] = useState(""); 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
   };
-
+  const requestData={
+    email:email
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       dispatch(setLoader(true));
       const response = await axios.post(
         "http://localhost:4000/api/v1/auth/forgetPassword",
-        { email },
+        requestData,
         {
           headers: {
             "Content-Type": "application/json",
@@ -29,7 +31,7 @@ const ForgetPassword = () => {
         }
       );
 
-      console.log("Response from backend:", response.data);
+      console.log("Response from backend forgetPassword:", response.data);
 
       if (response.data.success) {
         localStorage.setItem("email", email);

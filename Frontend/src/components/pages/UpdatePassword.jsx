@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
+import { useDispatch } from "react-redux";
+import { setLoader } from "../../slices/authSlice";
+import axios from "axios";
+import {toast} from "react-hot-toast"
 const UpdatePassword = () => {
+  const dispatch = useDispatch();
   const [newPassword, setNewPassword] = useState(""); // State for new password
   const [confirmPassword, setConfirmPassword] = useState(""); // State for confirm password
   const [successMessage, setSuccessMessage] = useState(""); // State for success message
-
-  const handleSubmit = (e) => {
+  const email = localStorage.getItem("email");
+  let requestData;
+  const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent form reload
-  
+    
     if (newPassword !== confirmPassword) {
       setSuccessMessage("Passwords do not match!");
   
@@ -21,7 +26,12 @@ const UpdatePassword = () => {
   
       return; // Stop further execution
     }
-  
+    requestData ={
+      newPassword:newPassword,
+      confirmPassword:confirmPassword,
+      email:email,
+    }
+    await resetPasswordUpdate();
     setSuccessMessage("Password updated successfully!"); // Show success message
   
     // Clear input fields after success
@@ -31,7 +41,34 @@ const UpdatePassword = () => {
       setConfirmPassword("");
     }, 2000);
   };
-  
+  const resetPasswordUpdate =async ()=>{
+    try{
+      dispatch(setLoader(true));
+      const response = await axios.post("http://localhost:4000/api/v1/auth/resetPassword",
+        requestData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("response updated passowrd",response.data);
+      if(response.data?.success){
+        dispatch(setLoader(false));
+        localStorage.removeItem("isForgetPassword");
+        localStorage.removeItem("email");
+        toast.success("Password Update Successfully!")
+      }else{
+        toast.error("Can't Updated the password!")
+      }
+    }catch(error){
+       console.log("Error",error.response?.data || error.message);
+       toast.error(error.response?.data?.message||"Error sending Data to backend")
+    }finally{
+      dispatch(setLoader(false));
+    }
+  }
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-deepForestGreen">

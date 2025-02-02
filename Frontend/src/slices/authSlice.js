@@ -36,6 +36,7 @@ const authSlice = createSlice({
     },
     registerUser: (state, action) => {
       state.registeredUser = action.payload;
+      localStorage.setItem("userData",JSON.stringify(action.payload))
     },
 
     setLoader: (state, action) => {
