@@ -5,6 +5,8 @@ const Otp = require("../models/otp");
 const Profile = require("../models/additionalFields");
 const sendEmail = require("../config/nodeMailer");
 const { sendOTPEmail } = require("../mail/templates/sendOTPEmail");
+const { sendThankYouEmail } = require("../mail/templates/sendThanYouMail");
+const Contact = require("../models/contact")
 require("dotenv").config();
 // signup controller
 exports.signup = async(req,res)=>{
@@ -425,3 +427,46 @@ exports.forgetPassword = async (req, res) => {
         });
     }
 };
+exports.contactMe =async (req,res)=>{
+        try{
+            const {fullName,email,message} = req.body;
+            // validate the data
+            if(!fullName ||!email ||!message){
+                return res.status(401).json({
+                    success:false,
+                    message:"Please provide the Required Fields",
+                })
+            }
+            // creating the databse to store user message in contact model
+            const contact = await Contact.create({
+                fullName,
+                email,
+                message
+            });
+            // sending email to the user
+            try{
+                const emailContent = sendThankYouEmail(fullName);
+                await sendEmail(email,"Thank For Contact!",emailContent);
+               }catch(error){
+               console.log("error",error);
+               return res.status(500).json({
+                   success:false,
+                   message:error.message
+               })
+               }
+            // return response 
+            return res.status(200).json({
+                success:true,
+                message:"Thanks For Contacting!",
+                conatctMessage:contact,
+            })
+
+
+        }catch(error){
+            return res.status(500).json({
+                success:false,
+                message:"Error while contacting Us! Please try again later!",
+                error:error.message
+            })
+        }
+}

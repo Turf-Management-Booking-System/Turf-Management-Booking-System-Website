@@ -1,9 +1,9 @@
-const sendOtpEmail = (otp) => {
+const sendThankYouEmail = (fullName) => {
     return `<!DOCTYPE html>
     <html>
     <head>
         <meta charset="UTF-8">
-        <title>OTP Sent Successfully</title>
+        <title>Thank You for Contacting Us</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -42,13 +42,12 @@ const sendOtpEmail = (otp) => {
             <a href="https://images.vexels.com/media/users/3/197720/raw/fc507e66f92633eb77d54a6000aa7829-online-learning-logo-template.jpg">
                 <img class="logo" src="" alt="kickonturf logo" />
             </a>
-            <div class="message">OTP Sent Successfully!</div>
+            <div class="message">Thank You for Contacting Us!</div>
             <div class="body">
-                <p>Dear User,</p>
-                <p>Your OTP is: <span class="highlight">${otp}</span></p>
-                <p>If you did not request this OTP, please contact us immediately to secure your account.</p>
-                <p>Thank you for choosing our service. Your security is our top priority, and we're dedicated to keeping your account safe.</p>
-                <p>Stay tuned for more updates and features that will enhance your experience with us.</p>
+                <p>Dear</p><span>${fullName}</span>
+                <p>Thank you for reaching out to us. We appreciate your interest and will get back to you shortly.</p>
+                <p>Your inquiry is important to us, and we are committed to providing you with the best possible assistance.</p>
+                <p>In the meantime, feel free to explore our website or contact us for any urgent matters.</p>
             </div>
             <div class="support">
                 If you have any questions or need further assistance, feel free to reach us at 
@@ -59,4 +58,4 @@ const sendOtpEmail = (otp) => {
     </html>`;
 };
 
-module.exports = { sendOtpEmail };
+module.exports = { sendThankYouEmail };

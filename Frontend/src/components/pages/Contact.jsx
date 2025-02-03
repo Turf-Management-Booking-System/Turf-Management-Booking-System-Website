@@ -1,11 +1,50 @@
-import React from "react";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { setLoader } from "../../slices/authSlice";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const ContactForm = () => {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const dispatch = useDispatch();
+
+  const requestData = {
+    fullName: fullName,
+    email: email,
+    message: message
+  };
+
+  const contactHandler = async (e) => {
+    e.preventDefault();
+    try {
+      dispatch(setLoader(true));
+      const response = await axios.post("http://localhost:4000/api/v1/auth/contactMe", requestData, {
+        headers: {
+          "Content-Type": "application/json",
+          withCredentials: true        
+        }
+      });
+      console.log("response from contact", response.data);
+      if (response.data.success) {
+        toast.success("Thanks For Contacting Us!");
+        setFullName("");
+        setEmail("");
+        setMessage("")
+      }
+    } catch (error) {
+      console.log(error.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || "Something Went Wrong!");
+    } finally {
+      dispatch(setLoader(false));
+    }
+  };
+
   return (
-    <div className=" min-h-screen flex items-center justify-center bg-gradient-to-r from-green-200 via-lime-200 to-green-400 text-white py-12">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-200 via-lime-200 to-green-400 text-white py-12">
       <div className="flex flex-col md:flex-row gap-16 p-8 w-full max-w-7xl m-14">
         {/* Left Section - Contact Information */}
-
         <div className="space-y-12 w-full md:w-1/2">
           {/* Address */}
           <div className="flex items-start gap-4">
@@ -71,7 +110,7 @@ const ContactForm = () => {
           <h2 className="text-3xl font-bold mb-6 text-gray-800">
             Send Message
           </h2>
-          <form className="space-y-8">
+          <form className="space-y-8" onSubmit={contactHandler}>
             {/* Full Name Input */}
             <div className="relative">
               <input
@@ -79,6 +118,9 @@ const ContactForm = () => {
                 className="peer w-full pt-6 pb-1 bg-transparent border-b-2 border-gray-300 text-gray-800 focus:outline-none focus:border-green-400"
                 placeholder=" "
                 required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                name="fullName"
               />
               <label
                 className="absolute left-0 top-1 text-gray-400 text-sm transition-all peer-placeholder-shown:top-7 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:text-sm peer-focus:text-green-400"
@@ -94,6 +136,9 @@ const ContactForm = () => {
                 className="peer w-full pt-6 pb-1 bg-transparent border-b-2 border-gray-300 text-gray-800 focus:outline-none focus:border-green-400"
                 placeholder=" "
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                name="email"
               />
               <label
                 className="absolute left-0 top-1 text-gray-400 text-sm transition-all peer-placeholder-shown:top-7 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:text-sm peer-focus:text-green-400"
@@ -109,6 +154,9 @@ const ContactForm = () => {
                 className="peer w-full pt-6 pb-1 bg-transparent border-b-2 border-gray-300 text-gray-800 focus:outline-none focus:border-green-400"
                 placeholder=" "
                 required
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                name="message"
               ></textarea>
               <label
                 className="absolute left-0 top-1 text-gray-400 text-sm transition-all peer-placeholder-shown:top-7 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:text-sm peer-focus:text-green-400"

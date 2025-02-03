@@ -85,6 +85,7 @@ const Otp = () => {
 
   const signupVerification = async () => {
     try {
+      dispatch(setLoader(true));
       const signupResponse = await axios.post(
         "http://localhost:4000/api/v1/auth/signup",
         { ...registeredUser }, // Ensure correct payload
@@ -103,9 +104,40 @@ const Otp = () => {
     } catch (error) {
       console.error("Signup Error:", error.response?.data || error.message);
       toast.error(error.response?.data?.message || "Signup failed");
+    }finally{
+      dispatch(setLoader(false));
     }
   };
+   const resentOtp =async()=>{
+    const requestData={
+      email:registeredUser.email
+    }
+    try {
+      dispatch(setLoader(true));
+      const response = await axios.post("http://localhost:4000/api/v1/auth/sendOtp", requestData, {
+        headers: {
+          "Content-Type": "application/json", 
+        },
+        withCredentials: true 
 
+      });
+  
+      console.log("Response from backend:", response.data);
+  
+      if (response.data.success) {
+        toast.success("OTP sent successfully!");
+        
+      } else {
+        toast.error(response.data.message || "Something went wrong");
+      }
+    } catch (error) {
+      console.error("Error:", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Error sending data to backend");
+    }
+    finally {
+      dispatch(setLoader(false));
+    }
+   }
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-green-100 via-lime-200 to-green-300">
       <div className="bg-white shadow-lg rounded-xl w-full max-w-md p-8 mx-4">
@@ -135,7 +167,9 @@ const Otp = () => {
           </button>
         </form>
         <p className="text-sm text-gray-500 text-center mt-4">
-          Didn't receive the OTP? <button className="text-green-600 underline">Resend OTP</button>
+          Didn't receive the OTP? 
+          <button className="text-green-600 underline" onClick={resentOtp}>Resend OTP</button>
+          
         </p>
       </div>
     </div>
