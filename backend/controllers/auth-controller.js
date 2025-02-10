@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const Otp = require("../models/otp");
 const Profile = require("../models/additionalFields");
 const sendEmail = require("../config/nodeMailer");
-const { sendOTPEmail } = require("../mail/templates/sendOTPEmail");
+const { sendOtpEmail } = require("../mail/templates/sendOtpEmail");
 const { sendThankYouEmail } = require("../mail/templates/sendThanYouMail");
 const Contact = require("../models/contact")
 require("dotenv").config();
@@ -244,7 +244,7 @@ exports.sendOtp = async(req,res)=>{
         console.log("otp saved",otp);
         // send otp Via email
         try{
-         const emailContent = sendOTPEmail(otp);
+         const emailContent = sendOtpEmail(otp);
          await sendEmail(email,"Otp send successfully",emailContent);
         }catch(error){
         console.log("error",error);
@@ -403,7 +403,7 @@ exports.forgetPassword = async (req, res) => {
 
         // TODO: Send the OTP via email (integrate your email service here
         try{
-            const emailContent = sendOTPEmail(otpCode);
+            const emailContent = sendOtpEmail(otpCode);
             await sendEmail(email,"Otp send successfully",emailContent);
            }catch(error){
            console.log("error",error);
