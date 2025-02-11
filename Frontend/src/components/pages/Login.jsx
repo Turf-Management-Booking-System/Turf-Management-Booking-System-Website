@@ -7,8 +7,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { registerUser, setLoader } from "../../slices/authSlice";
 import { login } from "../../slices/authSlice";
 import { setUser } from "../../slices/authSlice";
+
 const Login = () => {
   const [isActive, setIsActive] = useState(false);
+  const [loginPasswordVisible,setLoginPasswordVisible] = useState(false)
+  const [registerPasswordVisible,setRegisterPasswordVisible] = useState(false)
   const loader = useSelector(state=>state.auth.loader);
   console.log("loading value ",loader);
   const [email,setEmail] = useState("");
@@ -22,6 +25,15 @@ const Login = () => {
     password:"",
     role:"Player"
   });
+
+  const togglePasswordVisibility = (field) => {
+    if(field === "login"){
+      setLoginPasswordVisible(!loginPasswordVisible);
+    }else if (field === "register"){
+      setRegisterPasswordVisible(!registerPasswordVisible);
+    }
+  }
+
   const formHandler =(event)=>{
       setFormData(prev=>{
         return{
@@ -118,7 +130,7 @@ const LoginHandler = async (event) => {
   };
   return (
     <>
-      <div className="flex justify-center items-center min-h-screen bg-deepForestGreen mt-10">
+      <div className="flex justify-center items-center min-h-screen bg-deepForestGreen dark:bg-black mt-10">
         <div
           className={`relative ${
             isActive ? "active" : ""
@@ -128,7 +140,7 @@ const LoginHandler = async (event) => {
           <div className={`${isActive? "right-[50%] delay-[1200ms] max650:right-0 max650:bottom-[30%]" : "right-0 delay-[1000ms]"} login  max650:w-[100%] max650:h-[70%] max650:bottom-0 absolute w-[50%] h-[100%] bg-[#fff] flex items-center text-gray-700 text-center p-[40px] z-[1] transition-all ease-in-out duration-[600ms], visibility`}>
             <form className=" w-[100%]" onSubmit={LoginHandler}>
               <h1 className="text-4xl -mt-[10px] -mb-[10px]">
-                <b>Login</b>
+                <b className="font-orbitron">Login</b>
               </h1>
               <div className="relative mt-[30px] mb-[30px]">
                 <input
@@ -144,15 +156,22 @@ const LoginHandler = async (event) => {
               </div>
               <div className="relative mt-[30px] mb-[30px]">
                 <input
+                  type={loginPasswordVisible? "text" : "password"}
                   className="w-[100%] pl-[20px]  pr-[50px] pt-[13px] pb-[13px] bg-[#eee] rounded-xl border-none outline-none text-[16px] text-[#333] font-medium"
-                  type="password"
+                  id="loginpassword"
                   placeholder="Password"
                   required
                   onChange={(e)=>setPassword(e.target.value)}
                   name="password"
                   value={password}
                 />
-                <i className="bx bxs-lock-alt absolute right-5 top-[50%] transform -translate-y-[50%] text-xl text-[#888]"></i>
+                <button 
+                  type="button"
+                  onClick={() => togglePasswordVisibility("login")}
+                  className="absolute right-5 top-[50%] transform -translate-y-[50%] text-xl text-[#888]"
+                >
+                <i className={`bx ${loginPasswordVisible ? "bxs-hide" : "bxs-show"}`}></i>
+              </button>
               </div>
               <div className="-mt-[15px] mb-[15px]">
                 <Link to="/forgetpassword" className="text-[14.5px] text-green-700  no-underline" >
@@ -161,7 +180,7 @@ const LoginHandler = async (event) => {
               </div>
               <button
                 type="submit"
-                className="w-[100%] h-[48px] bg-deepForestGreen rounded-lg border-none cursor-pointer text-[16px] text-[#fff] font-semibold"
+                className="w-[100%] h-[48px] bg-green-700 rounded-lg border-none cursor-pointer text-[16px] text-[#fff] font-semibold"
                 style={{ boxShadow: "0 0 10px rgba(0,0,0,0.2)" }}
               >
                 Login
@@ -191,7 +210,7 @@ const LoginHandler = async (event) => {
           >
             <form className=" w-[100%]" onSubmit={SignupHandler}>
               <h1 className="text-4xl max650:m-6 -mt-[10px] -mb-[10px]">
-                <b>Registration</b>
+                <b className="font-orbitron">Registration</b>
               </h1>
               <div className="relative mt-[30px] mb-[20px]">
                 <input
@@ -231,20 +250,27 @@ const LoginHandler = async (event) => {
               </div>
               <div className="relative mt-[20px] mb-[20px]">
                 <input
-                  className="w-[100%] pl-[20px]  pr-[50px] pt-[13px] pb-[13px] bg-[#eee] rounded-xl border-none outline-none text-[16px] text-[#333] font-medium"
-                  type="password"
+                  className=" w-[100%] pl-[20px]  pr-[50px] pt-[13px] pb-[13px] bg-[#eee] rounded-xl border-none outline-none text-[16px] text-[#333] font-medium"
+                  type={registerPasswordVisible ? "text" : "password"}
+                  id="registerPassword"
                   placeholder="Password"
                   onChange={formHandler}
                   value={formData.password}
                   name="password"
                   required
                 />
-                <i className="bx bxs-lock-alt absolute right-5 top-[50%] transform -translate-y-[50%] text-xl text-[#888]"></i>
+                <button 
+                  type="button"
+                  onClick={() => togglePasswordVisibility("register")}
+                  className="absolute right-5 top-[50%] transform -translate-y-[50%] text-xl text-[#888]"
+                >
+                <i className={`bx ${registerPasswordVisible ? "bxs-hide" : "bxs-show"}`}></i>
+              </button>
               </div>
               
               <button
                 type="submit"
-                className="w-[100%] h-[48px] bg-deepForestGreen rounded-lg border-none cursor-pointer text-[16px] text-[#fff] font-semibold"
+                className="w-[100%] h-[48px] bg-green-700 rounded-lg border-none cursor-pointer text-[16px] text-[#fff] font-semibold"
                 style={{ boxShadow: "0 0 30px rgba(0,0,0,0.2" }}
               >
                 Register
@@ -280,9 +306,9 @@ const LoginHandler = async (event) => {
            items-center z-[2] ${isActive ? "left-[-50%] delay-[600ms] max650:left-0 max650:top-[-30%]" : " left-0 delay-[1200ms]"}`}
             >
               <h1 className="text-4xl -mt-[10px] -mb-[5px]">
-                <b>Hello, Welcome!</b>
+                <b className="font-orbitron">Hello, Welcome!</b>
               </h1>
-              <p className="text-[14.5px] mt-[15px] mb-[20px] ">
+              <p className="font-poppins text-[16px] mt-[15px] mb-[20px] ">
                 Don't have an account ?
               </p>
               <button
@@ -295,9 +321,9 @@ const LoginHandler = async (event) => {
             <div className={`toggle-panel max650:right-0 max650:bottom-[-30%] max650:w-[100%] max650:h-[30%] absolute w-[50%] h-[100%]  text-[#fff] flex flex-col justify-center items-center
              z-[2] transition-all duration-[600ms] ease-in-out  ${isActive ? "right-[0] delay-[1200ms] max650:bottom-[0]" : "right-[-50%] delay-[600ms]"}`}>
               <h1 className="text-4xl -mt-[10px] -mb-[5px]">
-                <b>Welcome Back</b>
+                <b className="font-orbitron">Welcome Back</b>
               </h1>
-              <p className="text-[14.5px] mt-[15px] mb-[20px] ">
+              <p className="text-[16px] font-poppins mt-[15px] mb-[20px] ">
                 Already have an account ?
               </p>
               <button

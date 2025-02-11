@@ -3,12 +3,12 @@ import React from "react";
 function footer() {
   return (
     <>
-      <footer className="bg-gradient-to-r from-green-300 to-lime-200 text-gray-800 py-10">
+      <footer className="bg-deepForestGreen text-gray-800 py-10">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo & About Section */}
           <div>
-            <h3 className="text-xl font-bold mb-4">KickOnTurf</h3>
-            <p className="text-sm">
+            <h3 className="text-xl font-bold text-green-400 mb-4">KickOnTurf</h3>
+            <p className="text-sm font-poppins">
               Your go-to platform for managing, booking, and scheduling sports
               turfs seamlessly.
             </p>

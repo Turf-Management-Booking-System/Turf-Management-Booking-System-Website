@@ -1,107 +1,156 @@
-import React, { useState,useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRightToBracket, faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
-import {useNavigate , Link} from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../slices/authSlice';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../slices/authSlice";
+
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [darkMode,setDarkMode] = useState(false);
- const isAuthenticated = useSelector(state=>state.auth.isAuthenticated);
- const dispatch= useDispatch();
-const navigate = useNavigate();
-const handleLoginClick = () => {
-  navigate("/login")
-}
+  const [darkMode, setDarkMode] = useState(
+    localStorage.getItem("darkMode") === "true"
+  );
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   useEffect(() => {
     if (darkMode) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
+    localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
-  const handleMenu = () => { 
-    setMenuOpen((prevState) => !prevState);
+  const handleMenu = () => setMenuOpen((prev) => !prev);
+  const toggleDarkMode = () => setDarkMode((prev) => !prev);
+  const handleLogoutClick = (event) => {
+    event.preventDefault();
+    dispatch(logout());
   };
 
-  const toggleDarkMode = () => {
-    setDarkMode((prev) => !prev )
-  }
-
- const handleLogoutClick=(event)=>{
-  event.preventDefault();
-  dispatch(logout());
- }
   return (
-    <nav className=" p-3 flex bg-[#065F46] text-white justify-between items-center fixed top-0 left-0 right-0 z-20 shadow-md">
-      {/* Logo(Desktop) */}
-      <Link to="/" className=" flex gap-2 items-center flex-1">
-        <span className="text-lg font-orbitron font-bold">KickOnTurf</span>
+    <nav className="p-3 flex bg-[#065F46] dark:bg-gray-900 text-white justify-between items-center fixed top-0 left-0 right-0 z-20 shadow-md">
+      {/* Logo */}
+      <Link to="/" className="flex gap-2 items-center flex-1 ml-3">
+        <span className="text-xl font-orbitron font-bold">KickOnTurf</span>
       </Link>
 
-      {/* Navbar(Desktop) */}
+      {/* Navbar Links (Desktop) */}
       <div id="nav-menu" className="hidden lg:flex gap-12">
-        <Link to="/" className="font-medium font-bebas hover:text-green-800">Home</Link>
-        <Link to="/about" className="font-medium font-montserrat hover:text-green-800">About</Link>
-        <Link to="/contact" className="font-medium font-orbitron hover:text-green-800">Contact</Link>
+        {["/", "/turf", "/about", "/contact"].map((path, index) => (
+          <Link
+            key={index}
+            to={path}
+            className={`text-[19px] font-medium font-montserrat pb-2 relative ${
+              location.pathname === path ? "after:w-full" : "after:w-0"
+            } after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-white after:transition-all after:duration-300`}
+          >
+            {path === "/"
+              ? "Home"
+              : path.replace("/", "").charAt(0).toUpperCase() + path.slice(2)}
+          </Link>
+        ))}
       </div>
 
-   
-      {/* Login Button (Desktop) and {/*Dark and Light mode */}
-      
-      {/* <div className="hidden lg:flex flex-1 justify-end"> */}
-      <div className="hidden lg:flex flex-1 items-center justify-end gap-4">
+      <div className="hidden lg:flex flex-1 items-center justify-end gap-4 mr-5">
+        {/* Dark Mode Toggle */}
         <button
           onClick={toggleDarkMode}
-          className="text-lg rounded-full p-2 hover:bg-green-500 dark:hover:bg-gray-700"
+          className="text-lg rounded-full py-2 px-3 hover:bg-green-900 dark:hover:bg-gray-700"
         >
-          {darkMode ? <i className='bx bxs-moon'></i> : <i class='bx bxs-sun'></i>}
+          {darkMode ? (
+            <i className="bx bx-moon text-2xl"></i>
+          ) : (
+            <i className="bx bx-sun text-2xl"></i>
+          )}
         </button>
-         {
-          !isAuthenticated && (
-            <button onClick={handleLoginClick} className="flex gap-2 items-center border border-green-600 px-6 py-2 rounded-lg hover:border-green-800">
-            <span className="font-display font-medium">Login</span>
+
+        {/*when Auth then  Notification */}
+        {isAuthenticated ? (
+          <div className="relative flex items-center gap-4">
+            <button className="relative p-2 hover:bg-green-900 dark:hover:bg-gray-700 rounded-full">
+              <i className="bx bx-bell text-2xl"></i>
+              {/*temporary dot hehehe*/}
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+
+            {/* Profile Dropdown when authenticated */}
+            <div className="relative">
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-2"
+              >
+                <i className="bx bxs-user-circle text-4xl"></i>
+              </button>
+              {dropdownOpen && (
+                <div className="absolute right-0.5 mt-6 w-96 bg-white text-black rounded-lg shadow-lg overflow-hidden transform transition-all duration-200 scale-95 origin-top-right">
+                  <div className="flex items-center gap-7 px-4 py-5 border-b">
+                    <img
+                      src=""
+                      alt=""
+                      className="w-14 h-14 rounded-full border-black"
+                    />
+                    <div>
+                      <p className="font-semibold text-xl">Nagma Shaikh</p>
+                    </div>
+                  </div>
+                  <Link to="/profile" className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition">
+            <div className="flex items-center gap-5">
+              <i className="bx bx-user text-2xl"></i> Edit Profile
+            </div>
+            <i className="bx bx-chevron-right text-2xl"></i>
+          </Link>
+
+          <Link to="/bookings" className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition">
+            <div className="flex items-center gap-5">
+              <i className="bx bxs-calendar-check text-2xl"></i> My Bookings
+            </div>
+            <i className="bx bx-chevron-right text-2xl"></i>
+          </Link>
+
+          <Link to="/history" className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition">
+            <div className="flex items-center gap-5">
+              <i className="bx bx-history text-2xl"></i>Booking History
+            </div>
+            <i className="bx bx-chevron-right text-2xl"></i>
+          </Link>
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogoutClick}
+            className="flex items-center justify-between w-full text-left px-5 py-5 hover:bg-gray-200 transition"
+          >
+            <div className="flex items-center gap-5">
+              <i className="bx bx-log-out text-2xl"></i> Logout
+            </div>
           </button>
-          )
-         }
-         {
-          isAuthenticated && (
-            <button onClick={handleLogoutClick} className="flex gap-2 items-center border border-green-600 px-6 py-2 rounded-lg hover:border-green-800">
-            <span className="font-display font-medium">Logout</span>
+        </div>
+      )}
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => navigate("/login")}
+            className="flex gap-2 items-center px-6 py-2 rounded-lg border transition-all duration-300 active:border-white"
+          >
+            <span className="font-montserrat text-[20px] font-medium">
+              Login
+            </span>
           </button>
-          )
-         }
-        
+        )}
       </div>
 
-      {/* toggle button*/}
+      {/* Mobile Menu Toggle */}
       <button className="p-2 lg:hidden" onClick={handleMenu}>
-        <FontAwesomeIcon icon={menuOpen ? faXmark : faBars} />
+        {menuOpen ? (
+          <i className="bx bx-x text-3xl"></i>
+        ) : (
+          <i className="bx bx-menu text-3xl"></i>
+        )}
       </button>
-
-      {/* Mobile Navigation */}
-      <div
-        className={`${
-          menuOpen ? 'flex' : 'hidden'
-        } fixed z-10  bg-white inset-0 p-3 flex-col`}
-      >
-        {/* Mobile Logo*/}
-        <div className="flex justify-between items-center mb-6">
-          <span className="text-lg font-medium font-display">KickOnTurf</span>
-          <button className="p-2" onClick={handleMenu}>
-            <FontAwesomeIcon icon={faXmark} />
-          </button>
-        </div>
-
-        {/* Mobile Navbar */}
-        <div className="space-y-4">
-          <a href="#" className="font-medium hover:text-green-800 block">Home</a>
-          <a href="#" className="font-medium hover:text-green-800 block">About</a>
-          <a href="#" className="font-medium hover:text-green-800 block">Contact</a>
-          <a href="#" className="font-medium hover:text-green-800 block">Login</a>
-        </div>
-      </div>
     </nav>
   );
 }
