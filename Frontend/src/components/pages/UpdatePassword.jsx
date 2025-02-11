@@ -4,12 +4,14 @@ import { useDispatch } from "react-redux";
 import { setLoader } from "../../slices/authSlice";
 import axios from "axios";
 import {toast} from "react-hot-toast"
+import { useNavigate } from "react-router-dom";
 const UpdatePassword = () => {
   const dispatch = useDispatch();
   const [newPassword, setNewPassword] = useState(""); // State for new password
   const [confirmPassword, setConfirmPassword] = useState(""); // State for confirm password
   const [successMessage, setSuccessMessage] = useState(""); // State for success message
   const email = localStorage.getItem("email");
+  const navigate = useNavigate();
   let requestData;
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent form reload
@@ -58,7 +60,7 @@ const UpdatePassword = () => {
         dispatch(setLoader(false));
         localStorage.removeItem("isForgetPassword");
         localStorage.removeItem("email");
-        toast.success("Password Update Successfully!")
+        navigate("/login")
       }else{
         toast.error("Can't Updated the password!")
       }

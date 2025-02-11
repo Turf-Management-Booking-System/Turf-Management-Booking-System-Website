@@ -17,9 +17,11 @@ app.use(cors({ origin: [
 require("dotenv").config();
 // import the routes
 const authRoutes = require("./routes/auth-routes");
-const turfRoutes = require("./routes/turf-routes")
+const turfRoutes = require("./routes/turf-routes");
+const notifyRoutes = require("./routes/notify-routes")
 app.use("/api/v1/auth",authRoutes);
 app.use("/api/v1/turf",turfRoutes);
+app.use("/api/v1/notify",notifyRoutes);
 // root route
 app.get("/",(req,res)=>{
        res.send("hello jee kaise ho")
