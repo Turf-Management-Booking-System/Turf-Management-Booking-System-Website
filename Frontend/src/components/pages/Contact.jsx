@@ -56,7 +56,7 @@ const ContactForm = () => {
           initial={{ x: "-100vw", opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 1.6, ease: "easeOut" }}
-          className="space-y-12 w-full md:w-1/2"
+          className="space-y-12 w-full md:w-1/2 "
         >
           <h1 className="text-4xl font-bold font-orbitron">❤️ Play, Relax, Repeat!</h1>
   <p className="text-lg font-poppins">
@@ -107,7 +107,7 @@ const ContactForm = () => {
           initial={{ x: "100vw", opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 1.6, ease: "easeOut" }}
-          className="bg-white rounded-lg p-8 w-full md:w-1/2 shadow-lg"
+          className="bg-white rounded-tl-[4vw] rounded-br-[4vw] p-8 w-full md:w-1/2 shadow-lg"
         >
           <h2 className="text-3xl font-bold mb-6 font-orbitron text-center text-green-900">
             Send Message
