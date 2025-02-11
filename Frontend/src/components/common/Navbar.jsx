@@ -3,6 +3,8 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../slices/authSlice";
 
+
+
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(
@@ -30,6 +32,7 @@ function Navbar() {
     event.preventDefault();
     dispatch(logout());
   };
+
 
   return (
     <nav className="p-3 flex bg-[#065F46] dark:bg-gray-900 text-white justify-between items-center fixed top-0 left-0 right-0 z-20 shadow-md">
@@ -71,7 +74,7 @@ function Navbar() {
         {/*when Auth then  Notification */}
         {isAuthenticated ? (
           <div className="relative flex items-center gap-4">
-            <button className="relative p-2 hover:bg-green-900 dark:hover:bg-gray-700 rounded-full">
+            <button onClick={() => navigate("/notification")} className="relative p-2 hover:bg-green-900 dark:hover:bg-gray-700 rounded-full">
               <i className="bx bx-bell text-2xl"></i>
               {/*temporary dot hehehe*/}
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>

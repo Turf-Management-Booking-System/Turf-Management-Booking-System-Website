@@ -20,7 +20,8 @@ import PageNotFound from "./components/pages/PageNotFound";
 import { fetchTurfLocations } from "./components/common/turfLocation";
 import LocationPopup from "./components/common/locationPopup";
 import TurfPage from "./components/pages/TurfPage";
-import EditProfile from "./components/pages/EditProfile";
+import Profile from "./components/pages/Profile";
+import Notification from "./components/pages/Notification";
 
 const App = () => {
   const dispatch = useDispatch(); 
@@ -63,7 +64,8 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="*" element={<PageNotFound />} />
         <Route path="/turf" element={<TurfPage/>}/>
-        <Route path="/profile" element={<EditProfile/>}/>
+        <Route path="/profile" element={<Profile/>}/>
+        <Route path="/notification" element={<Notification/>}/>
       </Routes>
         
       {!isAuthPage && <Footer />}
