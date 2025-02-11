@@ -1,5 +1,6 @@
 const Notification = require("../models/notification")
-
+const mongoose = require("mongoose")
+const User = require("../models/user")
 exports.createNotication =async (req,res)=>{
     try{
     // insert the message to whom user
@@ -11,9 +12,19 @@ exports.createNotication =async (req,res)=>{
             message:"Insert The Data Properly!"
         })
     }
+    const userIdConvert =new mongoose.Types.ObjectId(req.body.userId);
+    const userExists = await User.findById(userIdConvert);
+    if (!userExists) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    
+    
     // create a new notification 
-    const newMessage = await Notification({
-        userId,
+    const newMessage = await Notification.create({
+        user:userIdConvert,
         message
     });
     console.log("new message",newMessage);
@@ -21,7 +32,7 @@ exports.createNotication =async (req,res)=>{
     return res.status(200).json({
         success:true,
         message:"Notification Created Successfully!",
-        message:newMessage,
+        notification:newMessage,
     })
     }catch(error){
          console.log("Error",error);
@@ -45,14 +56,14 @@ exports.getNotifications=async (req,res)=>{
      }
     //  fetch the message
      const messages = await Notification.find({
-        userId
+        user:userId
      }).sort({createdAt:-1});
     console.log("fetch messages",messages);
     // return reponse
     return res.status(200).json({
         success:true,
         message:"Fetch The Current message!",
-        message:messages,
+        currentMessage:messages,
     })
     }catch(error){
         console.log("Error",error);
@@ -63,38 +74,52 @@ exports.getNotifications=async (req,res)=>{
          })
     }
 }
-exports.markAsRead=async(req,res)=>{
-    try{
-        const {notificationId} = req.params;
-        if(!notificationId){
-            return res.status(401).json({
-                success:false,
-                message:"Please Provide The Data"
-            })
-        }
-        const markAsReads= await Notification.findByIdAndUpdate({
-            notificationId},
-        {
-            isRead:true,
-        },{
-            new:true,
-        });
-        console.log("read the message",markAsReads);
-        return res.status(200).json({
-            success:true,
-            message:"Read the Message!",
-            messageRead:markAsReads,
-        })
 
-    }catch(error){
-        console.log("Error",error);
-        return res.status(500).json({
-           success:false,
-           message:"Error While Reading  The Notification! ",
-           error:error.message
-        })
+exports.markAsRead = async (req, res) => {
+  try {
+    const { notificationId } = req.params; // Extract the notificationId from URL params
+
+    if (!notificationId) {
+      return res.status(401).json({
+        success: false,
+        message: "Please Provide The Data",
+      });
     }
-}
+
+    // Convert the notificationId to ObjectId
+    const notificationObjectId = new mongoose.Types.ObjectId(notificationId);
+
+    const markAsReads = await Notification.findByIdAndUpdate(
+      notificationObjectId, 
+      { isRead: true },
+      { new: true } 
+    );
+
+    if (!markAsReads) {
+      return res.status(404).json({
+        success: false,
+        message: "Notification not found",
+      });
+    }
+
+    console.log("Read the message:", markAsReads);
+
+    // Return success response with updated notification
+    return res.status(200).json({
+      success: true,
+      message: "Notification marked as read!",
+      messageRead: markAsReads,
+    });
+  } catch (error) {
+    console.log("Error", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error while reading the notification!",
+      error: error.message,
+    });
+  }
+};
+
 exports.deleteNotification=async(req,res)=>{
     try{
        const {notificationId} = req.params;
@@ -104,7 +129,10 @@ exports.deleteNotification=async(req,res)=>{
             message:"Please Provide The Data!",
         })
        }
-       const deleteNotify = await Notification.findByIdAndDelete(notificationId,{
+       convertTheId = new mongoose.Types.ObjectId(notificationId)
+       const deleteNotify = await Notification.findByIdAndDelete(
+        convertTheId
+        ,{
         new:true,
        });
        console.log("delete message",deleteNotify);

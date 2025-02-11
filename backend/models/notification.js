@@ -8,9 +8,7 @@ const notificationSchema = mongoose.Schema({
   },
   message:{
     type:String,
-    required:[true,"Please Provide the message!"],
-    maxLength:30,
-    minLength:10
+    required:[true,"Please Provide the message!"]
   },
   isRead:{
     type:Boolean,
