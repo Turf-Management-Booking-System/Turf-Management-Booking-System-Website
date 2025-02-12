@@ -7,7 +7,6 @@ const initialState = {
   token: localStorage.getItem("token") || null,
   isAuthenticated: !!localStorage.getItem("token") && storedUser,
   loader: false,
-  registeredUser:null,
 };
 
 const authSlice = createSlice({
@@ -33,10 +32,6 @@ const authSlice = createSlice({
       state.user = action.payload;
       localStorage.setItem("userData", JSON.stringify(action.payload));
       }
-    },
-    registerUser: (state, action) => {
-      state.registeredUser = action.payload;
-      localStorage.setItem("userData",JSON.stringify(action.payload))
     },
 
     setLoader: (state, action) => {

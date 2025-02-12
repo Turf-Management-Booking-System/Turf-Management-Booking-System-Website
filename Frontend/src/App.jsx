@@ -22,12 +22,13 @@ import LocationPopup from "./components/common/locationPopup";
 import TurfPage from "./components/pages/TurfPage";
 import Profile from "./components/pages/Profile";
 import Notification from "./components/pages/Notification";
-
+import { loadNotification } from "./slices/notificationSlice";
+import { setNotification } from "./slices/notificationSlice";
 const App = () => {
   const dispatch = useDispatch(); 
   const location = useLocation();
   const loader = useSelector((state) => state.auth.loader);
-
+  const notifications = useSelector((state)=>state.notification.notifications)
   // Check if current page is authentication-related
   const isAuthPage = ["/otp", "/forgetpassword", "/updatepassword", "/changepassword"].includes(location.pathname);
 
@@ -37,14 +38,19 @@ const App = () => {
     const user = storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null;
     if (token && user) {
       dispatch(login({ user, token }));
-      dispatch(registerUser({
-        user,
-      }));
     }
   }, [dispatch]); 
    useEffect( ()=>{
      dispatch(fetchTurfLocations()); 
+     dispatch(loadNotification());
    },[dispatch])
+   useEffect(() => {
+    const storedNotifications = localStorage.getItem("userNotifications");
+    if (storedNotifications) {
+      dispatch(setNotification(JSON.parse(storedNotifications)));
+    }
+  }, [dispatch]);
+  
   return (
     <>
        <LocationPopup/>

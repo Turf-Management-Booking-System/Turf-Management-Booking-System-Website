@@ -4,19 +4,26 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser, setLoader } from "../../slices/authSlice";
+import { setLoader } from "../../slices/authSlice";
 import { login } from "../../slices/authSlice";
 import { setUser } from "../../slices/authSlice";
-
+import { setNotification } from "../../slices/notificationSlice";
+import { loadNotification } from "../../slices/notificationSlice";
+import { useEffect } from "react";
 const Login = () => {
   const [isActive, setIsActive] = useState(false);
+    const notifications = useSelector((state)=>state.notification.notifications)
   const [loginPasswordVisible,setLoginPasswordVisible] = useState(false)
+  const dispatch = useDispatch();
+
   const [registerPasswordVisible,setRegisterPasswordVisible] = useState(false)
   const loader = useSelector(state=>state.auth.loader);
+  useEffect( ()=>{
+       dispatch(loadNotification());
+     },[dispatch])
   console.log("loading value ",loader);
   const [email,setEmail] = useState("");
   const [password,setPassword]=useState("")
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData,setFormData] = useState({
     firstName:"",
@@ -70,6 +77,21 @@ const LoginHandler = async (event) => {
         user: response.data.user, 
       }));
       dispatch(setUser(response.data.user));
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/api/v1/notify/getNotifications/${user._id}`,
+          {
+            headers: { "Content-Type": "application/json", withCredentials: true },
+          }
+        );
+        if (response.data.success) {
+          console.log("fetch notification",response.data.currentMessage);
+          dispatch(setNotification(response.data.currentMessage ||[]));
+          console.log("notifications state",notifications);
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Something Went Wrong!");
+      }
       navigate("/dashboard");
     } else {
       toast.error(response.data.message || "Something went wrong");
@@ -108,7 +130,7 @@ const LoginHandler = async (event) => {
   
       if (response.data.success) {
         toast.success("OTP sent successfully!");
-        dispatch(registerUser(formData));
+        dispatch(setUser(formData));
         console.log("registerDtaa",formData);
         navigate("/otp");
       } else {
