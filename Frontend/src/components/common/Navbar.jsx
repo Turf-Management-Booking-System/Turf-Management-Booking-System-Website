@@ -77,7 +77,7 @@ function Navbar() {
             <button onClick={() => navigate("/notification")} className="relative p-2 hover:bg-green-900 dark:hover:bg-gray-700 rounded-full">
               <i className="bx bx-bell text-2xl"></i>
               {/*temporary dot hehehe*/}
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full">5</span>
             </button>
 
             {/* Profile Dropdown when authenticated */}
