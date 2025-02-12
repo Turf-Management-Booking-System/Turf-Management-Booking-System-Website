@@ -1,167 +1,100 @@
-import React from "react";
+import React, { useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFutbol } from "@fortawesome/free-solid-svg-icons";
+import { faFutbol, faSearch, faCalendarCheck } from "@fortawesome/free-solid-svg-icons";
+import TurfImageDay from "../../assets/images/TurfImageDay.jpg";
+import TurfImageNight from "../../assets/images/TurfImageNight.jpg";
+import { DarkModeContext } from "../../context/DarkModeContext";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
 
-function home() {
+function Home() {
+  const { darkMode } = useContext(DarkModeContext);
+  const [ref, inView] = useInView({ triggerOnce: false, threshold: 0.2 });
 
   return (
     <>
-      <div className="min-h-screen mt-16 bg-deepForestGreen">
-        <div
-          id="hero-container"
-          className="max-w-4xl mx-auto px-6 pb-16 pt-6 flex flex-col sm:pt-3 sm:items-center sm:text-center sm:max-w-2xl"
+      {/* Hero Section */}
+      <motion.div
+        style={{
+          backgroundImage: `url(${darkMode ? TurfImageNight : TurfImageDay})`,
+        }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 1.2 }}
+        className="relative min-h-screen mt-16 w-full bg-cover bg-center flex items-center justify-end"
+      >
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1 }}
+          className="max-w-4xl w-11/12 sm:w-1/2 p-8 bg-black bg-opacity-80 text-white rounded-lg shadow-lg mr-4 sm:mr-12"
         >
-          <div
-            id="version-text"
-            className="flex items-center my-6 gap-2 border border-yellow-300 bg-yellow-50 rounded-lg px-3 py-1 w-fit shadow-md hover:shadow-lg hover:-translate-y-1 transition group "
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="flex items-center my-4 gap-2 border border-yellow-300 bg-yellow-50 rounded-lg px-3 py-1 w-fit shadow-md hover:shadow-lg hover:-translate-y-1 transition group"
           >
-            {/* <div class="w-2 h-2 bg-yellow-400 rounded-full border border-yellow-600"></div> */}
             <p className="font-display font-medium text-red-500 flex items-center group">
               <span className="group-hover:animate-shake">⏰</span> Hurry Up!
-              <span className="text-yellow-800">
-                {" "}
-                Prime Slots Filling Fast !!
-              </span>
+              <span className="text-yellow-800"> Prime Slots Filling Fast!!</span>
             </p>
-          </div>
-          <div id="hero-featues" className=" hidden sm:flex gap-8 my-6">
-            <div className="font-orbitron flex justify-center gap-2 items-center text-white ">
-              <p>🏟️ Live Turf Availability</p>
-            </div>
-            <div className="font-orbitron flex justify-center gap-2 items-center text-white">
-              <p>💳 Secure Payments</p>
-            </div>
-            <div className="font-orbitron flex justify-center gap-2 items-center text-white">
-              <p>📅 Easy Scheduling</p>
-            </div>
-          </div>
-          <h1 className="font-orbitron text-4xl font-semibold leading-snug mt-4 sm:text-6xl text- #004d0 text-white">
+          </motion.div>
+          <h1 className="font-orbitron text-3xl sm:text-4xl font-semibold leading-snug">
             Manage Your Turf Bookings Seamlessly!
           </h1>
-          <p className="font-montserrat text-xl mt-4 sm:text-2xl sm:mt-8 sm:leading-normal text-white">
+          <p className="font-montserrat text-lg mt-4 sm:text-xl sm:mt-6">
             Book, manage, and track turf bookings with ease. Perfect for sports
             enthusiasts and administrators. Available across all platforms.
           </p>
-          <div
-            id="buttons-container"
-            className="mt-12 flex gap-4 flex-col sm:flex-row"
-          >
-            <button className="px-8 py-3 font-semibold rounded-lg text-white bg-green-600 shadow-sm hover:bg-opacity-90">
+          <div className="mt-8 flex gap-4 flex-col sm:flex-row">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-6 py-3 font-semibold rounded-lg text-white bg-green-600 shadow-sm hover:bg-opacity-90"
+            >
               Get Started
-            </button>
-            <button className="px-8 py-3 font-semibold rounded-lg bg-white border border-gray-400 hover:border-gray-800">
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-6 py-3 font-semibold rounded-lg bg-white text-black border border-gray-400 hover:border-gray-800"
+            >
               Explore Features
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
+      </motion.div>
 
-        {/*Section of search,book,play*/}
-        <section className="bg-gradient-to-r from-green-100 via-lime-200 to-green-300 py-12">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-              {/* Card 1 */}
-              <div className="flex flex-col items-center">
-                <div className="mb-4">
-                  <img
-                    src="https://img.icons8.com/ios-filled/64/search.png"
-                    alt="Search Icon"
-                    className="h-12 w-12"
-                  />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Search</h3>
-                <p className="text-gray-600">
-                  Are you looking to play after work, organize your Sunday
-                  Five’s football match? Explore the largest network of sports
-                  facilities all over India.
-                </p>
-              </div>
-
-              {/* Card 2 */}
-              <div className="flex flex-col items-center">
-                <div className="mb-4">
-                  <img
-                    src="https://img.icons8.com/ios-filled/64/calendar.png"
-                    alt="Book Icon"
-                    className="h-12 w-12"
-                  />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Book</h3>
-                <p className="text-gray-600">
-                  Once you’ve found the perfect ground, court, or gym, connect
-                  with the venue through the Book Now button to make online
-                  booking easy and secure.
-                </p>
-              </div>
-
-              {/* Card 3 */}
-              <div className="flex flex-col items-center">
-                <div className="mb-4">
-                  <FontAwesomeIcon icon={faFutbol} size="3x" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Play</h3>
-                <p className="text-gray-600">
-                  You’re the hero—you’ve found a stunning turf or court, booked
-                  with ease, and now it’s time to play. The scene is set for
-                  your epic match!
-                </p>
+      {/* Search, Book, Play Timeline */}
+      <section ref={ref} className="py-12 flex flex-col items-center relative">
+        <div className="w-1 h-[55rem] absolute left-1/2 transform -translate-x-1/2 bg-gray-900 text-white "></div>
+        {[ 
+          { icon: faSearch, title: "Search", desc: "Explore the largest network of sports facilities all over India.", position: "left" },
+          { icon: faCalendarCheck, title: "Book", desc: "Connect with the venue through the Book Now button to make online booking easy and secure.", position: "right" },
+          { icon: faFutbol, title: "Play", desc: "The scene is set for your epic match!", position: "left" }
+        ].map((item, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, x: item.position === "left" ? -100 : 100 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 + index * 0.2 }}
+            whileHover={{ scale: 1.05 }}
+            className={`relative flex items-center justify-${item.position} w-full max-w-6xl my-8`}
+          >
+            <div className={`w-1/2 p-6 flex ${item.position === "left" ? "justify-end" : "justify-start"}`}>
+              <div className="p-6 rounded-lg shadow-lg bg-white dark:bg-gray-900">
+                <FontAwesomeIcon icon={item.icon} size="3x" className="mb-4 text-[#587990] animate-bounce" />
+                <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+                <p className="text-gray-600 dark:text-gray-300">{item.desc}</p>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/*section */}
-        <section className="bg-gradient-to-r from-green-100 via-lime-200 to-green-300 py-12">
-          <h2 className="text-center text-3xl font-bold text-white mb-8">
-            Top Rated Turfs
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
-            <div className="bg-white shadow-lg rounded-lg p-6">
-              <img
-                src="turf1.jpg"
-                alt="Turf 1"
-                className="w-full h-40 object-cover rounded-md mb-4"
-              />
-              <h3 className="text-xl font-bold">Elite Sports Arena</h3>
-              <p className="text-gray-700 mt-2">
-                Located in Mumbai. Premium turf with lighting and refreshments.
-              </p>
-              <button className="mt-4 bg-green-500 text-white px-4 py-2 rounded-md">
-                Book Now
-              </button>
-            </div>
-            <div className="bg-white shadow-lg rounded-lg p-6">
-              <img
-                src="turf2.jpg"
-                alt="Turf 2"
-                className="w-full h-40 object-cover rounded-md mb-4"
-              />
-              <h3 className="text-xl font-bold">Pro Sports Hub</h3>
-              <p className="text-gray-700 mt-2">
-                Located in Pune. Spacious turf for football and cricket.
-              </p>
-              <button className="mt-4 bg-green-500 text-white px-4 py-2 rounded-md">
-                Book Now
-              </button>
-            </div>
-            <div className="bg-white shadow-lg rounded-lg p-6">
-              <img
-                src="turf3.jpg"
-                alt="Turf 3"
-                className="w-full h-40 object-cover rounded-md mb-4"
-              />
-              <h3 className="text-xl font-bold">Prime Sports Court</h3>
-              <p className="text-gray-700 mt-2">
-                Located in Delhi. Perfect for indoor basketball and badminton.
-              </p>
-              <button className="mt-4 bg-green-500 text-white px-4 py-2 rounded-md">
-                Book Now
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
+            <div className="w-8 h-8 bg-[#587990] rounded-full absolute left-1/2 transform -translate-x-1/2"></div>
+          </motion.div>
+        ))}
+      </section>
     </>
   );
 }
 
-export default home;
+export default Home;

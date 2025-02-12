@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -7,8 +7,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { registerUser, setLoader } from "../../slices/authSlice";
 import { login } from "../../slices/authSlice";
 import { setUser } from "../../slices/authSlice";
+import TurfLoginPage from "../../assets/images/TurfLoginPage.jpg";
+import { DarkModeContext } from "../../context/DarkModeContext";
+import TurfLogin from "../../assets/images/TurfLogin.jpg";
 
 const Login = () => {
+  const { darkMode } = useContext(DarkModeContext);
   const [isActive, setIsActive] = useState(false);
   const [loginPasswordVisible,setLoginPasswordVisible] = useState(false)
   const [registerPasswordVisible,setRegisterPasswordVisible] = useState(false)
@@ -130,7 +134,9 @@ const LoginHandler = async (event) => {
   };
   return (
     <>
-      <div className="flex justify-center items-center min-h-screen bg-deepForestGreen dark:bg-black mt-10">
+      <div  style={{
+                backgroundImage: `url(${darkMode ? TurfLogin : TurfLoginPage})`,
+              }} className="flex justify-center items-center min-h-screen bg-cover bg-center mt-12">
         <div
           className={`relative ${
             isActive ? "active" : ""
@@ -296,7 +302,7 @@ const LoginHandler = async (event) => {
           </div>
 
           <div
-            className={`toggle-box  absolute w-[100%] h-[100%] before:max650:rounded-[20vw] before:content-[''] before:absolute before:w-[300%] before:h-full before:bg-gradient-to-r from-green-600 via-lime-500 to-green-700 before:rounded-[150px] 
+            className={`toggle-box  absolute w-[100%] h-[100%] before:max650:rounded-[20vw] before:content-[''] before:absolute before:w-[300%] before:h-full before:bg-gradient-to-r from-[#587990] via-lime-500 to-[#235980] before:rounded-[150px] 
         before:z-[2] before:transition-all before:duration-[1800ms] before:ease-in-out 
         max650:before:w-[100%] max650:before:h-[300%] max650:before:left-0 max650:before:top-[-270%]
           ${isActive ? "before:left-[50%] before:max650:top-[70%] before:max650:left-0" : "before:left-[-250%]"}`}

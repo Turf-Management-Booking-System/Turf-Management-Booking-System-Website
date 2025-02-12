@@ -1,30 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext,useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../slices/authSlice";
-
+import { TbMessageChatbot } from "react-icons/tb";
+import { DarkModeContext } from "../../context/DarkModeContext";
 
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(
-    localStorage.getItem("darkMode") === "true"
-  );
+  const { darkMode, setDarkMode } = useContext(DarkModeContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    localStorage.setItem("darkMode", darkMode);
-  }, [darkMode]);
 
   const handleMenu = () => setMenuOpen((prev) => !prev);
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
@@ -35,7 +25,7 @@ function Navbar() {
 
 
   return (
-    <nav className="p-3 flex bg-[#065F46] dark:bg-gray-900 text-white justify-between items-center fixed top-0 left-0 right-0 z-20 shadow-md">
+    <nav className="p-3 flex bg-[#587990] dark:bg-gray-900 text-white justify-between items-center fixed top-0 left-0 right-0 z-20 shadow-md">
       {/* Logo */}
       <Link to="/" className="flex gap-2 items-center flex-1 ml-3">
         <span className="text-xl font-orbitron font-bold">KickOnTurf</span>
@@ -58,11 +48,17 @@ function Navbar() {
         ))}
       </div>
 
-      <div className="hidden lg:flex flex-1 items-center justify-end gap-4 mr-5">
+
+
+        <div className="hidden lg:flex flex-1 items-center justify-end gap-4 mr-5">
+        <div className="text-4xl">
+          <button onClick={() => navigate("/chatbot")}>
+            <TbMessageChatbot />
+          </button></div>
         {/* Dark Mode Toggle */}
         <button
           onClick={toggleDarkMode}
-          className="text-lg rounded-full py-2 px-3 hover:bg-green-900 dark:hover:bg-gray-700"
+          className="text-lg rounded-full py-2 px-3 hover:bg-blue-50 dark:hover:bg-gray-700"
         >
           {darkMode ? (
             <i className="bx bx-moon text-2xl"></i>
