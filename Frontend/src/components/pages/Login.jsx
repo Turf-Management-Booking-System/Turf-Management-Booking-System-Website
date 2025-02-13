@@ -1,4 +1,4 @@
-import React, { useState,useContext } from "react";
+import React, { useState,useContext,useEffect } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -9,7 +9,11 @@ import { login } from "../../slices/authSlice";
 import { setUser } from "../../slices/authSlice";
 import { setNotification } from "../../slices/notificationSlice";
 import { loadNotification } from "../../slices/notificationSlice";
-import { useEffect } from "react";
+import { DarkModeContext } from "../../context/DarkModeContext";
+import TurfLogin from "../../assets/images/TurfLogin.jpg";
+import TurfLoginPage from "../../assets/images/TurfLoginPage.jpg";
+
+
 const Login = () => {
   const { darkMode } = useContext(DarkModeContext);
   const [isActive, setIsActive] = useState(false);

@@ -1,4 +1,4 @@
-import React, { useContext,useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../slices/authSlice";
@@ -8,14 +8,17 @@ import { setNotification } from "../../slices/notificationSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { loadNotification } from "../../slices/notificationSlice";
+
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { darkMode, setDarkMode } = useContext(DarkModeContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  const notifications = useSelector((state)=>state.notification.notifications);
-  const user = useSelector((state)=>state.auth.user);
+  const notifications = useSelector(
+    (state) => state.notification.notifications
+  );
+  const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,37 +26,43 @@ function Navbar() {
   const handleMenu = () => setMenuOpen((prev) => !prev);
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
   const handleLogoutClick = (event) => {
+    setDropdownOpen(false); 
     event.preventDefault();
     dispatch(logout());
+    navigate('/login')
   };
+
   useEffect(() => {
     dispatch(loadNotification());
   }, [dispatch]);
-   useEffect(()=>{
-    const fetchNotification =async ()=>{
+
+  useEffect(() => {
+    const fetchNotification = async () => {
       try {
         const response = await axios.get(
           `http://localhost:4000/api/v1/notify/getNotifications/${user._id}`,
           {
-            headers: { "Content-Type": "application/json", withCredentials: true },
+            headers: {
+              "Content-Type": "application/json",
+              withCredentials: true,
+            },
           }
         );
         if (response.data.success) {
-          console.log("fetch notification",response.data.currentMessage);
-          dispatch(setNotification(response.data.currentMessage ||[]));
-          console.log("notifications state",notifications);
+          console.log("fetch notification", response.data.currentMessage);
+          dispatch(setNotification(response.data.currentMessage || []));
+          console.log("notifications state", notifications);
         }
       } catch (error) {
         toast.error(error.response?.data?.message || "Something Went Wrong!");
       }
-    }
-    
-      fetchNotification()
-   },[dispatch]);
+    };
 
+    fetchNotification();
+  }, [dispatch]);
 
-   const unreadCount = notifications.filter((notify)=> !notify.isRead).length;
-   console.log("unreadCount",unreadCount);
+  const unreadCount = notifications.filter((notify) => !notify.isRead).length;
+  console.log("unreadCount", unreadCount);
 
   return (
     <nav className="p-3 flex bg-[#587990] dark:bg-gray-900 text-white justify-between items-center fixed top-0 left-0 right-0 z-20 shadow-md">
@@ -79,17 +88,16 @@ function Navbar() {
         ))}
       </div>
 
-
-
-        <div className="hidden lg:flex flex-1 items-center justify-end gap-4 mr-5">
+      <div className="hidden lg:flex flex-1 items-center justify-end gap-4 mr-5">
         <div className="text-4xl">
           <button onClick={() => navigate("/chatbot")}>
             <TbMessageChatbot />
-          </button></div>
+          </button>
+        </div>
         {/* Dark Mode Toggle */}
         <button
           onClick={toggleDarkMode}
-          className="text-lg rounded-full py-2 px-3 hover:bg-blue-50 dark:hover:bg-gray-700"
+          className="text-lg rounded-full py-2 px-3 hover:bg-blue-50 hover:text-black dark:hover:bg-gray-700 dark:hover:text-white"
         >
           {darkMode ? (
             <i className="bx bx-moon text-2xl"></i>
@@ -101,10 +109,17 @@ function Navbar() {
         {/*when Auth then  Notification */}
         {isAuthenticated ? (
           <div className="relative flex items-center gap-4">
-            <button onClick={() => navigate("/notification")} className="relative p-2 hover:bg-green-900 dark:hover:bg-gray-700 rounded-full">
+            <button
+              onClick={() => navigate("/notification")}
+              className="relative p-2 hover:bg-green-900 dark:hover:bg-gray-700 rounded-full"
+            >
               <i className="bx bx-bell text-2xl"></i>
               {/*temporary dot hehehe*/}
-              <span className="absolute top-1 right-1 w-2 h-2 rounded-full">{unreadCount}</span>
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 w-2 h-2 rounded-full">
+                  {unreadCount}
+                </span>
+              )}
             </button>
 
             {/* Profile Dropdown when authenticated */}
@@ -113,7 +128,11 @@ function Navbar() {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center gap-2"
               >
-                <i className="bx bxs-user-circle text-4xl"></i>
+                <img
+                  src={user.image}
+                  alt="Profileimage"
+                  className="w-12 h-12 rounded-full border-2 border-white"
+                />
               </button>
               {dropdownOpen && (
                 <div className="absolute right-0.5 mt-6 w-96 bg-white text-black rounded-lg shadow-lg overflow-hidden transform transition-all duration-200 scale-95 origin-top-right">
@@ -124,41 +143,53 @@ function Navbar() {
                       className="w-14 h-14 rounded-full border-black"
                     />
                     <div>
-                      <p className="font-semibold text-xl capitalize">{user.firstName} {user.lastName}</p>
+                      <p className="font-semibold text-xl capitalize">
+                        {user.firstName} {user.lastName}
+                      </p>
                     </div>
                   </div>
-                  <Link to="/profile" className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition">
-            <div className="flex items-center gap-5">
-              <i className="bx bx-user text-2xl"></i> Edit Profile
-            </div>
-            <i className="bx bx-chevron-right text-2xl"></i>
-          </Link>
+                  <Link
+                    to="/profile"
+                    className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
+                  >
+                    <div className="flex items-center gap-5">
+                      <i className="bx bx-user text-2xl"></i> Edit Profile
+                    </div>
+                    <i className="bx bx-chevron-right text-2xl"></i>
+                  </Link>
 
-          <Link to="/bookings" className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition">
-            <div className="flex items-center gap-5">
-              <i className="bx bxs-calendar-check text-2xl"></i> My Bookings
-            </div>
-            <i className="bx bx-chevron-right text-2xl"></i>
-          </Link>
+                  <Link
+                    to="/bookings"
+                    className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
+                  >
+                    <div className="flex items-center gap-5">
+                      <i className="bx bxs-calendar-check text-2xl"></i> My
+                      Bookings
+                    </div>
+                    <i className="bx bx-chevron-right text-2xl"></i>
+                  </Link>
 
-          <Link to="/history" className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition">
-            <div className="flex items-center gap-5">
-              <i className="bx bx-history text-2xl"></i>Booking History
-            </div>
-            <i className="bx bx-chevron-right text-2xl"></i>
-          </Link>
+                  <Link
+                    to="/history"
+                    className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
+                  >
+                    <div className="flex items-center gap-5">
+                      <i className="bx bx-history text-2xl"></i>Booking History
+                    </div>
+                    <i className="bx bx-chevron-right text-2xl"></i>
+                  </Link>
 
-          {/* Logout Button */}
-          <button
-            onClick={handleLogoutClick}
-            className="flex items-center justify-between w-full text-left px-5 py-5 hover:bg-gray-200 transition"
-          >
-            <div className="flex items-center gap-5">
-              <i className="bx bx-log-out text-2xl"></i> Logout
-            </div>
-          </button>
-        </div>
-      )}
+                  {/* Logout Button */}
+                  <button
+                    onClick={handleLogoutClick}
+                    className="flex items-center justify-between w-full text-left px-5 py-5 hover:bg-gray-200 transition"
+                  >
+                    <div className="flex items-center gap-5">
+                      <i className="bx bx-log-out text-2xl"></i> Logout
+                    </div>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         ) : (
