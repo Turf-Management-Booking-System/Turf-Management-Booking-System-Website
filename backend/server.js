@@ -22,7 +22,7 @@ require("dotenv").config();
 const authRoutes = require("./routes/auth-routes");
 const turfRoutes = require("./routes/turf-routes");
 const notifyRoutes = require("./routes/notify-routes");
-const chatBotRoutes =require("./routes/chatBot-routes");
+
 app.use("/api/v1/auth",authRoutes);
 app.use("/api/v1/turf",turfRoutes);
 app.use("/api/v1/notify",notifyRoutes);

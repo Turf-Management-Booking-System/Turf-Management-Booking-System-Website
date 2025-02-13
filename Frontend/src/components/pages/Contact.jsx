@@ -56,7 +56,7 @@ const ContactForm = () => {
           initial={{ x: "-100vw", opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 1.6, ease: "easeOut" }}
-          className="space-y-12 w-full md:w-1/2"
+          className="space-y-12 w-full md:w-1/2 "
         >
           <h1 className="text-4xl font-bold font-orbitron">❤️ Play, Relax, Repeat!</h1>
   <p className="text-lg font-poppins">

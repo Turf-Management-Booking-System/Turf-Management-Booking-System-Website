@@ -6,7 +6,8 @@ const Profile = require("../models/additionalFields");
 const sendEmail = require("../config/nodeMailer");
 const { sendOtpEmail } = require("../mail/templates/sendOtpEmail");
 const { sendThankYouEmail } = require("../mail/templates/sendThanYouMail");
-const Contact = require("../models/contact")
+const Contact = require("../models/contact");
+const Notification = require("../models/notification")
 require("dotenv").config();
 // signup controller
 exports.signup = async(req,res)=>{
@@ -106,6 +107,10 @@ exports.login = async(req,res)=>{
             "expiresIn":"6h"
         });
         console.log("token",token);
+        const message = await Notification.create({
+            user:userExit._id,
+            message:"Welcome To our website! Thanks for Logged in!"
+        })
        // return the response
 res.cookie('token', token, {
     httpOnly: true, // Ensures cookie is only accessible by the server

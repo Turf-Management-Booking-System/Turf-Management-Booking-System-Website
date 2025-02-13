@@ -36,9 +36,8 @@ const TurfPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex mt-16">
-      {/* Left side */}
-      <div className="w-[22rem] fixed top-[85px] left-5 h-screen overflow-y-auto bg-white p-4 shadow-lg">
+    <div className="min-h-screen flex bg-gray-100 pt-[80px]">
+      <div className="w-1/4 bg-white p-4 shadow-lg h-screen sticky top-0">
         <h2 className="text-xl font-semibold mb-4">Filters</h2>
         <select className="w-full px-4 py-2 border rounded-lg mb-4" value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)}>
           <option value="All">All Locations</option>
@@ -65,17 +64,14 @@ const TurfPage = () => {
         </label>
       </div>
 
-      {/* Right Side */}
-      <div className="w-full md:w-[calc(100%-20rem)] ml-auto p-8">
-        {/* Search */}
-        <div className="fixed top-[85px] left-1/4 w-[71rem] bg-white shadow-md p-4 mb-4 flex rounded-lg">
+  
+      <div className="w-3/4 flex flex-col h-screen ">
+        <div className="bg-white shadow-md p-4 mb-4">
           <input type="text" placeholder="Search for a turf..." className="w-full px-4 py-2 border rounded-lg border-green-500 focus:outline-none focus:ring-2 focus:ring-green-600" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
-
-        {/* Cardd */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full ml-[2rem]  mt-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 overflow-y-auto flex-grow">
           {filteredTurfs.map((turf) => (
-            <div key={turf.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:scale-105 hover:shadow-xl transition-all relative">
+            <div key={turf.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:scale-105 hover:shadow-xl transition-all relative h-[25vw]">
               <img src={turf.image} alt="" className="w-full h-48 object-cover" />
               <div className="p-4">
                 <h2 className="text-xl font-semibold text-gray-800">{turf.name}</h2>
@@ -98,6 +94,7 @@ const TurfPage = () => {
           ))}
         </div>
       </div>
+     
     </div>
   );
 };
