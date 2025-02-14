@@ -42,8 +42,10 @@ const App = () => {
   }, [dispatch]); 
    useEffect( ()=>{
      dispatch(fetchTurfLocations()); 
-     dispatch(loadNotification());
-   },[dispatch])
+   },[dispatch]);
+    useEffect( ()=>{
+            dispatch(loadNotification());
+          },[dispatch])
    useEffect(() => {
     const storedNotifications = localStorage.getItem("userNotifications");
     if (storedNotifications) {

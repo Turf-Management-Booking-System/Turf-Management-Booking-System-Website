@@ -1,8 +1,10 @@
 import React from 'react'
 import { loadNotification } from '../../slices/notificationSlice';
-import { useSelector } from 'react-redux';
+import { useSelector,useDispatch } from 'react-redux';
 function Dashboard() {
-  const notifications = useSelector((state)=>state.notification.notifications)
+  const dispatch = useDispatch();
+  const notifications = useSelector((state)=>state.notification.notifications);
+  console.log("notifications in dasboard",notifications)
   useEffect( ()=>{
          dispatch(loadNotification());
        },[dispatch])

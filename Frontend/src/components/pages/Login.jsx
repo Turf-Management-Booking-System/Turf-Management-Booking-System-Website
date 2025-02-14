@@ -18,10 +18,7 @@ const Login = () => {
 
   const [registerPasswordVisible,setRegisterPasswordVisible] = useState(false)
   const loader = useSelector(state=>state.auth.loader);
-  useEffect( ()=>{
-       dispatch(loadNotification());
-     },[dispatch])
-  console.log("loading value ",loader);
+  
   const [email,setEmail] = useState("");
   const [password,setPassword]=useState("")
   const navigate = useNavigate();
@@ -40,7 +37,6 @@ const Login = () => {
       setRegisterPasswordVisible(!registerPasswordVisible);
     }
   }
-
   const formHandler =(event)=>{
       setFormData(prev=>{
         return{
@@ -77,24 +73,32 @@ const LoginHandler = async (event) => {
         user: response.data.user, 
       }));
       dispatch(setUser(response.data.user));
+      dispatch(loadNotification());
       try {
-        const response = await axios.get(
-          `http://localhost:4000/api/v1/notify/getNotifications/${user._id}`,
+        const notificationResponse = await axios.get(
+          `http://localhost:4000/api/v1/notify/getNotifications/${response.data.user._id}`,
           {
             headers: { "Content-Type": "application/json", withCredentials: true },
           }
         );
-        if (response.data.success) {
-          console.log("fetch notification",response.data.currentMessage);
-          dispatch(setNotification(response.data.currentMessage ||[]));
+        if (notificationResponse.data.success) {
+          console.log("fetch notification",notificationResponse.data.currentMessage);
+          dispatch(setNotification(notificationResponse.data.currentMessage || []));
+          localStorage.setItem(
+            "userNotification",
+            JSON.stringify(notificationResponse.data.currentMessage || [])
+          );
           console.log("notifications state",notifications);
+      
         }
       } catch (error) {
-        toast.error(error.response?.data?.message || "Something Went Wrong!");
+        toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!");
+        console.log(error.response?.data?.message)
       }
-      navigate("/dashboard");
+      navigate("/dashboard")
     } else {
-      toast.error(response.data.message || "Something went wrong");
+      toast.error(response.data.message || "Something went wrong please check");
+      console.log(error.response?.data?.message)
     }
   } catch (error) {
     console.error("Error:", error.response?.data || error.message);
@@ -134,7 +138,7 @@ const LoginHandler = async (event) => {
         console.log("registerDtaa",formData);
         navigate("/otp");
       } else {
-        toast.error(response.data.message || "Something went wrong");
+        toast.error(response.data.message || "Something went wrong in signup");
       }
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);

@@ -35,31 +35,31 @@ function Navbar() {
     event.preventDefault();
     dispatch(logout());
   };
-  useEffect(() => {
-    dispatch(loadNotification());
-  }, [dispatch]);
+  
    useEffect(()=>{
     const fetchNotification =async ()=>{
-      try {
-        const response = await axios.get(
-          `http://localhost:4000/api/v1/notify/getNotifications/${user._id}`,
-          {
-            headers: { "Content-Type": "application/json", withCredentials: true },
+      if(user && user._id){
+        try {
+          const response = await axios.get(
+            `http://localhost:4000/api/v1/notify/getNotifications/${user._id}`,
+            {
+              headers: { "Content-Type": "application/json", withCredentials: true },
+            }
+          );
+          if (response.data.success) {
+            console.log("fetch notification",response.data.currentMessage);
+            dispatch(setNotification(response.data.currentMessage ||[]));
+            console.log("notifications state",notifications);
           }
-        );
-        if (response.data.success) {
-          console.log("fetch notification",response.data.currentMessage);
-          dispatch(setNotification(response.data.currentMessage ||[]));
-          console.log("notifications state",notifications);
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something Went Wrong!");
         }
-      } catch (error) {
-        toast.error(error.response?.data?.message || "Something Went Wrong!");
       }
+      
     }
     
       fetchNotification()
-   },[dispatch]);
-
+   },[dispatch,user]);
 
    const unreadCount = notifications.filter((notify)=> !notify.isRead).length;
    console.log("unreadCount",unreadCount);

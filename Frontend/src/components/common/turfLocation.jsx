@@ -1,7 +1,7 @@
 import axios from "axios";
 import { setLoader } from "../../slices/authSlice";
 import { setLocation } from "../../slices/turfSlice";
-
+import toast from "react-hot-toast";
 export const fetchTurfLocations = () => async (dispatch) => {
   try {
     dispatch(setLoader(true));
