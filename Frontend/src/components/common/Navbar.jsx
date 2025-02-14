@@ -121,7 +121,7 @@ function Navbar() {
               <i className="bx bx-bell text-2xl"></i>
               {/*temporary dot hehehe*/}
               {unreadCount > 0 && (
-                <span className="absolute top-0 right-1.5 w-1 h-1 rounded-full">
+                <span className="absolute top-0 right-1.5 w-1 h-1 rounded-full ">
                   {unreadCount}
                 </span>
               )}
