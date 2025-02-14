@@ -2,6 +2,10 @@ const mongoose= require("mongoose");
 
 // create the schema
 const profileSchema = mongoose.Schema({
+   user:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"User"
+   },
     phoneNumber:{
        type:String,
        match: [/^\d{10}$/, "Please enter a valid 10-digit phone number!"], 
@@ -17,6 +21,10 @@ const profileSchema = mongoose.Schema({
         default:null,
         maxLength:30,
         minLength:10
+    },
+    dateOfBirth:{
+      type:String,
+      default:null
     },
     description:{
        type:String,

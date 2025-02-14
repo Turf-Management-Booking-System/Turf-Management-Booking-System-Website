@@ -1,6 +1,7 @@
 import React from 'react'
 import { loadNotification } from '../../slices/notificationSlice';
 import { useSelector,useDispatch } from 'react-redux';
+import { useEffect } from 'react';
 function Dashboard() {
   const dispatch = useDispatch();
   const notifications = useSelector((state)=>state.notification.notifications);

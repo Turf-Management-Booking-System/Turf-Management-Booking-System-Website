@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-
+import { useDispatch } from "react-redux";
+import { setLoader } from "../../slices/authSlice";
+import toast from "react-hot-toast";
+import axios from "axios";
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -7,7 +10,9 @@ const ChangePassword = () => {
   const [currentPasswordVisible, setCurrentPasswordVisible] = useState(false);
   const [newPasswordVisible, setNewPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-
+  const token = localStorage.getItem("token");
+  console.log("token",token);
+  const dispatch = useDispatch();
   // Handle password visibility toggle for each input
   const togglePasswordVisibility = (field) => {
     if (field === "current") {
@@ -18,10 +23,38 @@ const ChangePassword = () => {
       setConfirmPasswordVisible(!confirmPasswordVisible);
     }
   };
-
-  const handleSubmit = (e) => {
+   const requestData={
+    oldPassword:currentPassword,
+    newPassword:newPassword,
+    confirmNewPassword:confirmPassword,
+    token:token
+   }
+  const handleSubmit =async (e) => {
     e.preventDefault();
-    alert("Password changed successfully!");
+    try{
+      dispatch(setLoader(true));
+      const response = await axios.post("http://localhost:4000/api/v1/auth/changePassword",
+        requestData
+      ,{
+        headers:{
+         "Content-Type":"application/json",withCredentials:true,
+        }
+      });
+      console.log("response from change password",response.data);
+      if(response.data.success){
+        dispatch(setLoader(false));
+        toast.success("Password Updated Successfully!")
+      }
+    }catch(error){
+      toast.error(error.response?.data?.message || "Something Went Wrong!");
+      console.error("Error:", error.response?.data || error.message);
+
+    }finally{
+      dispatch(setLoader(false))
+    }
+    setConfirmPassword("");
+    setCurrentPassword("");
+    setNewPassword("")
   };
 
   return (

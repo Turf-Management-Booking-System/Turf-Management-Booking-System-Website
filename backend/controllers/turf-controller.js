@@ -189,7 +189,14 @@ exports.viewBookingById = async(req,res)=>{
 // confirmation booking
 exports.getAllTurfLocations = async(req,res)=>{
     try{
-      const turfLocations = await Turf.find({}).select("turfLocation");
+      const turfLocations = await Turf.aggregate([
+        { 
+            $group: { 
+                _id: "$turfLocation", // Group by turfLocation
+                docId: { $first: "$_id" } // Get first _id for each unique location
+         } 
+        }
+      ]);
       console.log("turf locations",turfLocations);
       return res.status(200).json({
         success:true,

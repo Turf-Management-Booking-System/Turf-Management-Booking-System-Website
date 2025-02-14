@@ -1,6 +1,6 @@
 const{auth,isAdmin,isUser} = require("../middlewares/auth-middleware");
 // importing the authentication controller
-const {signup,login,changePassword, sendOtp, verifyOtp, forgetPassword, resetPassword, contactMe,} = require("../controllers/auth-controller");
+const {signup,login,changePassword, sendOtp, verifyOtp, forgetPassword, resetPassword, contactMe, deleteProfile, uploadProfileImage,updateProfile} = require("../controllers/auth-controller");
 const express= require("express");
 const router = express.Router();
 // routing the path
@@ -13,6 +13,9 @@ router.post("/verifyOtp",verifyOtp);
 router.post("/forgetPassword",forgetPassword);
 router.post("/resetPassword",resetPassword);
 router.post("/contactMe",contactMe);
+router.delete("/deleteProfile/:id",deleteProfile);
+router.post("/updateProfile/:id",updateProfile);
+router.post("/upload-Profile-Image/:id",uploadProfileImage);
 
 // protected routes 
 router.get("/admin",auth,isAdmin,(req,res)=>{

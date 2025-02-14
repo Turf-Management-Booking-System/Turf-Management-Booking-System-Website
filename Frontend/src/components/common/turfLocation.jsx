@@ -11,7 +11,7 @@ export const fetchTurfLocations = () => async (dispatch) => {
       },
       withCredentials: true,
     });
-    console.log("Response from backend location", response.data);
+    console.log("Response from backend location", response.data.turf);
     dispatch(setLocation(response.data.turf));
   } catch (error) {
     console.log("Error", error.response?.data || error.message);

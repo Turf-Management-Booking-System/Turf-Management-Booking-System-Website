@@ -36,11 +36,11 @@ const LocationPopup = () => {
         <div className="flex flex-wrap justify-center space-x-4">
           {turfs.map((turf) => (
             <button
-              key={turf._id}
+              key={turf.docId}
               className="cursor-pointer p-2 bg-gray-100 hover:bg-gray-200 rounded-md m-1"
-              onClick={() => handleSelectLocation(turf.turfLocation)}
+              onClick={() => handleSelectLocation(turf._id)}
             >
-              {turf.turfLocation}
+              {turf._id}
             </button>
           ))}
         </div>

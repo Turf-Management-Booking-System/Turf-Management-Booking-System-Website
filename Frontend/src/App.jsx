@@ -67,8 +67,6 @@ const App = () => {
         <Route path="/otp" element={<Otp />} />
         <Route path="/forgetpassword" element={<ForgetPassword />} />
         <Route element={<PrivateRoute />}>
-          <Route path="/changepassword" element={<ChangePassword />} />
-          <Route path="/dashboard" element={<Dashboard />} />
         </Route>
         <Route path="/contact" element={<Contact />} />
         <Route path="/updatepassword" element={<UpdatePassword/>}/>
@@ -78,6 +76,10 @@ const App = () => {
         <Route path="/profile" element={<Profile/>}/>
         <Route path="/notification" element={<Notification/>}/>
         <Route path="/chatbot" element={<Chatbot/>}/>
+        <Route path="/changepassword" element={<ChangePassword />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+         {/* work is pending for private routing */}
+
       </Routes>
         
       {!isAuthPage && <Footer />}

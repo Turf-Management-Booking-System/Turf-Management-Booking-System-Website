@@ -53,7 +53,10 @@ exports.signup = async(req,res)=>{
             image:`https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
             additionalFields:profile._id
         });
-        console.log("new user",user);
+        profile.user = user._id;
+        await Profile.findByIdAndUpdate(profile._id, { user: user._id });
+
+        await profile.save();
         // return the response
         res.status(200).json({
             success:true,
@@ -474,4 +477,88 @@ exports.contactMe =async (req,res)=>{
                 error:error.message
             })
         }
+}
+exports.uploadProfileImage=(req,res)=>{
+    try{
+
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Error while updating  Profile Image! Please try again later!",
+            error:error.message
+        })
+    }
+}
+exports.updateProfile  = async(req,res)=>{
+    try{
+      const {firstName,lastName,email,gender,phoneNumber,dateOfBirth,location,description,about,id} = req.body;
+      const updateProfile = await Profile.findByIdAndUpdate({
+          _id:id
+      },{
+          gender:gender,
+          phoneNumber:phoneNumber,
+          dateOfBirth:dateOfBirth,
+          location:location,
+          description:description,
+          about:about
+      },{new:true});
+      let updateUserProfile;
+      if(email||firstName||lastName){
+         updateUserProfile = await User.findByIdAndUpdate({
+            _id:id
+        },{
+            email:email,
+            lastName:lastName,
+            firstName:firstName,
+        },{new:true})
+      }
+
+      return res.status(200).json({
+        success:true,
+        message:"Profile Updated Successfully!",
+        updateProfile,
+        updateUserProfile,
+      })
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Error while updating Profile! Please try again later!",
+            error:error.message
+        })
+    }
+}
+exports.deleteProfile = async(req,res)=>{
+    try{
+      const {id} = req.params;
+      if (!id){
+        return res.status(400).json({
+            success:false,
+            message:"User Id not exits!"
+        })
+      }
+      const user = await User.findById(id);
+      if(!user){
+        return res.status(400).json({
+            success:false,
+            message:"User doest not found!"
+        })
+      }
+      const deleteProfile = await Profile.findOneAndDelete({ user: id });
+      const deletedUser = await User.findByIdAndDelete(id);
+
+      console.log("deleted account",user);
+      return res.status(200).json({
+        success:true,
+        message:"Account Deleted Successfully!",
+        deletedUser,
+        deleteProfile,
+      })
+
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Error while deleting Profile! Please try again later!",
+            error:error.message
+        })
+    }
 }
