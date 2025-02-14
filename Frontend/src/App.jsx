@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
+import { DarkModeProvider } from "./context/DarkModeContext";
 import Navbar from "./components/common/Navbar";
 import Home from "./components/pages/Home";
 import Footer from "./components/common/Footer";
@@ -22,6 +23,7 @@ import LocationPopup from "./components/common/locationPopup";
 import TurfPage from "./components/pages/TurfPage";
 import Profile from "./components/pages/Profile";
 import Notification from "./components/pages/Notification";
+import Chatbot from "./components/pages/Chatbot";
 import { loadNotification } from "./slices/notificationSlice";
 import { setNotification } from "./slices/notificationSlice";
 const App = () => {
@@ -55,6 +57,7 @@ const App = () => {
   
   return (
     <>
+    <DarkModeProvider>
        <LocationPopup/>
       {loader && <Spinner />}
       {!isAuthPage && <Navbar />}
@@ -74,9 +77,11 @@ const App = () => {
         <Route path="/turf" element={<TurfPage/>}/>
         <Route path="/profile" element={<Profile/>}/>
         <Route path="/notification" element={<Notification/>}/>
+        <Route path="/chatbot" element={<Chatbot/>}/>
       </Routes>
         
       {!isAuthPage && <Footer />}
+    </DarkModeProvider>
     </>
   );
 };

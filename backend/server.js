@@ -2,8 +2,11 @@ const express = require("express");
 const connectDB = require("./config/database");
 const cors = require("cors");
 const app = express();
+
+
 // defines the ports
 const PORT =  process.env.PORT || 4000;
+  
 // for json data to accept
 app.use(express.json());
 app.use(cors({ origin: [
@@ -19,13 +22,17 @@ require("dotenv").config();
 const authRoutes = require("./routes/auth-routes");
 const turfRoutes = require("./routes/turf-routes");
 const notifyRoutes = require("./routes/notify-routes");
+const chatBotRoutes =require("./routes/chatBot-routes")
+
 app.use("/api/v1/auth",authRoutes);
 app.use("/api/v1/turf",turfRoutes);
 app.use("/api/v1/notify",notifyRoutes);
+app.use("/api/v1/ai",chatBotRoutes);
 // root route
 app.get("/",(req,res)=>{
        res.send("hello jee kaise ho")
 })
+
 // connection to db
 connectDB();
 // activate the server

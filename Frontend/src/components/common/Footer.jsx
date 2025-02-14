@@ -3,12 +3,12 @@ import React from "react";
 function footer() {
   return (
     <>
-      <footer className="bg-white text-gray-800 py-10">
+      <footer className="bg-[#587990] dark:bg-black text-white py-10">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo & About Section */}
           <div>
-            <h3 className="text-xl font-bold text-green-400 mb-4">KickOnTurf</h3>
-            <p className="text-sm font-poppins">
+            <h3 className="text-3xl font-orbitron font-bold text-black dark:text-white mb-4">KickOnTurf</h3>
+            <p className="text-lg font-poppins">
               Your go-to platform for managing, booking, and scheduling sports
               turfs seamlessly.
             </p>
@@ -16,8 +16,8 @@ function footer() {
 
           {/* Quick Links Section */}
           <div>
-            <h4 className="font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2">
+            <h4 className="font-semibold mb-4 font-serifa text-black text-2xl">Quick Links</h4>
+            <ul className="space-y-2 text-lg">
               <li>
                 <a href="/" className="hover:underline">
                   Home
@@ -43,11 +43,11 @@ function footer() {
 
           {/* Contact Section */}
           <div>
-            <h4 className="font-semibold mb-4">Contact Us</h4>
-            <p className="text-sm">
+            <h4 className="font-semibold mb-4 text-xl text-black">Contact Us</h4>
+            <p className="text-lg">
               📞 <span className="font-medium">+91-9876543210</span>
             </p>
-            <p className="text-sm">
+            <p className="text-lg">
               📧{" "}
               <a
                 href="mailto:support@kickonturf.com"
@@ -56,13 +56,13 @@ function footer() {
                 support@kickonturf.com
               </a>
             </p>
-            <p className="text-sm">📍 123, Turf Street, Mumbai, India</p>
+            <p className="text-lg">📍 123, Turf Street, Mumbai, India</p>
           </div>
 
           {/* Social Media Links */}
           <div>
-            <h4 className="font-semibold mb-4">Follow Us</h4>
-            <div className="flex space-x-4">
+            <h4 className="font-semibold mb-4 text-black text-2xl">Follow Us</h4>
+            <div className="flex space-x-4 ">
               <a
                 href="https://facebook.com"
                 className="hover:scale-110 transform transition"
@@ -70,7 +70,7 @@ function footer() {
                 <img
                   src="https://img.icons8.com/color/48/facebook-circled--v1.png"
                   alt="Facebook"
-                  className="h-8"
+                  className="h-12"
                 />
               </a>
               <a
@@ -80,7 +80,7 @@ function footer() {
                 <img
                   src="https://img.icons8.com/color/48/twitter-circled.png"
                   alt="Twitter"
-                  className="h-8"
+                  className="h-12"
                 />
               </a>
               <a
@@ -90,7 +90,7 @@ function footer() {
                 <img
                   src="https://img.icons8.com/color/48/instagram-new.png"
                   alt="Instagram"
-                  className="h-8"
+                  className="h-12"
                 />
               </a>
               <a
@@ -100,7 +100,7 @@ function footer() {
                 <img
                   src="https://img.icons8.com/color/48/linkedin-circled.png"
                   alt="LinkedIn"
-                  className="h-8"
+                  className="h-12"
                 />
               </a>
             </div>
@@ -108,12 +108,12 @@ function footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-10 border-t border-gray-200 pt-4 text-center text-sm text-gray-600">
+        <div className="mt-10 border-t border-gray-200 pt-4 text-center text-lg font-poppins text-black">
           <p>© 2025 KickOnTurf. All Rights Reserved.</p>
           <p>
             Built with 💚 by{" "}
-            <a href="/" className="text-green-600 hover:underline">
-              Your Team
+            <a href="/" className="text-white hover:underline">
+              Nagma and Shabina
             </a>
             .
           </p>

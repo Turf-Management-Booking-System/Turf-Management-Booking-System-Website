@@ -51,9 +51,13 @@ const Notification = () => {
   const filteredNotifications = notifications.filter((notif) => {
     if (filter === "read" && !notif.isRead) return false;
     if (filter === "unread" && notif.isRead) return false;
-    if (typeFilter !== "all" && notif.messageType !== typeFilter) return false;
+    if (typeFilter !== "all" && notif.messageType.toLowerCase() !== typeFilter.toLowerCase()) return false;
     return true;
   });
+
+  console.log("All Notifications:", notifications);
+
+
 
   return (
     <div className="min-h-screen w-full bg-deepForestGreen flex justify-center pt-16 mt-10">
@@ -123,6 +127,7 @@ const Notification = () => {
                     ${notif.messageType === "warn" ? "border-red-300" :
                     notif.messageType === "alert" ? "border-yellow-200" :
                     "border-blue-300"
+                    
                   }`}
                 >
                   {/* Left Section - Logo & Message */}
