@@ -8,11 +8,15 @@ import { setNotification } from "../../slices/notificationSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { loadNotification } from "../../slices/notificationSlice";
+import { FaKey } from "react-icons/fa";
+import { BiHistory } from "react-icons/bi";
+import Chatbot from "../pages/Chatbot";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { darkMode, setDarkMode } = useContext(DarkModeContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(false);
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const notifications = useSelector(
@@ -23,13 +27,17 @@ function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const handleChatbotToggle = () => {
+    setShowChatbot((prev) => !prev); 
+  };
+
   const handleMenu = () => setMenuOpen((prev) => !prev);
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
   const handleLogoutClick = (event) => {
-    setDropdownOpen(false); 
+    setDropdownOpen(false);
     event.preventDefault();
     dispatch(logout());
-    navigate('/login')
+    navigate("/login");
   };
   
    useEffect(()=>{
@@ -61,7 +69,7 @@ function Navbar() {
    console.log("unreadCount",unreadCount);
 
   return (
-    <nav className="p-3 flex bg-[#587990] dark:bg-gray-900 text-white justify-between items-center fixed top-0 left-0 right-0 z-20 shadow-md">
+    <nav className="p-3 flex bg-[#5886a7] dark:bg-gray-900 text-white justify-between items-center fixed top-0 left-0 right-0 z-20 shadow-md">
       {/* Logo */}
       <Link to="/" className="flex gap-2 items-center flex-1 ml-3">
         <span className="text-xl font-orbitron font-bold">KickOnTurf</span>
@@ -85,11 +93,12 @@ function Navbar() {
       </div>
 
       <div className="hidden lg:flex flex-1 items-center justify-end gap-4 mr-5">
-        <div className="text-4xl">
-          <button onClick={() => navigate("/chatbot")}>
+      <div className="text-4xl">
+          <button onClick={handleChatbotToggle}>
             <TbMessageChatbot />
           </button>
         </div>
+        {showChatbot && <Chatbot onClose={handleChatbotToggle} />}
         {/* Dark Mode Toggle */}
         <button
           onClick={toggleDarkMode}
@@ -107,12 +116,12 @@ function Navbar() {
           <div className="relative flex items-center gap-4">
             <button
               onClick={() => navigate("/notification")}
-              className="relative p-2 hover:bg-green-900 dark:hover:bg-gray-700 rounded-full"
+              className="relative p-2 hover:bg-[#8bb0ca] dark:hover:bg-gray-700 rounded-full"
             >
               <i className="bx bx-bell text-2xl"></i>
               {/*temporary dot hehehe*/}
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 rounded-full">
+                <span className="absolute top-0 right-1.5 w-1 h-1 rounded-full">
                   {unreadCount}
                 </span>
               )}
@@ -170,7 +179,18 @@ function Navbar() {
                     className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
                   >
                     <div className="flex items-center gap-5">
-                      <i className="bx bx-history text-2xl"></i>Booking History
+                    <BiHistory className="text-2xl" />Booking History
+                    </div>
+                    <i className="bx bx-chevron-right text-2xl"></i>
+                  </Link>
+
+                  <Link
+                    to="/changepassword"
+                    className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
+                  >
+                    <div className="flex items-center gap-5">
+                    <FaKey size={20} />
+                    Change Password
                     </div>
                     <i className="bx bx-chevron-right text-2xl"></i>
                   </Link>
