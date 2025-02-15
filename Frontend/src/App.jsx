@@ -26,6 +26,7 @@ import Notification from "./components/pages/Notification";
 import Chatbot from "./components/pages/Chatbot";
 import { loadNotification } from "./slices/notificationSlice";
 import { setNotification } from "./slices/notificationSlice";
+import FloatingButton from "./components/pages/FloatingButton";
 const App = () => {
   const dispatch = useDispatch(); 
   const location = useLocation();

@@ -3,6 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { setLoader } from "../../slices/authSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
+import lockBg from "../../assets/Images/lockBg.jpg"
+import FloatingButton from "./FloatingButton";
+
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -60,12 +63,15 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-deepForestGreen">
-      <div className="bg-gradient-to-r from-green-400 via-lime-400 to-green-600 shadow-lg rounded-xl w-full sm:w-[80%] md:w-[60%] lg:w-[40%] p-8 mx-4">
-        <h2 className="text-2xl font-bold text-teal-green text-center mb-4 font-orbitron">
+    <div style={{
+              backgroundImage: `url(${lockBg})`}} className="flex justify-center items-center min-h-screen bg-cover bg-center">
+              <div className="absolute inset-0 dark:bg-black bg-green-100 dark:opacity-65 opacity-85"></div> 
+      <div className="bg-[#3cb48a] dark:bg-gray-600 dark:border-white border-black border-2 shadow-lg rounded-xl w-full sm:w-[76%] md:w-[56%] lg:w-[37%] p-8 mx-4 relative z-10">
+        <FloatingButton/>
+        <h2 className="text-3xl font-bold text-white text-center mb-4 font-orbitron">
           Change Password
         </h2>
-        <p className="text-gray-600 text-center mb-6 font-poppins">
+        <p className="text-white text-center mb-6 font-poppins">
           Enter your current password and a new password to change it.
         </p>
         <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
@@ -73,7 +79,7 @@ const ChangePassword = () => {
           <div className="relative">
             <label
               htmlFor="currentPassword"
-              className="text-sm font-medium text-gray-700 font-poppins"
+              className="text-sm font-medium text-white font-poppins"
             >
               Current Password
             </label>
@@ -89,7 +95,7 @@ const ChangePassword = () => {
             <button
               type="button"
               onClick={() => togglePasswordVisibility("current")}
-              className="absolute right-3 top-14 transform -translate-y-1/2 text-deepForestGreen text-2xl"
+              className="absolute right-3 top-14 transform -translate-y-1/2 text-black text-2xl"
             >
               <i
                 className={`bx ${currentPasswordVisible ? "bxs-hide" : "bxs-show"}`}
@@ -101,7 +107,7 @@ const ChangePassword = () => {
           <div className="relative">
             <label
               htmlFor="newPassword"
-              className="text-sm font-medium text-gray-700 font-poppins"
+              className="text-sm font-medium text-white font-poppins"
             >
               New Password
             </label>
@@ -117,7 +123,7 @@ const ChangePassword = () => {
             <button
               type="button"
               onClick={() => togglePasswordVisibility("new")}
-              className="absolute right-3 top-14 transform -translate-y-1/2 text-deepForestGreen text-2xl"
+              className="absolute right-3 top-14 transform -translate-y-1/2 text-black text-2xl"
             >
               <i
                 className={`bx ${newPasswordVisible ? "bxs-hide" : "bxs-show"}`}
@@ -129,7 +135,7 @@ const ChangePassword = () => {
           <div className="relative">
             <label
               htmlFor="confirmPassword"
-              className="text-sm font-medium text-gray-700 font-poppins"
+              className="text-sm font-medium text-white font-poppins"
             >
               Confirm New Password
             </label>
@@ -137,7 +143,7 @@ const ChangePassword = () => {
               type={confirmPasswordVisible ? "text" : "password"}
               id="confirmPassword"
               placeholder="Confirm your new password"
-              className="w-full border border-gray-300 rounded-lg p-3 mt-1 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-gray-300 rounded-lg p-3 mt-1 text-gray-800 focus:outline-none focus:ring-2 focus:ring-black"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
@@ -145,7 +151,7 @@ const ChangePassword = () => {
             <button
               type="button"
               onClick={() => togglePasswordVisibility("confirm")}
-              className="absolute right-3 top-14 transform -translate-y-1/2 text-deepForestGreen text-2xl"
+              className="absolute right-3 top-14 transform -translate-y-1/2 text-black text-2xl"
             >
               <i
                 className={`bx ${confirmPasswordVisible ? "bxs-hide" : "bxs-show"}`}
@@ -156,14 +162,14 @@ const ChangePassword = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="bg-deepForestGreen text-white py-3 rounded-lg hover:bg-green-600 transition duration-200"
+            className="bg-white  text-black py-3 rounded-lg hover:bg-green-300  dark:hover:bg-gray-400 text-lg transition duration-200"
           >
             Change Password
           </button>
         </form>
-        <p className="text-sm text-gray-500 text-center mt-6 font-poppins">
+        <p className="text-l text-white text-center mt-6 font-poppins">
           Remembered your password?{" "}
-          <a href="/login" className="text-green-600 underline">
+          <a href="/login" className="text-green-950 dark:text-black underline">
             Log In
           </a>
         </p>
