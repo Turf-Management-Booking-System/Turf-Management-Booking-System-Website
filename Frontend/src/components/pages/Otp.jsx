@@ -140,7 +140,7 @@ const Otp = () => {
     }
    }
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-green-100 via-lime-200 to-green-300">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-[#8dabc1]  to-[#1a527a]">
       <div className="bg-white shadow-lg rounded-xl w-full max-w-md p-8 mx-4">
         <h2 className="text-2xl font-bold text-green-600 text-center mb-4">Enter OTP</h2>
         <p className="text-gray-600 text-center mb-6">

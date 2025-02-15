@@ -87,7 +87,7 @@ const ChangePassword = () => {
               type={currentPasswordVisible ? "text" : "password"}
               id="currentPassword"
               placeholder="Enter your current password"
-              className="w-full border border-gray-300 rounded-lg p-3 mt-1 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-gray-300 rounded-lg p-3 mt-1 text-gray-800 focus:outline-none focus:ring-2 focus:ring-black"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               required
@@ -115,7 +115,7 @@ const ChangePassword = () => {
               type={newPasswordVisible ? "text" : "password"}
               id="newPassword"
               placeholder="Enter your new password"
-              className="w-full border border-gray-300 rounded-lg p-3 mt-1 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-gray-300 rounded-lg p-3 mt-1 text-gray-800 focus:outline-none focus:ring-2 focus:ring-black"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
