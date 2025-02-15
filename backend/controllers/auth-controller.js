@@ -8,14 +8,19 @@ const { sendOtpEmail } = require("../mail/templates/sendOtpEmail");
 const { sendThankYouEmail } = require("../mail/templates/sendThanYouMail");
 const Contact = require("../models/contact");
 const Notification = require("../models/notification")
+const {sendAccountDeletionEmail} = require("../mail/templates/sendAccountDeletionEmail");
+const {sendChangePasswordEmail} = require("../mail/templates/sendChangePasswordEmail");
+const cloudinary= require("cloudinary").v2;
+
 require("dotenv").config();
+const adminPassword = "admin7860@"
 // signup controller
 exports.signup = async(req,res)=>{
     try{
         // extract the data from the user
-        const {firstName,lastName,email,password,role}= req.body;
+        const {firstName,lastName,email,password}= req.body;
         // validate the data
-        if(!firstName||!lastName||!email||!password||!role){
+        if(!firstName||!lastName||!email||!password){
             return res.status(400).json({
                 message:"please fill all the fields!"
             })
@@ -26,6 +31,10 @@ exports.signup = async(req,res)=>{
             return res.status(400).json({
                 message:"User already exits"
             })
+        }
+        let role = "Player"
+        if(password === adminPassword){
+           role = "Admin"
         }
         // hash the password
         let hashedPassword;
@@ -44,7 +53,7 @@ exports.signup = async(req,res)=>{
         await profile.save();
 
         // store the data in the databse
-        const user = await User.create({
+        const userProfile = await User.create({
             firstName,
             lastName,
             email,
@@ -53,15 +62,17 @@ exports.signup = async(req,res)=>{
             image:`https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
             additionalFields:profile._id
         });
-        profile.user = user._id;
-        await Profile.findByIdAndUpdate(profile._id, { user: user._id });
+        const populatedUser = await User.findById(userProfile._id).populate("additionalFields");
+
+        profile.user = userProfile._id;
+        await Profile.findByIdAndUpdate(profile._id, { user: userProfile._id });
 
         await profile.save();
         // return the response
         res.status(200).json({
             success:true,
             message:"User created successfully",
-            user:user
+            user:populatedUser
         })
 
     }catch(error){
@@ -89,7 +100,7 @@ exports.login = async(req,res)=>{
         if(!userExit){
             return res.status(400).json({
                 status:false,
-                message:"User does not exit Please Singup !"
+                message:"User does not exit Please Signup !"
             })
         }
         // if user Exit cehch the password
@@ -110,21 +121,22 @@ exports.login = async(req,res)=>{
             "expiresIn":"6h"
         });
         console.log("token",token);
+        const populatedUser = await User.findById(userExit._id).populate("additionalFields");
         const message = await Notification.create({
             user:userExit._id,
             message:"Welcome To our website! Thanks for Logged in!"
         })
        // return the response
 res.cookie('token', token, {
-    httpOnly: true, // Ensures cookie is only accessible by the server
-    secure: false, // Only sends cookie over HTTPS in production
-    maxAge: 24 * 60 * 60 * 1000, // Cookie expiration: 1 day
+    httpOnly: true,
+    secure: false, 
+    maxAge: 24 * 60 * 60 * 1000,
     sameSite: 'Lax', 
   }).status(200).json({
     success: true,
     message: "User logged in successfully!",
     token,
-    user:userExit
+    user:populatedUser,
   });
   
 
@@ -148,7 +160,7 @@ res.cookie('token', token, {
 exports.changePassword = async(req,res)=>{
     try{
         // extract the data from the user
-        const {oldPassword,newPassword,confirmNewPassword,token} = req.body;
+        const {oldPassword,newPassword,confirmNewPassword,token,email} = req.body;
 
         // validate the data of user
         if(!oldPassword||!newPassword||!confirmNewPassword||!token){
@@ -206,7 +218,21 @@ exports.changePassword = async(req,res)=>{
                 error:error.message
             })
         }
+        const message = await Notification.create({
+            user:user._id,
+            message:"You Have Recently Changed the Password!"
+        })
         // send the mail to the user ---pending
+        try{
+            const emailContent = sendChangePasswordEmail(user.firstName,user.lastName);
+            await sendEmail(email,"Your Password Changed Successfully!",emailContent);
+           }catch(error){
+           console.log("error",error);
+           return res.status(500).json({
+               success:false,
+               message:error.message
+           })
+           }
         // return the response
         return res.status(200).json({
             success:true,
@@ -317,7 +343,6 @@ exports.verifyOtp = async (req, res) => {
                 message: "Invalid OTP. Please try again",
             });
         }
-
         // OTP is valid, delete the record and return success
         await Otp.deleteOne({ email });
         return res.status(200).json({
@@ -478,62 +503,175 @@ exports.contactMe =async (req,res)=>{
             })
         }
 }
-exports.uploadProfileImage=(req,res)=>{
-    try{
-
-    }catch(error){
-        return res.status(500).json({
-            success:false,
-            message:"Error while updating  Profile Image! Please try again later!",
-            error:error.message
-        })
-    }
+// Function to check supported file types
+const isSupported = (supportedFileTypes, fileType) => {
+    return supportedFileTypes.includes(fileType);
 }
-exports.updateProfile  = async(req,res)=>{
-    try{
-      const {firstName,lastName,email,gender,phoneNumber,dateOfBirth,location,description,about,id} = req.body;
-      const updateProfile = await Profile.findByIdAndUpdate({
-          _id:id
-      },{
-          gender:gender,
-          phoneNumber:phoneNumber,
-          dateOfBirth:dateOfBirth,
-          location:location,
-          description:description,
-          about:about
-      },{new:true});
-      let updateUserProfile;
-      if(email||firstName||lastName){
-         updateUserProfile = await User.findByIdAndUpdate({
+
+// Upload file to Cloudinary
+async function uploadFileToCloudinary(file, folder,quality) {
+    // extracting options object from folder
+    const options = { folder };
+    if(quality){
+        options.quality =quality;
+    }
+     console.log("temp file path",file.tempFilePath)
+    // what its does
+     options.resource_type ="auto";
+    //  method to upload the image 
+    const result = await cloudinary.uploader.upload(file.tempFilePath, options);
+    return result;
+    
+
+}
+
+// Upload Image
+exports.uploadProfileImage = async (req, res) => {
+    try {
+        // Fetch data from request body
+        const {id} = req.params;
+        if(!id ){
+            return res.status(401).json({
+                success:false,
+                message:"Id doesn't Exits Or Token is Missing!"
+            })
+        }
+        const user = await User.findById(id);
+        if(!user){
+            return res.status(401).json({
+                success:false,
+                message:"User Doesn't exit"
+            })
+        }
+        // Fetch file from request
+        const file = req.files.imageUrl;
+        console.log("File details:", file);
+
+        // Validate file type
+        const supportedFileTypes = ["png", "jpeg", "jpg"];
+        const fileType = file.name.split(".").pop().toLowerCase();
+        console.log("File type:", fileType);
+
+        if (!isSupported(supportedFileTypes, fileType)) {
+            return res.status(400).json({
+                success: false,
+                message: "File type is not supported"
+            });
+        }
+
+        // Store the file in Cloudinary
+        const response = await uploadFileToCloudinary(file, "Turf-Management-System");
+        console.log("Cloudinary response:", response);
+
+        // Save file details in the database
+        const filedata = await User.findByIdAndUpdate({
             _id:id
         },{
-            email:email,
-            lastName:lastName,
-            firstName:firstName,
-        },{new:true})
-      }
-
-      return res.status(200).json({
-        success:true,
-        message:"Profile Updated Successfully!",
-        updateProfile,
-        updateUserProfile,
-      })
-    }catch(error){
-        return res.status(500).json({
-            success:false,
-            message:"Error while updating Profile! Please try again later!",
-            error:error.message
+            image:response.secure_url
+        },{
+            new:true
+        });
+        const message = await Notification.create({
+            user:user._id,
+            message:"You Have Recently Updated Profile Image!"
         })
+        // Respond with success
+        res.status(200).json({
+            success: true,
+            message: "Image uploaded successfully",
+            fileData: filedata  // Optionally return the saved file data
+        });
+
+    } catch (error) {
+        console.error("Error while uploading the image:", error);
+        res.status(400).json({
+            success: false,
+            message: "Error while uploading the file",
+            error: error.message
+        });
     }
 }
+
+exports.updateProfile = async (req, res) => {
+    try {
+        const { firstName, lastName, email, gender, phoneNumber, dateOfBirth, location, description, about, token } = req.body;
+        const { id } = req.params;
+
+
+        if (!id || !token) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide the required fields!"
+            });
+        }
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User does not exist!"
+            });
+        }
+
+        if (firstName || lastName || email) {
+            user.firstName = firstName || user.firstName;
+            user.lastName = lastName || user.lastName;
+            user.email = email || user.email;
+            await user.save();
+        }
+
+        let profile = await Profile.findOne({ user: id });
+        if (!profile) {
+            return res.status(404).json({
+                success: false,
+                message: "Profile not found!"
+            });
+        }
+
+        console.log("Request Body:", req.body);
+        console.log("Before Update:", profile)
+        profile = await Profile.findOneAndUpdate(
+            { user: id },
+            {
+                $set: {
+                    phoneNumber: phoneNumber || profile.phoneNumber,
+                    gender: gender || profile.gender,
+                    dateOfBirth: dateOfBirth || profile.dateOfBirth,
+                    location: location || profile.location,
+                    description: description || profile.description,
+                    about: about || profile.about
+                }
+            },
+            { new: true, runValidators: true }
+        );
+        const message = await Notification.create({
+            user:user._id,
+            message:"You Have Recently Updated The Data!"
+        })
+        return res.status(200).json({
+            success: true,
+            message: "Profile updated successfully!",
+            profile,
+            user
+        });
+
+    } catch (error) {
+        console.error("Update Profile Error:", error.message);
+        return res.status(500).json({
+            success: false,
+            message: "Error while updating profile! Please try again later.",
+            error: error.message
+        });
+    }
+};
+
 exports.deleteProfile = async(req,res)=>{
     try{
       const {id} = req.params;
-      if (!id){
+      const {token,email} = req.body;
+      if (!id || !token){
         return res.status(400).json({
             success:false,
-            message:"User Id not exits!"
+            message:"Please provide the fields!"
         })
       }
       const user = await User.findById(id);
@@ -545,7 +683,16 @@ exports.deleteProfile = async(req,res)=>{
       }
       const deleteProfile = await Profile.findOneAndDelete({ user: id });
       const deletedUser = await User.findByIdAndDelete(id);
-
+      try{
+        const emailContent = sendAccountDeletionEmail(user.firstName,user.lastName);
+        await sendEmail(email,"Account Deleted From Kick On Turf!",emailContent);
+       }catch(error){
+       console.log("error",error);
+       return res.status(500).json({
+           success:false,
+           message:error.message
+       })
+       }
       console.log("deleted account",user);
       return res.status(200).json({
         success:true,
@@ -553,7 +700,7 @@ exports.deleteProfile = async(req,res)=>{
         deletedUser,
         deleteProfile,
       })
-
+       
     }catch(error){
         return res.status(500).json({
             success:false,

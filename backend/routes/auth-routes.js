@@ -11,10 +11,10 @@ router.post("/changePassword",auth,isUser,changePassword);
 router.post("/sendOtp",sendOtp);
 router.post("/verifyOtp",verifyOtp);
 router.post("/forgetPassword",forgetPassword);
-router.post("/resetPassword",resetPassword);
+router.post("/ressetPassword",resetPassword);
 router.post("/contactMe",contactMe);
-router.delete("/deleteProfile/:id",deleteProfile);
-router.post("/updateProfile/:id",updateProfile);
+router.delete("/deleteProfile/:id",auth,deleteProfile);
+router.post("/updateProfile/:id", auth,updateProfile);
 router.post("/upload-Profile-Image/:id",uploadProfileImage);
 
 // protected routes 

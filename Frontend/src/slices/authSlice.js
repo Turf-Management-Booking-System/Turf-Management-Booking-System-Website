@@ -28,19 +28,34 @@ const authSlice = createSlice({
       localStorage.removeItem("token");
     },
     setUser: (state, action) => {
-      if(state.registeredUser){
+      
       state.user = action.payload;
       localStorage.setItem("userData", JSON.stringify(action.payload));
-      }
+      
     },
 
     setLoader: (state, action) => {
       state.loader = action.payload;
     },
+   updateProfileImage: (state, action) => {
+          if (state.user) {
+        state.user.image = action.payload;
+        localStorage.setItem("userData", JSON.stringify(state.user));
+
+      }
+    },
+    deleteAccountUser:(state,action)=>{
+      state.user = null,
+      state.token =null,
+      state.isAuthenticated= false,
+      localStorage.removeItem("userData");
+      localStorage.removeItem("token");
+    
+    }
   },
 });
 
 // Export actions
-export const { login, logout, setUser, registerUser, setLoader } = authSlice.actions;
+export const { login, logout, setUser, registerUser, setLoader,updateProfileImage , deleteAccountUser} = authSlice.actions;
 
 export default authSlice.reducer;

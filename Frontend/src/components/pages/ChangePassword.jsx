@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setLoader } from "../../slices/authSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -11,6 +11,7 @@ const ChangePassword = () => {
   const [newPasswordVisible, setNewPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const token = localStorage.getItem("token");
+  const user = useSelector((state)=>state.auth.user)
   console.log("token",token);
   const dispatch = useDispatch();
   // Handle password visibility toggle for each input
@@ -27,7 +28,8 @@ const ChangePassword = () => {
     oldPassword:currentPassword,
     newPassword:newPassword,
     confirmNewPassword:confirmPassword,
-    token:token
+    token:token,
+    email:user.email
    }
   const handleSubmit =async (e) => {
     e.preventDefault();

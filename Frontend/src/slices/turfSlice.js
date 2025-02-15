@@ -21,9 +21,13 @@ const turfSlice = createSlice({
             state.isVisited = action.payload
             localStorage.setItem("visited",JSON.stringify(action.payload));
         },
+        deleteAccountTurf:(state,action)=>{
+            state.selectedLocations = null,
+            state.isVisited = false
+        }
     }
 })
 
-export const { setLocation,setSelectedTurfLocation,setVisited } = turfSlice.actions;
+export const { setLocation,setSelectedTurfLocation,setVisited,deleteAccountTurf } = turfSlice.actions;
 export default turfSlice.reducer;
 

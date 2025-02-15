@@ -32,7 +32,6 @@ const Login = () => {
     lastName:"",
     email:"",
     password:"",
-    role:"Player"
   });
 
   const togglePasswordVisibility = (field) => {
@@ -135,7 +134,7 @@ const LoginHandler = async (event) => {
 
       });
   
-      console.log("Response from backend:", response.data);
+      console.log("Response from backend signup:", response.data.user);
   
       if (response.data.success) {
         toast.success("OTP sent successfully!");

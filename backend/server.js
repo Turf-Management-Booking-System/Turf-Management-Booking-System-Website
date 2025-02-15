@@ -16,7 +16,14 @@ app.use(cors({ origin: [
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials:true,
     allowedHeaders:["Content-Type","Authorization","withCredentials"]
-}))
+}));
+const fileupload =require("express-fileupload");
+app.use(fileupload({
+    useTempFiles: true,       // Enable temp files
+    tempFileDir: '/tmp/'}      // Directory for temp files
+));
+const {cloudinaryConnect} =require("./config/cloudinary");
+cloudinaryConnect();
 require("dotenv").config();
 // import the routes
 const authRoutes = require("./routes/auth-routes");

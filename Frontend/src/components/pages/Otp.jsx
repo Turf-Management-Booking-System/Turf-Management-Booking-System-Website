@@ -4,16 +4,17 @@ import axios from "axios";
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { registerUser, setLoader } from '../../slices/authSlice';
+import { setUser, setLoader } from '../../slices/authSlice';
 
 const Otp = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const registeredUser = useSelector((state) => state.auth.registeredUser);
+  const user = useSelector((state)=>state.auth.user);
+  console.log("user for otp",user)
   const isForgetPassword = localStorage.getItem("isForgetPassword") === "true";
 
-  if (!registeredUser?.email) {
+  if (!user?.email) {
     toast.error("Email not found. Please ensure you are logged in.");
     return;
   }
@@ -55,7 +56,7 @@ const Otp = () => {
     const newOtp = otp.join("");
     const requestData = {
       otp: newOtp,
-      email: registeredUser.email,
+      email: user?.email,
     };
 
     try {
@@ -88,12 +89,12 @@ const Otp = () => {
       dispatch(setLoader(true));
       const signupResponse = await axios.post(
         "http://localhost:4000/api/v1/auth/signup",
-        { ...registeredUser }, // Ensure correct payload
+        { ...user }, // Ensure correct payload
         { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
 
       if (signupResponse.data?.success) {
-        dispatch(registerUser(signupResponse.data.user));
+        dispatch(setUser(signupResponse.data.user));
         setTimeout(() => {
           toast.success("User created successfully!");
         }, 2000);
@@ -110,7 +111,7 @@ const Otp = () => {
   };
    const resentOtp =async()=>{
     const requestData={
-      email:registeredUser.email
+      email:user?.email
     }
     try {
       dispatch(setLoader(true));

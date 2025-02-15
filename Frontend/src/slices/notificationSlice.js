@@ -34,11 +34,15 @@ const notificationSlice = createSlice({
             ? JSON.parse(storedNotifications)
             : [];
     },
+    deleteAccountNotification :(state)=>{
+     state.notifications=[],
+     localStorage.removeItem("userNotification")
+    }
     },
   });
   
   // Export actions
-  export const { setNotification,markAsRead,deleteNotification ,loadNotification} = notificationSlice.actions;
+  export const { setNotification,markAsRead,deleteNotification ,loadNotification,deleteAccountNotification} = notificationSlice.actions;
   
   export default notificationSlice.reducer;
   
