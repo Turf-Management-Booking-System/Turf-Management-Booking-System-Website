@@ -33,6 +33,7 @@ const App = () => {
   const loader = useSelector((state) => state.auth.loader);
   const notifications = useSelector((state)=>state.notification.notifications)
   // Check if current page is authentication-related
+  
   const isAuthPage = ["/otp", "/forgetpassword", "/updatepassword", "/changepassword"].includes(location.pathname);
 
   useEffect(() => {

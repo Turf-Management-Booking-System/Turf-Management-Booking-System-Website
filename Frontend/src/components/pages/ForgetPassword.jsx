@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { setLoader } from "../../slices/authSlice";
 import { toast } from "react-hot-toast";
 import axios from "axios";
+import FloatingButton from "./FloatingButton";
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState(""); 
@@ -50,25 +51,26 @@ const ForgetPassword = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-deepForestGreen">
-      <div className="bg-white shadow-lg rounded-xl w-full max-w-md p-8 mx-4">
-        <h2 className="text-2xl font-bold text-deepForestGreen text-center mb-4">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-[#8dabc1] to-[#1a527a] dark:from-gray-500 dark:to-gray-900">
+      <FloatingButton/>
+      <div className="bg-white dark:bg-black border border-black dark:border-white shadow-2xl rounded-xl w-full max-w-md p-8 mx-4">
+        <h2 className="text-2xl font-bold text-[#1a527a] dark:text-white text-center mb-4">
           Forgot Password?
         </h2>
-        <p className="text-gray-600 text-center mb-6">
+        <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
           Enter your registered email to receive a password reset link.
         </p>
         <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
           {/* Email Input */}
           <div>
-            <label htmlFor="email" className="text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-200">
               Email Address
             </label>
             <input
               type="email"
               id="email"
               placeholder="Enter your email"
-              className="w-full border border-gray-300 rounded-lg p-3 mt-1 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-gray-300 rounded-lg p-3 mt-1 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-200"
               value={email}
               onChange={handleEmailChange}
               required
@@ -77,12 +79,12 @@ const ForgetPassword = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition duration-200"
+            className="bg-[#3e81b0] dark:bg-gray-500 text-white py-3 rounded-lg hover:bg-[#71a4c8] dark:hover:bg-gray-400 transition duration-200"
           >
             Reset Password
           </button>
         </form>
-        <p className="text-sm text-gray-500 text-center mt-6">
+        <p className="text-sm text-gray-500 dark:text-gray-300 text-center mt-6">
           Remember your password?{" "}
           <a href="/login" className="text-green-600 underline">Log In</a>
         </p>

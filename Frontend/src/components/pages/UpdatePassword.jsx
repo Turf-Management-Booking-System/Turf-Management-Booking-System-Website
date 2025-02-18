@@ -5,28 +5,30 @@ import { setLoader } from "../../slices/authSlice";
 import axios from "axios";
 import {toast} from "react-hot-toast"
 import { useNavigate } from "react-router-dom";
+import lockBg from "../../assets/Images/lockBg.jpg"
+import FloatingButton from "./FloatingButton";
+
 const UpdatePassword = () => {
   const dispatch = useDispatch();
-  const [newPassword, setNewPassword] = useState(""); // State for new password
-  const [confirmPassword, setConfirmPassword] = useState(""); // State for confirm password
-  const [successMessage, setSuccessMessage] = useState(""); // State for success message
+  const [newPassword, setNewPassword] = useState(""); 
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const email = localStorage.getItem("email");
   const navigate = useNavigate();
   let requestData;
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent form reload
+    e.preventDefault();
     
     if (newPassword !== confirmPassword) {
       setSuccessMessage("Passwords do not match!");
   
-      // Clear input fields after showing the error
       setTimeout(() => {
         setSuccessMessage("");
         setNewPassword("");
         setConfirmPassword("");
       }, 2000);
   
-      return; // Stop further execution
+      return;
     }
     requestData ={
       newPassword:newPassword,
@@ -34,7 +36,7 @@ const UpdatePassword = () => {
       email:email,
     }
     await resetPasswordUpdate();
-    setSuccessMessage("Password updated successfully!"); // Show success message
+    setSuccessMessage("Password updated successfully!");
   
     // Clear input fields after success
     setTimeout(() => {
@@ -73,12 +75,14 @@ const UpdatePassword = () => {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-deepForestGreen">
-      <div className="bg-white shadow-lg rounded-xl w-full max-w-md p-8 mx-4">
+    <div  style={{ backgroundImage: `url(${lockBg})`}} className="flex justify-center items-center min-h-screen bg-cover bg-center">
+       <div className="absolute inset-0 dark:bg-black bg-green-100 dark:opacity-65 opacity-85"></div> 
+      <div className="bg-white dark:bg-black rounded-xl w-full max-w-md p-8 mx-4 relative z-10 shadow-2xl">
+        <FloatingButton/>
         <h2 className="text-2xl font-bold text-green-600 text-center mb-4">
           Update Password
         </h2>
-        <p className="text-gray-600 text-center mb-6">
+        <p className="text-gray-600 dark:text-white text-center mb-6">
           Enter your new password below.
         </p>
 
@@ -93,7 +97,7 @@ const UpdatePassword = () => {
         <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
           {/* New Password Input */}
           <div>
-            <label htmlFor="new-password" className="text-sm font-medium text-gray-700">
+            <label htmlFor="new-password" className="text-sm font-medium dark:text-white text-gray-700">
               New Password
             </label>
             <input
@@ -102,14 +106,14 @@ const UpdatePassword = () => {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Enter new password"
-              className="w-full border border-gray-300 rounded-lg p-3 mt-1 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-full border border-gray-400 rounded-lg p-3 mt-1 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
           </div>
 
           {/* Confirm Password Input */}
           <div>
-            <label htmlFor="confirm-password" className="text-sm font-medium text-gray-700">
+            <label htmlFor="confirm-password" className="text-sm font-medium text-gray-700 dark:text-white">
               Confirm Password
             </label>
             <input
@@ -118,18 +122,18 @@ const UpdatePassword = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Confirm new password"
-              className="w-full border border-gray-300 rounded-lg p-3 mt-1 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-full border border-gray-400 rounded-lg p-3 mt-1 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
           </div>
 
           {/* Submit Button */}
-          <button type="submit" className="bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition duration-200">
+          <button type="submit" className="bg-green-500 text-white py-3 rounded-lg hover:bg-green-700 transition duration-200">
             Update Password
           </button>
         </form>
 
-        <p className="text-sm text-gray-500 text-center mt-6">
+        <p className="text-sm text-gray-500 dark:text-gray-300 text-center mt-6">
           Go back to{" "}
           <Link to="/login" className="text-green-600 underline">Log In</Link>
         </p>

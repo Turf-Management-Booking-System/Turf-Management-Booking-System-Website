@@ -64,7 +64,7 @@ const ChangePassword = () => {
 
   return (
     <div style={{
-              backgroundImage: `url(${lockBg})`}} className="flex justify-center items-center min-h-screen bg-cover bg-center">
+              backgroundImage: `url(${lockBg})`}} className="flex justify-center items-center min-h-screen cc">
               <div className="absolute inset-0 dark:bg-black bg-green-100 dark:opacity-65 opacity-85"></div> 
       <div className="bg-[#3cb48a] dark:bg-gray-600 dark:border-white border-black border-2 shadow-lg rounded-xl w-full sm:w-[76%] md:w-[56%] lg:w-[37%] p-8 mx-4 relative z-10">
         <FloatingButton/>

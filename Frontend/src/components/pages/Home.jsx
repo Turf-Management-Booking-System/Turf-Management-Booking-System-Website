@@ -1,15 +1,146 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFutbol, faSearch, faCalendarCheck } from "@fortawesome/free-solid-svg-icons";
+import {
+  faFutbol,
+  faSearch,
+  faCalendarCheck,
+  faArrowRight,
+  faChevronDown,
+} from "@fortawesome/free-solid-svg-icons";
 import TurfImageDay from "../../assets/images/TurfImageDay.jpg";
 import TurfImageNight from "../../assets/images/TurfImageNight.jpg";
 import { DarkModeContext } from "../../context/DarkModeContext";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { Link } from "react-router-dom";
 
 function Home() {
   const { darkMode } = useContext(DarkModeContext);
   const [ref, inView] = useInView({ triggerOnce: false, threshold: 0.2 });
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const toggleFAQ = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+  const timelineItems = [
+    {
+      icon: faSearch,
+      title: "Search",
+      desc: "Explore the largest network of sports facilities all over India.",
+      position: "left",
+    },
+    {
+      icon: faCalendarCheck,
+      title: "Book",
+      desc: "Connect with the venue through the Book Now button to make online booking easy and secure.",
+      position: "right",
+    },
+    {
+      icon: faFutbol,
+      title: "Play",
+      desc: "The scene is set for your epic match!",
+      position: "left",
+    },
+  ];
+
+  const faqs = [
+    {
+      question: "How do I book a turf?",
+      answer:
+        "You can easily book a turf by searching for available slots, selecting your preferred time, and completing the booking process online.",
+    },
+    {
+      question: "Can I cancel my booking?",
+      answer:
+        "Yes, you can cancel your booking up to 24 hours before the scheduled time for a full refund.",
+    },
+    {
+      question: "What types of sports can I play?",
+      answer:
+        "Our turfs are suitable for various sports including football, cricket, tennis, and more. Check individual turf details for specific sport options.",
+    },
+    {
+      question: "Do I need to create an account to book a turf?",
+      answer:
+        "Yes, creating an account helps you manage your bookings, check availability, and receive updates.",
+    },
+    {
+      question: "How do I check my booking details?",
+      answer:
+        "You can check your booking details in the 'My Bookings' section of your account",
+    },
+    {
+      question: "What payment methods do you accept?",
+      answer:
+        "We accept UPI, credit/debit cards, net banking, and cash payments at selected locations.",
+    },
+    {
+      question: "Is there any advance payment required?",
+      answer:
+        "Yes, a partial or full advance payment is required to confirm your booking.",
+    },
+    {
+      question: "Will I get a refund if I cancel my booking?",
+      answer:
+        "Refunds are provided based on our cancellation policy. If canceled 24 hours before the booking, you get a full refund.",
+    },
+    {
+      question: "What facilities are available on the turf?",
+      answer:
+        "Our turfs have washrooms, parking, drinking water, and seating for spectators.",
+    },
+    {
+      question: "Are floodlights available for night matches?",
+      answer:
+        "Yes, our turfs are equipped with floodlights for evening and night games.",
+    },
+    {
+      question: "What are the rules for using the turf?",
+      answer:
+        "Users must wear proper sports footwear, avoid littering, and respect the time slot allotted to them. We have provided rules on each specific turf thats need to be follow",
+    },
+    {
+      question: "Is there a time limit for bookings?",
+      answer:
+        "Yes, the minimum booking duration is 30 minutes, and the maximum varies depending on availability.",
+    },
+    {
+      question: "How do I contact customer support?",
+      answer:
+        "To reach us go through contact page ,you can send mail,you can call on given number",
+    },
+    {
+      question: "I am facing issues with booking. What should I do?",
+      answer:
+        "If you face any issues, try refreshing the page or contacting our support team for assistance.",
+    },
+    {
+      question: "How can I change my account details?",
+      answer:
+        "You can update your profile details in the 'Edit Profile' section of your account",
+    },
+  ];
+
+  const featuredTurfs = [
+    {
+      id: 1,
+      name: "Green Valley Turf",
+      location: "Mumbai",
+      image: "",
+    },
+    {
+      id: 2,
+      name: "City Central Arena",
+      location: "Delhi",
+      image: "",
+    },
+    {
+      id: 3,
+      name: "Sunset Sports Complex",
+      location: "Bangalore",
+      image: "",
+    },
+  ];
 
   return (
     <>
@@ -37,11 +168,14 @@ function Home() {
           >
             <p className="font-display font-medium text-red-500 flex items-center group">
               <span className="group-hover:animate-shake">⏰</span> Hurry Up!
-              <span className="text-yellow-800"> Prime Slots Filling Fast!!</span>
+              <span className="text-yellow-800">
+                {" "}
+                Prime Slots Filling Fast!!
+              </span>
             </p>
           </motion.div>
           <h1 className="font-orbitron text-3xl sm:text-4xl font-semibold leading-snug">
-            Manage Your Turf Bookings Seamlessly!
+          Find & Book the Best Turfs Near You!
           </h1>
           <p className="font-montserrat text-lg mt-4 sm:text-xl sm:mt-6">
             Book, manage, and track turf bookings with ease. Perfect for sports
@@ -51,14 +185,14 @@ function Home() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 font-semibold rounded-lg text-white bg-green-600 shadow-sm hover:bg-opacity-90"
+              className="px-6 py-3 font-semibold rounded-lg text-white border border-white bg-green-600 shadow-sm hover:bg-opacity-90"
             >
-              Get Started
+              Book Now
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 font-semibold rounded-lg bg-white text-black border border-gray-400 hover:border-gray-800"
+              className="px-6 py-3 font-semibold rounded-lg bg-white text-black border border-gray-500 hover:border-gray-800"
             >
               Explore Features
             </motion.button>
@@ -67,34 +201,157 @@ function Home() {
       </motion.div>
 
       {/* Search, Book, Play Timeline */}
-      <section ref={ref} className="py-12 flex flex-col items-center relative">
-        <div className="w-1 h-[55rem] absolute left-1/2 transform -translate-x-1/2 bg-gray-900 text-white "></div>
-        {[ 
-          { icon: faSearch, title: "Search", desc: "Explore the largest network of sports facilities all over India.", position: "left" },
-          { icon: faCalendarCheck, title: "Book", desc: "Connect with the venue through the Book Now button to make online booking easy and secure.", position: "right" },
-          { icon: faFutbol, title: "Play", desc: "The scene is set for your epic match!", position: "left" }
-        ].map((item, index) => (
+      <section
+        ref={ref}
+        className="py-12 flex flex-col items-center relative bg-gray-100 dark:bg-gray-800"
+      >
+        <div className="w-1 h-[55rem] absolute left-1/2 transform -translate-x-1/2 bg-gray-300 dark:bg-gray-600"></div>
+        {timelineItems.map((item, index) => (
           <motion.div
             key={index}
-            initial={{ opacity: 0, x: item.position === "left" ? -100 : 100 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 + index * 0.2 }}
-            whileHover={{ scale: 1.05 }}
-            className={`relative flex items-center justify-${item.position} w-full max-w-6xl my-8`}
+            initial={{ opacity: 0, x: item.position === "left" ? -400 : 400 }}
+            animate={inView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 2.5, delay: index * 0.5 }}
+            className={`relative flex items-center w-full max-w-6xl my-8 ${
+              item.position === "left" ? "justify-start" : "justify-end"
+            }`}
           >
-            <div className={`w-1/2 p-6 flex ${item.position === "left" ? "justify-end" : "justify-start"}`}>
-              <div className="p-6 rounded-lg shadow-lg bg-white dark:bg-gray-900">
-                <FontAwesomeIcon icon={item.icon} size="3x" className="mb-4 text-[#587990] animate-bounce" />
-                <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+            <div
+              className={`w-1/2 p-6 ${
+                item.position === "left" ? "pr-12" : "pl-12"
+              }`}
+            >
+              <div className="p-6 rounded-lg shadow-lg bg-white dark:bg-gray-600 transition-all duration-300 hover:shadow-xl">
+                <FontAwesomeIcon
+                  icon={item.icon}
+                  size="3x"
+                  className="mb-4 text-[#5886a7] dark:text-[#9fbfd8] animate-bounce"
+                />
+                <h3 className="text-xl font-semibold mb-2 dark:text-white">
+                  {item.title}
+                </h3>
                 <p className="text-gray-600 dark:text-gray-300">{item.desc}</p>
               </div>
             </div>
-            <div className="w-8 h-8 bg-[#587990] rounded-full absolute left-1/2 transform -translate-x-1/2"></div>
+            <div className="w-8 h-8 bg-[#5886a7] dark:bg-[#9fbfd8] rounded-full absolute left-1/2 transform -translate-x-1/2"></div>
           </motion.div>
         ))}
+      </section>
+      {/* Featured Turfs */}
+      <section 
+      className="py-16 bg-white dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-8 text-center dark:text-white">
+            Featured Turfs
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ml-7 mr-7">
+            {featuredTurfs.map((turf, index) => (
+              <motion.div
+              key={turf.id}
+              initial={{ x: -200, opacity: 0 }} 
+              whileInView={{ x: 0, opacity: 1 }} 
+              transition={{ duration: 1.2, delay: index * 0.2 }} 
+              whileHover={{ scale: 1.05 }} 
+              viewport={{ once: false, amount: 0.2 }}
+              className="bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg"
+            >                  
+                <img
+                  src={turf.image || ""}
+                  alt={""}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold mb-2 dark:text-white">
+                    {turf.name}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    {turf.location}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <Link
+              to="/turfs"
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300"
+            >
+              View More Turfs
+              <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/*Faqs*/}
+      <section className="py-16 bg-gray-100 dark:bg-gray-800">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-8 text-center dark:text-white">
+            Frequently Asked Questions
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {faqs.map((faq, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-4 cursor-pointer"
+                onClick={() => toggleFAQ(index)}
+              >
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold dark:text-white">
+                    {faq.question}
+                  </h3>
+                  <motion.div
+                    animate={{ rotate: openIndex === index ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faChevronDown}
+                      className="text-blue-500"
+                    />
+                  </motion.div>
+                </div>
+
+                <motion.p
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{
+                    height: openIndex === index ? "auto" : 0,
+                    opacity: openIndex === index ? 1 : 0,
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="text-gray-600 dark:text-gray-300 overflow-hidden mt-2"
+                >
+                  {faq.answer}
+                </motion.p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CAT */}
+      <section className="py-16 bg-green-600 dark:bg-green-800">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4 text-white">
+            Ready to Book Your Perfect Turf?
+          </h2>
+          <p className="text-xl mb-8 text-blue-100">
+            Join thousands of sports enthusiasts and book your ideal playing
+            field today!
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-8 py-4 bg-white text-blue-600 font-bold rounded-lg shadow-lg hover:bg-blue-50 transition duration-300"
+          >
+            Get Started Now
+          </motion.button>
+        </div>
       </section>
     </>
   );
 }
-
 export default Home;

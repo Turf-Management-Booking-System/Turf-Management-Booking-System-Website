@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUser, setLoader } from '../../slices/authSlice';
+import FloatingButton from './FloatingButton';
 
 const Otp = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -14,6 +15,7 @@ const Otp = () => {
   console.log("user for otp",user)
   const isForgetPassword = localStorage.getItem("isForgetPassword") === "true";
 
+  
   if (!user?.email) {
     toast.error("Email not found. Please ensure you are logged in.");
     return;
@@ -140,14 +142,14 @@ const Otp = () => {
     }
    }
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-[#8dabc1]  to-[#1a527a]">
-      <div className="bg-white shadow-lg rounded-xl w-full max-w-md p-8 mx-4">
-        <h2 className="text-2xl font-bold text-green-600 text-center mb-4">Enter OTP</h2>
-        <p className="text-gray-600 text-center mb-6">
-          Please enter the 6-digit OTP sent to your registered mobile number.
-        </p>
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-[#8dabc1] to-[#1a527a] dark:from-gray-500 dark:to-gray-900 px-4">
+      <FloatingButton/>
+      <div className="bg-white dark:bg-black shadow-lg rounded-xl w-full max-w-md p-6 sm:p-8">
+        <h2 className="text-2xl font-bold text-[#1a527a] dark:text-white text-center mb-4">Enter OTP</h2>
+        <p className="text-gray-600 dark:text-gray-300 text-center mb-6">Please enter the 6-digit OTP sent to your email.</p>
+
         <form className="flex flex-col items-center" onSubmit={handleSubmit}>
-          <div className="flex space-x-2 mb-6">
+          <div className="flex justify-center gap-2 sm:gap-3 mb-6">
             {otp.map((digit, index) => (
               <input
                 key={index}
@@ -156,21 +158,24 @@ const Otp = () => {
                 value={digit}
                 onChange={(e) => handleChange(e.target, index)}
                 onKeyDown={(e) => handleBackspace(e, index)}
-                className="w-12 h-12 border border-gray-300 rounded-lg text-center text-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+                className="w-10 h-10 sm:w-12 sm:h-12 border border-gray-300 dark:border-gray-700 dark:bg-gray-100 rounded-lg text-center text-lg focus:outline-none focus:ring-2 focus:ring-green-400 transition"
               />
             ))}
           </div>
+
           <button
             type="submit"
-            className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition duration-200"
+            className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition duration-200 w-full sm:w-auto"
           >
             Verify OTP
           </button>
         </form>
-        <p className="text-sm text-gray-500 text-center mt-4">
-          Didn't receive the OTP? 
-          <button className="text-green-600 underline" onClick={resentOtp}>Resend OTP</button>
-          
+
+        <p className="text-sm text-gray-500 dark:text-gray-300 text-center mt-4">
+          Didn't receive the OTP?{" "}
+          <button className="text-green-600 underline" onClick={resentOtp}>
+            Resend OTP
+          </button>
         </p>
       </div>
     </div>

@@ -60,14 +60,14 @@ const Notification = () => {
 
 
   return (
-    <div className="min-h-screen w-full bg-deepForestGreen flex justify-center pt-16 mt-10">
+    <div className="min-h-screen w-full bg-green-100 dark:bg-black flex justify-center pt-16 mt-10">
       <motion.div
         initial={{ y: 500, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1.5, ease: "easeOut" }}
         className="w-full max-w-4xl"
       >
-        <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-xl">
+        <div className="w-full max-w-4xl bg-gray-200 p-6 rounded-lg shadow-xl">
           {/* Header Section */}
           <div className="flex items-center space-x-3">
             <i className="bx bx-bell text-green-900 text-4xl"></i>
