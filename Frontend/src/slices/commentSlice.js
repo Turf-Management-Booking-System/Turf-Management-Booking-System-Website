@@ -25,8 +25,8 @@ const commentSlice= createSlice({
            })
         },
         setRating:(state,action)=>{
-            state.rating = action.paylaod
-        },
+            state.rating = action.payload
+        }
     }
 });
 export const {setComment,setRating,updateComment,deleteComment} = commentSlice.actions;

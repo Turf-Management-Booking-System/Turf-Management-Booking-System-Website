@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoader } from "../../slices/authSlice";
 import { toast } from "react-hot-toast";
-import { deleteComment, setComment, updateComment } from "../../slices/commentSlice";
+import {  setComment, } from "../../slices/commentSlice";
 import { useNavigate } from "react-router-dom";
 
 const TurfDetailsPage = () => {
@@ -29,7 +29,7 @@ const TurfDetailsPage = () => {
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization:` Bearer ${token}`,
             },
             withCredentials: true,
           }
@@ -89,8 +89,10 @@ const TurfDetailsPage = () => {
       );
       if (response.data.success) {
         toast.success("Review submitted successfully!");
+        fetchTurfRatingAndReview();
         setReview("");
         setRating(0);
+        setUserRating(0);
         dispatch(setComment([...turf.comments,response.data.comment]));
         setTurf((prevTurf) => ({
           ...prevTurf,
@@ -110,73 +112,6 @@ const TurfDetailsPage = () => {
     setRating(star);
   };
 
-  const handleUpdateComment = async (commentIds) => {
-    try {
-      dispatch(setLoader(true));
-      const response = await axios.post(
-        `http://localhost:4000/api/v1/comment/updateComment/${user?._id}/${id}`,
-        {
-          commentId: commentIds,
-          commentText: review,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (response.data.success) {
-        toast.success("Review Updated successfully!");
-        dispatch(updateComment({ commentId: commentIds, updatedComment: response.data.updatedComment }));
-        setTurf((prevTurf) => ({
-          ...prevTurf,
-          comments: prevTurf.comments.map((comment) =>
-            comment._id === commentIds
-              ? { ...comment, commentText: response.data.updatedComment.commentText }
-              : comment
-          ),
-        }));
-        setReview("");
-        setRating(0);
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Something went wrong while updating the comment!");
-      console.log(error.response?.data?.message);
-    } finally {
-      dispatch(setLoader(false));
-    }
-  };
-
-  const handleDeleteComment = async (commentId) => {
-    try {
-      dispatch(setLoader(true));
-      const response = await axios.delete(
-        `http://localhost:4000/api/v1/comment/deleteComment/${id}/${user?._id}/${commentId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (response.data.success) {
-        toast.success("Review Deleted successfully!");
-        dispatch(deleteComment({ commentId }));
-        setTurf((prevTurf) => ({
-          ...prevTurf,
-          comments: prevTurf.comments.filter((comment) => comment._id !== commentId),
-        }));
-        setReview("");
-        setRating(0);
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Something went wrong while deleting the comment!");
-      console.log(error.response?.data?.message);
-    } finally {
-      dispatch(setLoader(false));
-    }
-  };
 
    console.log("userRating",userRating)
   const  fetchTurfRatingAndReview =async ()=>{
@@ -186,7 +121,7 @@ const TurfDetailsPage = () => {
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization:` Bearer ${token}`,
 
           },
         }
@@ -310,22 +245,8 @@ const TurfDetailsPage = () => {
                 </div>
                 <p className="mt-2">{comment.commentText}</p>
                 <p>{comment.rating?.rating}</p>
-                <div className="mt-2 flex space-x-4 text-blue-500">
-                  <button
-                    onClick={() => handleUpdateComment(comment._id)}
-                    className="text-sm"
-                  >
-                    Update
-                  </button>
-                  <button
-                    onClick={() => handleDeleteComment(comment._id)}
-                    className="text-sm text-red-500"
-                  >
-                    Delete
-                  </button>
                 </div>
               </div>
-            </div>
           ))
         ) : (
           <p className="text-gray-600">No comments yet. Be the first to review!</p>
