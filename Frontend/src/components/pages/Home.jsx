@@ -6,11 +6,13 @@ import {
   faCalendarCheck,
   faArrowRight,
   faChevronDown,
+  faStar,
+  faEnvelope,
 } from "@fortawesome/free-solid-svg-icons";
 import TurfImageDay from "../../assets/images/TurfImageDay.jpg";
 import TurfImageNight from "../../assets/images/TurfImageNight.jpg";
 import { DarkModeContext } from "../../context/DarkModeContext";
-import { motion } from "framer-motion";
+import { motion ,AnimatePresence} from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Link } from "react-router-dom";
 
@@ -18,6 +20,7 @@ function Home() {
   const { darkMode } = useContext(DarkModeContext);
   const [ref, inView] = useInView({ triggerOnce: false, threshold: 0.2 });
   const [openIndex, setOpenIndex] = useState(null);
+  const [email,setEmail] = useState("");
 
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -92,21 +95,58 @@ function Home() {
       id: 1,
       name: "Green Valley Turf",
       location: "Mumbai",
+      pricePerHour: "1500",
+      rating: 4.8,
       image: "",
     },
     {
       id: 2,
       name: "City Central Arena",
       location: "Delhi",
+      pricePerHour: "1400",
+      rating: 4.2,
       image: "",
     },
     {
       id: 3,
       name: "Sunset Sports Complex",
       location: "Bangalore",
+      rating: 4.5,
+      pricePerHour: "1100",
       image: "",
     },
   ];
+
+  const testimonials = [
+    {
+      id: 1,
+      name: "John Doe",
+      image:"",
+      comment: "Great experience booking through this platform. The turf was in excellent condition!",
+      rating: 5,
+    },
+    {
+      id: 2,
+      name: "Jane Smith",
+      image:"",
+      comment: "Easy to use and a wide variety of turfs to choose from. Highly recommended!",
+      rating: 4,
+    },
+    {
+      id: 3,
+      name: "Mike Johnson",
+      image:"",
+      comment: "Smooth booking process and excellent customer support. Will definitely use again!",
+      rating: 5,
+    },
+  ]
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    // Handle newsletter subscription
+    console.log("Subscribed with email:", email)
+    setEmail("")
+  }
 
   return (
     <>
@@ -169,13 +209,14 @@ function Home() {
       {/* Search, Book, Play Timeline */}
       <section
         ref={ref}
-        className="py-12 flex flex-col items-center relative bg-gray-100 dark:bg-gray-800"
+        className="py-16 flex flex-col items-center relative bg-gray-100 dark:bg-gray-800"
       >
-        <div className="w-1 h-[55rem] absolute left-1/2 transform -translate-x-1/2 bg-gray-300 dark:bg-gray-600"></div>
+        <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">How It Works</h2>
+        <div className="w-1 mt-10 h-[61rem] absolute left-1/2 transform -translate-x-1/2 bg-gray-300 dark:bg-gray-600"></div>
         {timelineItems.map((item, index) => (
           <motion.div
             key={index}
-            initial={{ opacity: 0, x: item.position === "left" ? -400 : 400 }}
+            initial={{ opacity: 0, x: item.position === "left" ? -300 : 300 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 2.5, delay: index * 0.5 }}
             className={`relative flex items-center w-full max-w-6xl my-8 ${
@@ -199,7 +240,7 @@ function Home() {
                 <p className="text-gray-600 dark:text-gray-300">{item.desc}</p>
               </div>
             </div>
-            <div className="w-8 h-8 bg-[#5886a7] dark:bg-[#9fbfd8] rounded-full absolute left-1/2 transform -translate-x-1/2"></div>
+            <div className="w-10 h-10 bg-[#5886a7] dark:bg-[#9fbfd8] rounded-full absolute left-1/2  text-white font-bold transform -translate-x-1/2 flex items-center justify-center">{index + 1}</div>
           </motion.div>
         ))}
       </section>
@@ -227,24 +268,60 @@ function Home() {
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-4">
-                  <h3 className="text-xl font-semibold mb-2 dark:text-white">
-                    {turf.name}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    {turf.location}
-                  </p>
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{turf.name}</h2>
+                <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                  <i className="bx bx-map text-red-500"></i> {turf.location}
+                </p>
+                <div className="flex justify-between">
+                <p className="text-green-600 dark:text-green-400 font-bold mt-2">₹{turf.pricePerHour}/hr</p>
+                <div className="flex items-center mt-4">
+                <span className="text-yellow-400 mr-1">
+                      <FontAwesomeIcon icon={faStar} />
+                    </span>
+                    <span className="font-bold dark:text-white">{turf.rating}</span>
                 </div>
+                </div>
+              </div>
               </motion.div>
             ))}
           </div>
           <div className="text-center mt-8">
             <Link
-              to="/turfs"
+              to="/turf"
               className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300"
             >
               View More Turfs
               <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-16 bg-gray-100 dark:bg-gray-800">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">What Our Users Say</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={testimonial.id}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg"
+              >
+                <p className="text-gray-600 dark:text-gray-300 mb-4">{testimonial.comment}</p>
+                <div className="flex items-center gap-2">
+                  <span className="w-12 h-12 border border-black rounded-full"></span>
+                  <span className="font-semibold dark:text-white">{testimonial.name}</span>
+                  <div className="flex ml-[10rem]">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <FontAwesomeIcon key={i} icon={faStar} className="text-yellow-500" />
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -315,6 +392,37 @@ function Home() {
           >
             Get Started Now
           </motion.button>
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="py-16 bg-[#5886a7] dark:bg-black">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4 text-white">Stay Updated</h2>
+          <p className="text-xl mb-8 text-blue-100">
+            Subscribe to our newsletter for the latest turf news and exclusive offers!
+          </p>
+          <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+            <div className="flex">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-grow px-4 py-2 rounded-l-lg focus:outline-none"
+                required
+              />
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="submit"
+                className="bg-green-500 text-white px-6 py-2 rounded-r-lg hover:bg-green-600 transition duration-300"
+              >
+                <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
+                Subscribe
+              </motion.button>
+            </div>
+          </form>
         </div>
       </section>
     </>

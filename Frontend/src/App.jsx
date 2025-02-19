@@ -26,7 +26,7 @@ import Notification from "./components/pages/Notification";
 import Chatbot from "./components/pages/Chatbot";
 import { loadNotification } from "./slices/notificationSlice";
 import { setNotification } from "./slices/notificationSlice";
-import FloatingButton from "./components/pages/FloatingButton";
+import AdminPanel from "./components/pages/AdminPanel";
 import TurfDetailPage from "./components/pages/TurfDetailPage";
 import BookingPage from "./components/pages/BookingPage";
 const App = () => {
@@ -84,6 +84,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="turf/turfDetails/:id" element={<TurfDetailPage/>}/>
         <Route path="/booking/:turfId/slots" element={<BookingPage/>}/>
+        <Route path="/adminpanel" element={<AdminPanel/>}/>
          {/* work is pending for private routing */}
 
       </Routes>
