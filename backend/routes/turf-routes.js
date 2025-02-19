@@ -1,5 +1,5 @@
-const { createTurf, updateTurf, deleteTurf, getAllTurf, viewAllUsers, getAllTurfLocations } = require("../controllers/turf-controller");
-const{auth,isAdmin} = require("../middlewares/auth-middleware");
+const { createTurf, updateTurf, deleteTurf, getAllTurf, viewAllUsers, getAllTurfLocations,getTurfSelectedLocation,getTurfById, getTurfSlots, } = require("../controllers/turf-controller");
+const{auth,isAdmin,isUser} = require("../middlewares/auth-middleware");
 // importing the controllers for routing
 
 const express= require("express");
@@ -7,8 +7,11 @@ const router = express.Router();
 router.post("/createTurf",auth,isAdmin,createTurf);
 router.post("/updateTurf",auth,isAdmin,updateTurf);
 router.post("/deleteTurf",auth,isAdmin,deleteTurf);
-router.get("/getAllTurf",auth,isAdmin,getAllTurf);
+router.get("/getAllTurf",getAllTurf);
 router.get("/viewAllUser",auth,isAdmin,viewAllUsers);
-router.get("/getAllTurfLocations",getAllTurfLocations);
+router.get("/getAllTurfLocations",auth,getAllTurfLocations);
+router.get("/getAllTurfLocations/:location",auth,getTurfSelectedLocation);
+router.get("/getTurfById/:id",auth,getTurfById);
+router.get("/:turfId/slots",auth,isUser,getTurfSlots);
 
 module.exports = router;

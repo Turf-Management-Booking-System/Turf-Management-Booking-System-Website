@@ -4,15 +4,13 @@ const commentSchema = mongoose.Schema({
    commentText:{
       type:String,
       required:[true,"Please enter the comment!"],
-      maxLength:30,
-      minLength:5,
    },
-   user:{
+   userId:{
      type:mongoose.Schema.Types.ObjectId,
      ref:"User",
      required:[true,"Please give the user reference!"],
    },
-   turf:{
+   turfId:{
      type:mongoose.Schema.Types.ObjectId,
      ref:"Turf",
      required:[true,"Please give the turf reference!"],

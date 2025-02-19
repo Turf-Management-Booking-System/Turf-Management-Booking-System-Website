@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
-
+const SlotSchema = new mongoose.Schema({
+        time: { type: String, required: true }, 
+        status: { type: String, enum: ["available", "booked"], default: "available" }
+      });
 // create the schema
 const turfSchema = mongoose.Schema({
   turfName :{
@@ -65,7 +68,21 @@ const turfSchema = mongoose.Schema({
         required:[true,"Please enter the phone number!"],
         match: [/^\d{10}$/, "Please enter a valid 10-digit phone number!"], 
 
-  }
+  },
+  comments:[{
+     type:mongoose.Schema.Types.ObjectId,
+     ref:"Comment"
+  }],
+  slots:[SlotSchema],
+
+  ratings:[{
+    type:mongoose.Schema.Types.ObjectId,
+     ref:"Rating",
+  }],
+  sports:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Sport"
+  }]
 })
 // export the module
 module.exports = mongoose.model("Turf",turfSchema)

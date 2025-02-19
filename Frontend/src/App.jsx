@@ -27,6 +27,8 @@ import Chatbot from "./components/pages/Chatbot";
 import { loadNotification } from "./slices/notificationSlice";
 import { setNotification } from "./slices/notificationSlice";
 import FloatingButton from "./components/pages/FloatingButton";
+import TurfDetailPage from "./components/pages/TurfDetailPage";
+import BookingPage from "./components/pages/BookingPage";
 const App = () => {
   const dispatch = useDispatch(); 
   const location = useLocation();
@@ -80,6 +82,8 @@ const App = () => {
         <Route path="/chatbot" element={<Chatbot/>}/>
         <Route path="/changepassword" element={<ChangePassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="turf/turfDetails/:id" element={<TurfDetailPage/>}/>
+        <Route path="/booking/:turfId/slots" element={<BookingPage/>}/>
          {/* work is pending for private routing */}
 
       </Routes>

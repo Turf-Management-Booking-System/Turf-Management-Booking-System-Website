@@ -3,12 +3,14 @@ import {useDispatch, useSelector} from "react-redux";
 import toast from "react-hot-toast";
 import axios from "axios"
 import { deleteAccountUser, setLoader, updateProfileImage } from "../../slices/authSlice";
-import { deleteAccountTurf } from "../../slices/turfSlice";
 import { deleteAccountNotification } from "../../slices/notificationSlice";
 import {useNavigate} from "react-router-dom";
 import { loadNotification,setNotification } from "../../slices/notificationSlice";
+import { setUser } from "../../slices/authSlice";
 const EditProfile = () => {
   const dispatch = useDispatch();
+  const isForgetPassword = localStorage.getItem("isForgetPassword")||null;
+  const email = localStorage.getItem("email")||null;
   const user = useSelector((state)=>state.auth.user);
   const notifications = useSelector((state)=>state.notification.notifications);
   const navigate = useNavigate();
@@ -63,9 +65,22 @@ const EditProfile = () => {
             withCredentials:true
           }
         });
-        console.log("response Data",response.data);
+        console.log("response Data for update profile",response.data);
         if(response.data.success){
             toast.success("Profile Updated Successfullly!");
+            dispatch(setUser(response.data.user));
+            localStorage.setItem("userData",JSON.stringify(response.data.user));
+            setProfile({
+              firstName:  "",
+    lastName: "",
+    email:"",
+    gender:"",
+    phone: "",
+    dob:"", // Date of Birth field
+    description: "",
+    location: "",
+    about: "" // About field
+            })
             dispatch(loadNotification());
       try {
         const notificationResponse = await axios.get(
@@ -90,7 +105,7 @@ const EditProfile = () => {
       }
         }
       }catch(error){
-        toast.error(error.response?.data?.message || "Something Went Wrong!");
+        toast.error(error.response?.data?.message || "Something Went Wrong while updating the data!");
   
       }finally{
         dispatch(setLoader(false))
@@ -116,8 +131,11 @@ const EditProfile = () => {
         console.log("response Data",response.data);
         if(response.data.success){
             dispatch(deleteAccountUser());
-            dispatch(deleteAccountTurf());
-            dispatch(deleteAccountNotification())
+            dispatch(deleteAccountNotification());
+            if(isForgetPassword && email){
+              localStorage.removeItem("isForgetPassword");
+              localStorage.removeItem("email");
+            }
             toast.success("Profile Deleted Successfullly!");
             navigate("/")
           

@@ -254,7 +254,7 @@ exports.changePassword = async(req,res)=>{
 exports.sendOtp = async(req,res)=>{
     try{ 
         // extract data
-        const {email} = req.body;
+      const {email} = req.body;
         // validate the data
         if(!email){
             return res.status(400).json({
@@ -262,13 +262,15 @@ exports.sendOtp = async(req,res)=>{
                 message:"Please enter the correct email"
             })
         }
+        await Otp.deleteOne({ email });
         // generate otp and expires time
         const otp =Math.floor(100000+ Math.random()*900000);
         console.log(otp);
         // current time will add 5 minutes milliseconds
         const expriesAt = Date.now()+5*60*1000;
-        console.log("expires time",expriesAt)
-        // save the otp in databse
+        console.log("expires time",expriesAt);
+
+        // save the otp in database
         const otpSaved = await Otp.create({
             email,
             otpCode:otp,
@@ -643,6 +645,7 @@ exports.updateProfile = async (req, res) => {
             },
             { new: true, runValidators: true }
         );
+        const updatedProfile = await User.findById(user._id).populate("additionalFields");
         const message = await Notification.create({
             user:user._id,
             message:"You Have Recently Updated The Data!"
@@ -650,8 +653,8 @@ exports.updateProfile = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "Profile updated successfully!",
-            profile,
-            user
+            
+            user:updatedProfile,
         });
 
     } catch (error) {

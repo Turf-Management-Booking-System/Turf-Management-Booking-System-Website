@@ -1,22 +1,46 @@
 
-const Turf = require("../models/turf")
+const Turf = require("../models/turf");
+const Sport = require("../models/sports")
 // create turf
 exports.createTurf=async(req,res)=>{
     try{
     // get the data from the admin
-    const{turfName,turfDescription,turfTitle,turfOwner,turfPricePerHour,turfLocation,turfImages,turfAddress,turfAmentities,turfRules,turfSize,turfAvailability,turfOwnerPhoneNumber,token}= req.body;
+    const slots = [
+        { time: "9:00 AM", status: "available" },
+        { time: "10:00 AM", status: "available" },
+        { time: "11:00 AM", status: "available" },
+        { time: "12:00 PM", status: "available" },
+        { time: "1:00 PM", status: "available" },
+        { time: "2:00 PM", status: "available" },
+        { time: "3:00 PM", status: "available" },
+        { time: "4:00 PM", status: "available" },
+        { time: "5:00 PM", status: "available" },
+        { time: "6:00 PM", status: "available" },
+        { time: "7:00 PM", status: "available" },
+        { time: "8:00 PM", status: "available" },
+        { time: "9:00 PM", status: "available" },
+        { time: "10:00 PM", status: "available" }
+      ];
+    const{turfName,turfDescription,turfTitle,turfOwner,turfPricePerHour,turfLocation,turfImages,turfAddress,turfAmentities,turfRules,turfSize,turfAvailability,turfOwnerPhoneNumber,sports}= req.body;
     // validate the data from the admin
-    if(!turfName||!turfDescription||!turfTitle||!turfOwner||!turfPricePerHour||!turfLocation||!turfImages||!turfAddress||!turfAmentities||!turfRules||!turfSize||!turfAvailability||!turfOwnerPhoneNumber||!token){
+    if(!turfName||!turfDescription||!turfTitle||!turfOwner||!turfPricePerHour||!turfLocation||!turfImages||!turfAddress||!turfAmentities||!turfRules||!turfSize||!turfAvailability||!turfOwnerPhoneNumber||!sports){
         return res.status(400).json({
             success:false,
             message:"please neter the turf details!"
         })
     }
+   
     // store the data in the databse
     const turfDeatils = await Turf.create({
-          turfName,turfDescription,turfTitle,turfOwner,turfPricePerHour,turfLocation,turfImages,turfAddress,turfAmentities,turfRules,turfSize,turfAvailability,turfOwnerPhoneNumber
+          turfName,turfDescription,turfTitle,turfOwner,turfPricePerHour,turfLocation,turfImages,turfAddress,turfAmentities,turfRules,turfSize,turfAvailability,turfOwnerPhoneNumber,slots,
     });
     console.log("turf details",turfDeatils);
+    const createSports = await Sport.create({
+        sports:sports,
+        turfId:turfDeatils._id,
+    })
+    turfDeatils.sports.push(createSports._id)
+    await turfDeatils.save()
     // send email to the turf owner
     // return the response
     return res.status(200).json({
@@ -140,7 +164,88 @@ exports.getAllTurf = async(req,res)=>{
         })
     }
 }
-// get turf by id,name,location,price
+// get turf by ,location
+exports.getTurfSelectedLocation = async(req,res)=>{
+    try{
+      const {location} = req.params;
+      if(!location){
+        return res.status(401).json({
+            success:false,
+            message:"PLease Enter the Location!"
+       } )
+      }
+      const fetchAllTurf = await Turf.find({
+        turfLocation:location
+      }).populate("comments");
+      return res.status(200).json({
+        success:true,
+        message:"Turf Fetch by Location",
+        fetchAllTurf,
+      })
+    }catch(error){
+        console.log("error",error);
+        return res.status(500).json({
+            success:false,
+            message:"error while fetching selected location turf!",
+            error:error.message
+        })
+    }
+}
+// get turf by id 
+exports.getTurfById =async (req,res)=>{
+    try{
+     const {id} = req.params;
+     if(!id){
+        return res.status(400).json({
+            success:false,
+            message:"Couldn't Find Id"
+        })
+     }
+     const fetchTurfById = await Turf.findById(id)
+     .populate({
+        path:"comments",
+        populate:{
+          path:"userId",
+          select:"firstName lastName image"
+
+        }
+     })
+     .populate({
+        path: "ratings",
+        populate: {
+            path: "user",
+            select: "firstName lastName"
+        }
+    }).populate({
+        path:"sports"
+    })
+     .exec();
+     if(!fetchTurfById){
+        return res.status(404).json({
+            success:false,
+            message:"Not Found With The Particular Id"
+        })
+     }
+      // Calculate average rating
+      const ratings = fetchTurfById.ratings;
+      const averageRating = ratings.length
+          ? ratings.reduce((sum, rating) => sum + rating.rating, 0) / ratings.length
+          : 0;
+     return res.status(200).json({
+        success:true,
+        message:"Fetch The Turf By Id",
+        fetchTurfById,
+        averageRating:averageRating.toFixed(1),
+     })
+    }catch(error){
+        console.log("error",error);
+        return res.status(500).json({
+            success:false,
+            message:"error while fetching turf By Id!",
+            error:error.message
+        })
+    }
+}
 // view all users
 exports.viewAllUsers= async(req,res)=>{
     try{
@@ -207,6 +312,37 @@ exports.getAllTurfLocations = async(req,res)=>{
         return res.status(500).json({
             success:false,
             message:"Failed to Fetch Turf Locations",
+            error:error.message
+        })
+    }
+}
+// getTurfSlots
+exports.getTurfSlots = async(req,res)=>{
+    try{
+        const {turfId}= req.params;
+        if(!turfId){
+            return res.status(404).json({
+                success:false,
+                message:"Please enter the data proeprly"
+            })
+        }
+        const fetchTurfSlots = await Turf.findById(turfId);
+        if(!fetchTurfSlots){
+            return res.status(404).json({
+                success:false,
+                message:"Couldn't Find Turf"
+            })
+        }
+        return res.status(200).json({
+            success:true,
+            message:"Fetch the Turf Slots",
+            slots :fetchTurfSlots.slots,
+          })
+        
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Failed to Fetch Turf Slots",
             error:error.message
         })
     }

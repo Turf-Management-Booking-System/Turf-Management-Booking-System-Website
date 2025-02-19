@@ -3,9 +3,14 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 exports.auth=async(req,res,next)=>{
     try {
+        console.log("Token from body:", req.body.token);
+        console.log("Token from cookies:", req.cookies.token);
+        console.log("Token from Authorization header:", req.header("Authorization"));
         // extract jwt token
         //  other ways to fetch token
-        const token =req.body.token || req.cookies.token || req.header("Authorization").replace("Bearer ","");
+        const token = req.cookies.token || req.header("Authorization").replace("Bearer ", "") 
+       
+
         // checking if token exits
         if(!token || token === 'undefined'){
             return res.status(400).json({
@@ -28,6 +33,7 @@ exports.auth=async(req,res,next)=>{
         }
        
     } catch (error) {
+        console.log("Error",error)
         return res.status(500).json({
             success:false,
             message:"error while fetching  token",
@@ -68,3 +74,22 @@ exports.isAdmin =async (req,res,next) => {
         })
     }
 }
+exports.isUserOrAdmin = async (req, res, next) => {
+    try {
+        // Check if the user is either Player or Admin
+        if (req.user.role === "Player" || req.user.role === "Admin") {
+            next(); // Allow access
+        } else {
+            return res.status(403).json({
+                success: false,
+                message: "Access denied. You are not authorized."
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Error while checking user role",
+            error: error.message
+        });
+    }
+};

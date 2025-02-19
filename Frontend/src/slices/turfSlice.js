@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState={
+    turfs:[],
     locations:[],
     isVisited:localStorage.getItem("visited")|| false,
     selectedLocations:localStorage.getItem("selectedTurf")||null,
@@ -21,13 +22,12 @@ const turfSlice = createSlice({
             state.isVisited = action.payload
             localStorage.setItem("visited",JSON.stringify(action.payload));
         },
-        deleteAccountTurf:(state,action)=>{
-            state.selectedLocations = null,
-            state.isVisited = false
+        setTurfs:(state,action)=>{
+            state.turfs = action.payload
         }
     }
 })
 
-export const { setLocation,setSelectedTurfLocation,setVisited,deleteAccountTurf } = turfSlice.actions;
+export const { setLocation,setSelectedTurfLocation,setVisited,setTurfs } = turfSlice.actions;
 export default turfSlice.reducer;
 

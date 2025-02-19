@@ -75,49 +75,15 @@ function Home() {
         "We accept UPI, credit/debit cards, net banking, and cash payments at selected locations.",
     },
     {
-      question: "Is there any advance payment required?",
-      answer:
-        "Yes, a partial or full advance payment is required to confirm your booking.",
-    },
-    {
-      question: "Will I get a refund if I cancel my booking?",
-      answer:
-        "Refunds are provided based on our cancellation policy. If canceled 24 hours before the booking, you get a full refund.",
-    },
-    {
-      question: "What facilities are available on the turf?",
-      answer:
-        "Our turfs have washrooms, parking, drinking water, and seating for spectators.",
-    },
-    {
-      question: "Are floodlights available for night matches?",
-      answer:
-        "Yes, our turfs are equipped with floodlights for evening and night games.",
-    },
-    {
       question: "What are the rules for using the turf?",
       answer:
         "Users must wear proper sports footwear, avoid littering, and respect the time slot allotted to them. We have provided rules on each specific turf thats need to be follow",
     },
-    {
-      question: "Is there a time limit for bookings?",
-      answer:
-        "Yes, the minimum booking duration is 30 minutes, and the maximum varies depending on availability.",
-    },
+
     {
       question: "How do I contact customer support?",
       answer:
         "To reach us go through contact page ,you can send mail,you can call on given number",
-    },
-    {
-      question: "I am facing issues with booking. What should I do?",
-      answer:
-        "If you face any issues, try refreshing the page or contacting our support team for assistance.",
-    },
-    {
-      question: "How can I change my account details?",
-      answer:
-        "You can update your profile details in the 'Edit Profile' section of your account",
     },
   ];
 

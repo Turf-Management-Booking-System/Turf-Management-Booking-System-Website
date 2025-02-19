@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { Link } from 'react-router-dom';
 function PageNotFound() {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
