@@ -18,6 +18,7 @@ const TurfPage = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false); // Added missing state
   const navigate = useNavigate();
   const locations = useSelector((state)=>state.turf.locations)
+  console.log("locations",locations)
   const token = useSelector((state) => state.auth.token);
   const turfs = useSelector((state) => state.turf.turfs);
   const dispatch = useDispatch();
@@ -82,7 +83,7 @@ useEffect(() => {
           setPriceRange(200);
         }
   
-        console.log(fetchedTurfs);
+        console.log( "fetched turfs",fetchedTurfs);
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong while fetching turf data!");

@@ -596,11 +596,11 @@ exports.uploadProfileImage = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
     try {
-        const { firstName, lastName, email, gender, phoneNumber, dateOfBirth, location, description, about, token } = req.body;
+        const { firstName, lastName, email, gender, phoneNumber, dateOfBirth, location, description, about } = req.body;
         const { id } = req.params;
 
 
-        if (!id || !token) {
+        if (!id) {
             return res.status(400).json({
                 success: false,
                 message: "Please provide the required fields!"
@@ -670,8 +670,8 @@ exports.updateProfile = async (req, res) => {
 exports.deleteProfile = async(req,res)=>{
     try{
       const {id} = req.params;
-      const {token,email} = req.body;
-      if (!id || !token){
+      const {email} = req.body;
+      if (!id){
         return res.status(400).json({
             success:false,
             message:"Please provide the fields!"

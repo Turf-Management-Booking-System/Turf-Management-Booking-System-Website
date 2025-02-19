@@ -13,7 +13,7 @@ import UpdatePassword from "./components/pages/UpdatePassword";
 import ChangePassword from "./components/pages/ChangePassword";
 import Spinner from "./components/common/Spinner";
 import { useSelector, useDispatch } from "react-redux";
-import { login, registerUser } from "./slices/authSlice";
+import { login } from "./slices/authSlice";
 import Dashboard from "./components/pages/Dashboard";
 import "../src/App.css";
 import PrivateRoute from "./routes/PrivateRoute";
@@ -38,6 +38,7 @@ const App = () => {
   
   const isAuthPage = ["/otp", "/forgetpassword", "/updatepassword", "/changepassword"].includes(location.pathname);
 
+ 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const storedUser = localStorage.getItem("userData");

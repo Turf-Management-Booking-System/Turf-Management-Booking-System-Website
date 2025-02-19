@@ -43,7 +43,6 @@ const EditProfile = () => {
     description:profile.description,
     location:profile.location,
     about:profile.about,
-    token:token
    }
   const handleChange =async (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -62,6 +61,7 @@ const EditProfile = () => {
         ,{
           headers:{
             "Content-Type":"application/json",
+            Authorization:`Bearer ${token}`,
             withCredentials:true
           }
         });
@@ -113,7 +113,6 @@ const EditProfile = () => {
       }
    }
    const dataToken = {
-    token:token,
     email:user.email,
    }
    const deleteProfileHandler=async(e)=>{
@@ -125,6 +124,7 @@ const EditProfile = () => {
           data:dataToken,
           headers:{
             "Content-Type":"application/json",
+            Authorization:`Bearer ${token}`,
             withCredentials:true
           }
         });
