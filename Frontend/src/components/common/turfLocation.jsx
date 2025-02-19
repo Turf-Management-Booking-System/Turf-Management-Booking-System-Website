@@ -2,12 +2,15 @@ import axios from "axios";
 import { setLoader } from "../../slices/authSlice";
 import { setLocation } from "../../slices/turfSlice";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 export const fetchTurfLocations = () => async (dispatch) => {
+  const token = useSelector((state)=>state.auth.token)
   try {
     dispatch(setLoader(true));
     const response = await axios.get("http://localhost:4000/api/v1/turf/getAllTurfLocations", {
       headers: {
         "Content-Type": "application/json",
+        Authorization:`Bearer ${token}`
       },
       withCredentials: true,
     });
