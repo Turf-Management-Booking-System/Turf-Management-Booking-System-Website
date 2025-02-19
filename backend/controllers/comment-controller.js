@@ -144,3 +144,48 @@ exports.addRating= async (req, res) => {
   }
 };
 
+exports.createCommentWithRating = async (req, res) => {
+  try {
+    const { commentText, ratingValue } = req.body;
+    const userId = req.params.userId;
+    const turfId = req.params.turfId;
+    const newRating = new Rating({
+      user: userId,
+      turf: turfId,
+      rating: ratingValue,
+    });
+    const savedRating = await newRating.save();
+    const newComment = new Comment({
+      userId: userId,
+      turfId: turfId,
+      commentText: commentText,
+      rating: savedRating._id,
+    })
+
+    await newComment.save();
+  const turf = await Turf.findById(turfId);
+   turf.comments.push(newComment._id);
+   const fetchTurfById = await turf.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Comment and Rating saved successfully!",
+      fetchTurfById,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+exports.getCommentsWithRatings = async (req, res) => {
+  try {
+    const turfId = req.params.turfId;
+    const comments = await Comment.find({ turfId: turfId })
+      .populate("userId", "firstName lastName email image")
+      .populate("rating", "rating"); 
+
+    res.status(200).json({ success: true, comments });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+

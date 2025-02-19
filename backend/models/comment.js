@@ -15,6 +15,11 @@ const commentSchema = mongoose.Schema({
      ref:"Turf",
      required:[true,"Please give the turf reference!"],
    },
+   rating:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Rating",
+
+   }
 },{timestamps:true})
 // exports the module
 module.exports = mongoose.model("Comment",commentSchema)

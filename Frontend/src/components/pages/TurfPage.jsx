@@ -17,31 +17,40 @@ const TurfPage = () => {
   const [likedTurfs, setLikedTurfs] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false); // Added missing state
   const navigate = useNavigate();
-  const [allLocations,setAllLocations]= useState(["All"]);
+  const locations = useSelector((state)=>state.turf.locations)
   const token = useSelector((state) => state.auth.token);
   const turfs = useSelector((state) => state.turf.turfs);
   const dispatch = useDispatch();
   const selectedlocations = JSON.parse(localStorage.getItem("selectedTurf")) || null;
-  const turfLocation =async ()=>{
-    try {
-      dispatch(setLoader(true));
-      const response = await axios.get("http://localhost:4000/api/v1/turf/getAllTurfLocations", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
-      console.log("Response from backend location", response.data.turf);
-      setAllLocations(response.data.turf);
-      console.log("set location",allLocations);
-      console.log("reposne",response.data.turf)
-    } catch (error) {
-      console.log("Error", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Unable to send data to backend");
-    } finally {
-      dispatch(setLoader(false));
+  const [sports, setSports] = useState([]);
+  const [minPrice,setMinPrice]= useState(200);
+  const [maxPrice,setMaxPrice]= useState(2000);
+
+
+const fetchSports = async () => {
+  try {
+    const response = await axios.get("http://localhost:4000/api/v1/turf/getAllSports",{
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+
+      },
+      withCredentials: true,
+
+    });
+    if (response.data.success) {
+      setSports(["All", ...response.data.sports]); 
+      console.log("repsonse of sports",response.data.sports)
     }
+  } catch (error) {
+    console.error("Error fetching sports:", error);
   }
+};
+
+useEffect(() => {
+  fetchSports();
+}, [token]);
+
   // Fetch turf data based on user-selected location or all turfs
   const fetchTurfByLocationsOrAll = async () => {
     try {
@@ -49,15 +58,31 @@ const TurfPage = () => {
       const url = selectedlocations
         ? `http://localhost:4000/api/v1/turf/getAllTurfLocations/${selectedlocations}`
         : "http://localhost:4000/api/v1/turf/getAllTurf";
+        
       const response = await axios.get(url, {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
       });
+  
       if (response.data.success) {
-        dispatch(setTurfs(response.data.fetchAllTurf));
-        console.log(response.data.fetchAllTurf)
+        const fetchedTurfs = response.data.fetchAllTurf;
+        dispatch(setTurfs(fetchedTurfs));
+  
+        if (fetchedTurfs.length > 0) {
+          const prices = fetchedTurfs.map((turf) => turf.turfPricePerHour);
+          setMinPrice(Math.min(...prices));
+          setMaxPrice(Math.max(...prices));
+          setPriceRange(Math.min(...prices)); 
+        } else {
+          setMinPrice(200);
+          setMaxPrice(2000);
+          setPriceRange(200);
+        }
+  
+        console.log(fetchedTurfs);
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong while fetching turf data!");
@@ -66,11 +91,11 @@ const TurfPage = () => {
       dispatch(setLoader(false));
     }
   };
+  
 
   useEffect(() => {
-    turfLocation();
     fetchTurfByLocationsOrAll();
-  }, []);
+  }, [token]);
 
   const toggleLike = (id) => {
     setLikedTurfs((prev) =>
@@ -78,14 +103,15 @@ const TurfPage = () => {
     );
   };
 
-  let filteredTurfs = turfs.filter(
-    (turf) =>
-      turf.turfName.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedLocation === "All" || turf.turfLocation.includes(selectedLocation)) &&
-      (selectedSport === "All" || turf.sport=== selectedSport) &&
-      turf.turfPricePerHour <= priceRange &&
-      (!showFavorites || likedTurfs.includes(turf._id))
-  );
+  // let filteredTurfs = turfs.filter(
+    // (turf) =>
+      // turf.turfName.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      // (selectedLocation === "All" || turf.turfLocation.includes(selectedLocation)) &&
+      // (selectedSport === "All" || turf.sport === selectedSport) &&
+      // (priceRange === 2000 || turf.turfPricePerHour <= priceRange) &&
+      // (!showFavorites || likedTurfs.includes(turf._id))
+  // );
+  let filteredTurfs = turfs;  
 
   if (sortOrder === "low-to-high") {
     filteredTurfs.sort((a, b) => a.turfPricePerHour - b.turfPricePerHour);
@@ -131,23 +157,23 @@ const TurfPage = () => {
 
         <label className="font-bold dark:text-white">Select Location</label>
         <div className="grid grid-cols-2 gap-2 mb-4">
-          {allLocations.map((location) => (
+        {["All", ...locations.map((location) => location._id)].map((location) => (
             <label key={location.docId} className="flex items-center gap-2 cursor-pointer dark:text-gray-300">
               <input
                 type="radio"
                 name="location"
-                value={location._id}
+                value={location}
                 checked={selectedLocation === location}
                 onChange={(e) => setSelectedLocation(e.target.value)}
               />
-              {location._id}
+              {location}
             </label>
           ))}
         </div>
 
         <label className="font-bold dark:text-white">Select Sport</label>
         <div className="grid grid-cols-2 gap-2 mb-4">
-          {["All", "Football", "Cricket", "Basketball", "Badminton"].map((sport) => (
+          {sports.map((sport) => (
             <label key={sport} className="flex items-center gap-2 cursor-pointer dark:text-gray-300">
               <input
                 type="radio"
@@ -164,9 +190,9 @@ const TurfPage = () => {
         <label className="font-bold dark:text-white">Price Range</label>
         <input
           type="range"
-          min="500"
-          max="2000"
-          step="100"
+          min={minPrice}
+          max={maxPrice}
+          step="20"
           value={priceRange}
           onChange={(e) => setPriceRange(Number(e.target.value))}
           className="cursor-pointer w-full"

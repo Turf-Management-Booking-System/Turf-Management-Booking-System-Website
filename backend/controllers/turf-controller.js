@@ -205,9 +205,12 @@ exports.getTurfById =async (req,res)=>{
      .populate({
         path:"comments",
         populate:{
-          path:"userId",
-          select:"firstName lastName image"
-
+            path:"userId",
+            select:"firstName lastName image"
+        },
+        populate:{
+            path:"rating",
+            select:"rating"
         }
      })
      .populate({
@@ -231,6 +234,7 @@ exports.getTurfById =async (req,res)=>{
       const averageRating = ratings.length
           ? ratings.reduce((sum, rating) => sum + rating.rating, 0) / ratings.length
           : 0;
+
      return res.status(200).json({
         success:true,
         message:"Fetch The Turf By Id",
@@ -347,3 +351,20 @@ exports.getTurfSlots = async(req,res)=>{
         })
     }
 }
+
+exports.getAllSports = async (req, res) => {
+        try {
+          const turfs = await Turf.find({}).populate({
+            path: 'sports',
+            select: 'sports' 
+          });
+          const allSports = [...new Set(turfs.flatMap(turf => turf.sports.flatMap(sport => sport.sports)))];
+      
+          res.status(200).json({ success: true, sports: allSports });
+        } catch (error) {
+          res.status(500).json({ success: false, message: "Error fetching sports" });
+        }
+      
+      
+      
+};

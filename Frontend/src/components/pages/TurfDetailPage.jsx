@@ -4,20 +4,22 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoader } from "../../slices/authSlice";
 import { toast } from "react-hot-toast";
-import { deleteComment, setComment,updateComment } from "../../slices/commentSlice";
+import { deleteComment, setComment, updateComment } from "../../slices/commentSlice";
 import { useNavigate } from "react-router-dom";
 
 const TurfDetailsPage = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
-  const user = useSelector((state)=>state.auth.user)
+  const user = useSelector((state) => state.auth.user);
   const { id } = useParams();
   const [turf, setTurf] = useState(null);
   const [currentImage, setCurrentImage] = useState(0);
   const [rating, setRating] = useState(0);
-  const [review,setReview]= useState("");
-  // api call to fetch data of a particular turf
+  const [review, setReview] = useState("");
+  const [userRating, setUserRating] = useState(0);
+  const [averageRating,setAverageRating] = useState(0)
+  const [commentWithRating,setCommentWithRating] = useState([])
   useEffect(() => {
     const fetchTurfDetails = async () => {
       try {
@@ -35,6 +37,8 @@ const TurfDetailsPage = () => {
 
         if (response.data.success) {
           setTurf(response.data.fetchTurfById);
+          console.log("turf",response.data.fetchTurfById);
+          setAverageRating(response.data.averageRating)
         }
       } catch (error) {
         toast.error(
@@ -51,7 +55,6 @@ const TurfDetailsPage = () => {
     }
   }, [id, dispatch, token]);
 
-  // Function to handle next and previous images
   const nextImage = () => {
     if (turf.turfImages && turf.turfImages.length > 0) {
       setCurrentImage((prev) => (prev + 1) % turf.turfImages.length);
@@ -65,17 +68,17 @@ const TurfDetailsPage = () => {
   };
 
   const handleBooking = (turfId) => {
-    navigate(`/booking/${turfId}/slots`)
+    navigate(`/booking/${turfId}/slots`);
   };
-  // handler for cretaing a comment
+
   const handleReviewSubmit = async () => {
     try {
-      dispatch(setLoader(true))
-      const response =
-       await axios.post(
-        `http://localhost:4000/api/v1/comment/createComment/${id}/${user?._id}`,
+      dispatch(setLoader(true));
+      const response = await axios.post(
+        `http://localhost:4000/api/v1/comment/createCommentWithRating/${user?._id}/${id}`,
         {
-          commentText:review
+          commentText: review,
+          ratingValue: userRating,
         },
         {
           headers: {
@@ -88,35 +91,33 @@ const TurfDetailsPage = () => {
         toast.success("Review submitted successfully!");
         setReview("");
         setRating(0);
-        dispatch(setComment([...turf.comments,response.data.populatedComment]));
-        console.log("value of rating",rating);
+        dispatch(setComment([...turf.comments,response.data.comment]));
         setTurf((prevTurf) => ({
           ...prevTurf,
-          comments: [...prevTurf.comments, response.data.populatedComment],
+          comments: [...prevTurf.comments,response.data.comment],
         }));
+
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something went wrong while creating the comment !");
+      toast.error(error.response?.data?.message || "Something went wrong while creating the comment!");
       console.log(error.response?.data?.message);
-    }finally{
-      dispatch(setLoader(false))
+    } finally {
+      dispatch(setLoader(false));
     }
   };
 
-  // Star selection function
   const handleStarClick = (star) => {
     setRating(star);
   };
 
-  // handler for updating the commnet
-   const handleUpdateComment =async (commentIds)=>{
+  const handleUpdateComment = async (commentIds) => {
     try {
-      dispatch(setLoader(true))
-      const response =await axios.post(
-        `http://localhost:4000/api/v1/comment/updateComment/${id}/${user?._id}`,
-        { 
-          commentId:commentIds,
-          commentText:review
+      dispatch(setLoader(true));
+      const response = await axios.post(
+        `http://localhost:4000/api/v1/comment/updateComment/${user?._id}/${id}`,
+        {
+          commentId: commentIds,
+          commentText: review,
         },
         {
           headers: {
@@ -127,13 +128,12 @@ const TurfDetailsPage = () => {
       );
       if (response.data.success) {
         toast.success("Review Updated successfully!");
-        dispatch(updateComment({ commentId: commentIds, updatedComment: response.data.updatedComment }))
-        console.log("value of rating",rating);
+        dispatch(updateComment({ commentId: commentIds, updatedComment: response.data.updatedComment }));
         setTurf((prevTurf) => ({
           ...prevTurf,
           comments: prevTurf.comments.map((comment) =>
             comment._id === commentIds
-              ? { ...comment, commentText:response.data.updatedComment.commentText }
+              ? { ...comment, commentText: response.data.updatedComment.commentText }
               : comment
           ),
         }));
@@ -141,19 +141,18 @@ const TurfDetailsPage = () => {
         setRating(0);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something went wrong while updating the comment !");
+      toast.error(error.response?.data?.message || "Something went wrong while updating the comment!");
       console.log(error.response?.data?.message);
-    }finally{
-      dispatch(setLoader(false))
+    } finally {
+      dispatch(setLoader(false));
     }
-   }
-  //  handler for deleting the comment
-   const handleDeleteComment =async(commentId)=>{
+  };
+
+  const handleDeleteComment = async (commentId) => {
     try {
-      dispatch(setLoader(true))
-      const response =await axios.delete(
+      dispatch(setLoader(true));
+      const response = await axios.delete(
         `http://localhost:4000/api/v1/comment/deleteComment/${id}/${user?._id}/${commentId}`,
-      
         {
           headers: {
             "Content-Type": "application/json",
@@ -163,23 +162,47 @@ const TurfDetailsPage = () => {
       );
       if (response.data.success) {
         toast.success("Review Deleted successfully!");
-        dispatch(deleteComment({commentId}))
-        console.log("value of rating",rating);
+        dispatch(deleteComment({ commentId }));
         setTurf((prevTurf) => ({
           ...prevTurf,
-          comments: prevTurf.comments.filter(comment => comment._id !== commentId),
-        
+          comments: prevTurf.comments.filter((comment) => comment._id !== commentId),
         }));
         setReview("");
         setRating(0);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something went wrong while deleting the comment !");
+      toast.error(error.response?.data?.message || "Something went wrong while deleting the comment!");
       console.log(error.response?.data?.message);
-    }finally{
-      dispatch(setLoader(false))
+    } finally {
+      dispatch(setLoader(false));
     }
-   }
+  };
+
+   console.log("userRating",userRating)
+  const  fetchTurfRatingAndReview =async ()=>{
+      try{
+        const response = await axios.get(
+          `http://localhost:4000/api/v1/comment/getCommentWithRating/${id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+
+          },
+        }
+      );
+      if (response.data.success) {
+        console.log("resposne",response.data.comment)
+        setCommentWithRating(response.data.comments)
+      }
+      }catch(error){
+        toast.error(error.response?.data?.message || "Something went wrong while fetching the comment and Review!");
+        console.log(error.response?.data?.message);
+      }
+    }
+    useEffect(()=>{
+       fetchTurfRatingAndReview();
+    },[id,token])
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
       <h1 className="text-3xl font-bold text-gray-800">{turf?.turfName}</h1>
@@ -213,13 +236,14 @@ const TurfDetailsPage = () => {
         <p><span className="font-semibold">💰 Price Per Hour:</span> ₹{turf?.turfPricePerHour}</p>
         <p><span className="font-semibold">👤 Owner:</span> {turf?.turfOwner} ({turf?.turfOwnerPhoneNumber})</p>
         <p><span className="font-semibold">📖 Description:</span> {turf?.turfDescription}</p>
+        <p><span className="font-semibold">⭐ Average Rating:</span> {averageRating}</p>
 
         <p className={`font-semibold ${turf?.turfAvailability ? "text-green-600" : "text-red-600"}`}>
           {turf?.turfAvailability ? (
             <>
               ✅ Available for Booking
               <button
-                onClick={()=>handleBooking(turf._id)}
+                onClick={() => handleBooking(turf._id)}
                 className="ml-4 bg-blue-500 text-white py-2 px-4 rounded"
               >
                 Book Turf Now
@@ -235,13 +259,13 @@ const TurfDetailsPage = () => {
       <div className="mt-8">
         <h3 className="font-semibold text-lg">📝 Rate and Review</h3>
         <div className="flex items-center space-x-2 mt-4">
-          <span>Rating:</span>
+          <span>Your Rating:</span>
           <div className="flex space-x-1">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
-                onClick={() => handleStarClick(star)}
-                className={`text-2xl ${star <= rating ? "text-yellow-500" : "text-gray-400"}`}
+                onClick={() => setUserRating(star)}
+                className={`text-2xl ${star <= userRating ? "text-yellow-500" : "text-gray-400"}`}
               >
                 ★
               </button>
@@ -264,52 +288,51 @@ const TurfDetailsPage = () => {
         </button>
       </div>
 
-
       {/* Existing Reviews Section */}
-      {/* Existing Reviews Section */}
-<div className="mt-6">
-  <h3 className="font-semibold text-lg">⭐ Comments</h3>
-  {turf?.comments?.length > 0 ? (
-    turf.comments.map((comment) => (
-      <div key={comment._id} className="mt-4 flex items-start space-x-4">
-        <img
-          src={comment?.userId?.image}
-          alt="User Avatar"
-          className="w-12 h-12 rounded-full object-cover"
-        />
-        <div className="flex-1">
-          <div className="flex justify-between items-center">
-            <p className="font-semibold">
-              {comment?.userId?.firstName} {comment?.userId?.lastName}
-            </p>
-            <p className="text-sm text-gray-500">
-              {new Date(comment.createdAt).toLocaleString()}
-            </p>
-          </div>
-          <p className="mt-2">{comment.commentText}</p>
-          <div className="mt-2 flex space-x-4 text-blue-500">
-            <button
-              onClick={() => handleUpdateComment(comment._id)} 
-              className="text-sm"
-            >
-              Update
-            </button>
-            <button
-              onClick={() => handleDeleteComment(comment._id)}
-              className="text-sm text-red-500"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
+      <div className="mt-6">
+        <h3 className="font-semibold text-lg">⭐ Comments</h3>
+        {commentWithRating.length > 0 ? (
+          commentWithRating.map((comment) => (
+            <div key={comment._id} className="mt-4 flex items-start space-x-4">
+              <img
+                src={comment?.userId?.image}
+                alt="User Avatar"
+                className="w-12 h-12 rounded-full object-cover"
+              />
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <p className="font-semibold">
+                    {comment?.userId?.firstName} {comment?.userId?.lastName}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {new Date(comment.createdAt).toLocaleString()}
+                  </p>
+                </div>
+                <p className="mt-2">{comment.commentText}</p>
+                <p>{comment.rating?.rating}</p>
+                <div className="mt-2 flex space-x-4 text-blue-500">
+                  <button
+                    onClick={() => handleUpdateComment(comment._id)}
+                    className="text-sm"
+                  >
+                    Update
+                  </button>
+                  <button
+                    onClick={() => handleDeleteComment(comment._id)}
+                    className="text-sm text-red-500"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-600">No comments yet. Be the first to review!</p>
+        )}
       </div>
-    ))
-  ) : (
-    <p className="text-gray-600">No comments yet. Be the first to review!</p>
-  )}
-</div>
-  </div>
+    </div>
   );
 };
 
-export default TurfDetailsPage;
+export default TurfDetailsPage

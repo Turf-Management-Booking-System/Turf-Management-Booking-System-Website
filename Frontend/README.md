@@ -1,219 +1,314 @@
-import { useEffect, useState } from "react";
-import "boxicons/css/boxicons.min.css";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoader } from "../../slices/authSlice";
-import { setTurfs } from "../../slices/turfSlice";
-import toast from "react-hot-toast";
-import axios from "axios";
+import { toast } from "react-hot-toast";
+import { deleteComment, setComment,updateComment } from "../../slices/commentSlice";
 import { useNavigate } from "react-router-dom";
 
-const TurfPage = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("All");
-  const [priceRange, setPriceRange] = useState(500);
-  const [sortOrder, setSortOrder] = useState("none");
-  const [selectedSport, setSelectedSport] = useState("All");
-  const [showFavorites, setShowFavorites] = useState(false);
-  const [likedTurfs, setLikedTurfs] = useState([]);
-  const [isFilterOpen, setIsFilterOpen] = useState(false); // Added missing state
-  const navigate = useNavigate();
-  const token = useSelector((state) => state.auth.token);
-  const turfs = useSelector((state) => state.turf.turfs);
+const TurfDetailsPage = () => {
+  const navigate = useNavigate()
   const dispatch = useDispatch();
-  const selectedlocations = JSON.parse(localStorage.getItem("selectedTurf")) || null;
+  const token = useSelector((state) => state.auth.token);
+  const user = useSelector((state)=>state.auth.user)
+  const { id } = useParams();
+  const [turf, setTurf] = useState(null);
+  const [currentImage, setCurrentImage] = useState(0);
+  const [rating, setRating] = useState(0);
+  const [review,setReview]= useState("");
+  // api call to fetch data of a particular turf
+  useEffect(() => {
+    const fetchTurfDetails = async () => {
+      try {
+        dispatch(setLoader(true));
+        const response = await axios.get(
+          `http://localhost:4000/api/v1/turf/getTurfById/${id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            withCredentials: true,
+          }
+        );
 
-  // Fetch turf data based on user-selected location or all turfs
-  const fetchTurfByLocationsOrAll = async () => {
-    try {
-      dispatch(setLoader(true));
-      const url = selectedlocations
-        ? `http://localhost:4000/api/v1/turf/getAllTurfLocations/${selectedlocations}`
-        : "http://localhost:4000/api/v1/turf/getAllTurf";
-      const response = await axios.get(url, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
-      if (response.data.success) {
-        dispatch(setTurfs(response.data.fetchAllTurf));
-        console.log(response.data.fetchAllTurf)
+        if (response.data.success) {
+          setTurf(response.data.fetchTurfById);
+        }
+      } catch (error) {
+        toast.error(
+          error.response?.data?.message || "Something went wrong while fetching turf data!"
+        );
+        console.error("Error:", error.response?.data?.message);
+      } finally {
+        dispatch(setLoader(false));
       }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Something went wrong while fetching turf data!");
-      console.error(error);
-    } finally {
-      dispatch(setLoader(false));
+    };
+
+    if (id) {
+      fetchTurfDetails();
+    }
+  }, [id, dispatch, token]);
+
+  // Function to handle next and previous images
+  const nextImage = () => {
+    if (turf.turfImages && turf.turfImages.length > 0) {
+      setCurrentImage((prev) => (prev + 1) % turf.turfImages.length);
     }
   };
 
-  useEffect(() => {
-    fetchTurfByLocationsOrAll();
-  }, []);
-
-  const toggleLike = (id) => {
-    setLikedTurfs((prev) =>
-      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
-    );
+  const prevImage = () => {
+    if (turf.turfImages && turf.turfImages.length > 0) {
+      setCurrentImage((prev) => (prev - 1 + turf.turfImages.length) % turf.turfImages.length);
+    }
   };
 
-  let filteredTurfs = turfs.filter(
-    (turf) =>
-      turf.turfName.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedLocation === "All" || turf.turfLocation.includes(selectedLocation)) &&
-      (selectedSport === "All" || turf.sport === selectedSport) &&
-      turf.turfPricePerHour <= priceRange &&
-      (!showFavorites || likedTurfs.includes(turf._id))
-  );
-
-  if (sortOrder === "low-to-high") {
-    filteredTurfs.sort((a, b) => a.turfPricePerHour - b.turfPricePerHour);
-  } else if (sortOrder === "high-to-low") {
-    filteredTurfs.sort((a, b) => b.turfPricePerHour - a.turfPricePerHour);
-  }
-
-  const navigateToTurfPage = (turfId) => {
-    navigate(`turfDetails/${turfId}`);
+  const handleBooking = (turfId) => {
+    navigate(`/booking/${turfId}/slots`)
+  };
+  // handler for cretaing a comment
+  const handleReviewSubmit = async () => {
+    try {
+      dispatch(setLoader(true))
+      const response =
+       await axios.post(
+        `http://localhost:4000/api/v1/comment/createComment/${id}/${user?._id}`,
+        {
+          commentText:review
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.data.success) {
+        toast.success("Review submitted successfully!");
+        setReview("");
+        setRating(0);
+        dispatch(setComment([...turf.comments,response.data.populatedComment]));
+        console.log("value of rating",rating);
+        setTurf((prevTurf) => ({
+          ...prevTurf,
+          comments: [...prevTurf.comments, response.data.populatedComment],
+        }));
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong while creating the comment !");
+      console.log(error.response?.data?.message);
+    }finally{
+      dispatch(setLoader(false))
+    }
   };
 
+  // Star selection function
+  const handleStarClick = (star) => {
+    setRating(star);
+  };
+
+  // handler for updating the commnet
+   const handleUpdateComment =async (commentIds)=>{
+    try {
+      dispatch(setLoader(true))
+      const response =await axios.post(
+        `http://localhost:4000/api/v1/comment/updateComment/${id}/${user?._id}`,
+        { 
+          commentId:commentIds,
+          commentText:review
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.data.success) {
+        toast.success("Review Updated successfully!");
+        dispatch(updateComment({ commentId: commentIds, updatedComment: response.data.updatedComment }))
+        console.log("value of rating",rating);
+        setTurf((prevTurf) => ({
+          ...prevTurf,
+          comments: prevTurf.comments.map((comment) =>
+            comment._id === commentIds
+              ? { ...comment, commentText:response.data.updatedComment.commentText }
+              : comment
+          ),
+        }));
+        setReview("");
+        setRating(0);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong while updating the comment !");
+      console.log(error.response?.data?.message);
+    }finally{
+      dispatch(setLoader(false))
+    }
+   }
+  //  handler for deleting the comment
+   const handleDeleteComment =async(commentId)=>{
+    try {
+      dispatch(setLoader(true))
+      const response =await axios.delete(
+        `http://localhost:4000/api/v1/comment/deleteComment/${id}/${user?._id}/${commentId}`,
+      
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.data.success) {
+        toast.success("Review Deleted successfully!");
+        dispatch(deleteComment({commentId}))
+        console.log("value of rating",rating);
+        setTurf((prevTurf) => ({
+          ...prevTurf,
+          comments: prevTurf.comments.filter(comment => comment._id !== commentId),
+        
+        }));
+        setReview("");
+        setRating(0);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong while deleting the comment !");
+      console.log(error.response?.data?.message);
+    }finally{
+      dispatch(setLoader(false))
+    }
+   }
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900 pt-[80px] transition-colors duration-300">
-      {/* Mobile Filter Button */}
-      <button
-        className="md:hidden fixed top-4 right-14 z-50 bg-white text-black py-2 px-3 rounded-full shadow-lg"
-        onClick={() => setIsFilterOpen(!isFilterOpen)}
-      >
-        <i className="bx bx-filter-alt"></i>
-      </button>
+    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+      <h1 className="text-3xl font-bold text-gray-800">{turf?.turfName}</h1>
+      <p className="text-lg text-gray-600">{turf?.turfTitle}</p>
 
-      {/* Filters Section */}
-      <div
-        className={`w-full md:w-1/4 bg-white dark:bg-gray-800 p-4 shadow-lg md:h-screen md:sticky top-0 flex flex-col transition-all duration-300 ${
-          isFilterOpen ? "fixed inset-0 z-40" : "hidden md:flex"
-        }`}
-      >
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold dark:text-white">Filters</h2>
-          <button className="md:hidden" onClick={() => setIsFilterOpen(false)}>
-            <i className="bx bx-x text-2xl"></i>
+      {turf?.turfImages && turf.turfImages.length > 0 && (
+        <div className="relative mt-4">
+          <img
+            src={turf.turfImages[currentImage]}
+            alt="Turf"
+            className="w-full h-60 object-cover rounded-lg"
+          />
+          <button
+            onClick={prevImage}
+            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+          >
+            ❮
+          </button>
+          <button
+            onClick={nextImage}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+          >
+            ❯
           </button>
         </div>
+      )}
 
-        <label className="flex items-center gap-2 cursor-pointer mb-4 font-bold dark:text-white">
-          <input
-            type="checkbox"
-            checked={showFavorites}
-            onChange={() => setShowFavorites(!showFavorites)}
+      <div className="mt-6 space-y-4">
+        <p><span className="font-semibold">📍 Location:</span> {turf?.turfLocation}</p>
+        <p><span className="font-semibold">📌 Address:</span> {turf?.turfAddress}</p>
+        <p><span className="font-semibold">💰 Price Per Hour:</span> ₹{turf?.turfPricePerHour}</p>
+        <p><span className="font-semibold">👤 Owner:</span> {turf?.turfOwner} ({turf?.turfOwnerPhoneNumber})</p>
+        <p><span className="font-semibold">📖 Description:</span> {turf?.turfDescription}</p>
+
+        <p className={`font-semibold ${turf?.turfAvailability ? "text-green-600" : "text-red-600"}`}>
+          {turf?.turfAvailability ? (
+            <>
+              ✅ Available for Booking
+              <button
+                onClick={()=>handleBooking(turf._id)}
+                className="ml-4 bg-blue-500 text-white py-2 px-4 rounded"
+              >
+                Book Turf Now
+              </button>
+            </>
+          ) : (
+            "❌ Currently Unavailable"
+          )}
+        </p>
+      </div>
+
+      {/* Rating and Review Section */}
+      <div className="mt-8">
+        <h3 className="font-semibold text-lg">📝 Rate and Review</h3>
+        <div className="flex items-center space-x-2 mt-4">
+          <span>Rating:</span>
+          <div className="flex space-x-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                onClick={() => handleStarClick(star)}
+                className={`text-2xl ${star <= rating ? "text-yellow-500" : "text-gray-400"}`}
+              >
+                ★
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="mt-2">
+          <textarea
+            value={review}
+            onChange={(e) => setReview(e.target.value)}
+            placeholder="Write your review here..."
+            className="w-full border p-2 rounded"
           />
-          Show Favorites
-        </label>
-
-        <label className="font-bold dark:text-white">Select Location</label>
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          {["All", "Kurla", "Andheri", "Bandra", "Dadar", "Ghatkopar", "Thane", "Vashi", "Borivali"].map((location) => (
-            <label key={location} className="flex items-center gap-2 cursor-pointer dark:text-gray-300">
-              <input
-                type="radio"
-                name="location"
-                value={location}
-                checked={selectedLocation === location}
-                onChange={(e) => setSelectedLocation(e.target.value)}
-              />
-              {location}
-            </label>
-          ))}
         </div>
-
-        <label className="font-bold dark:text-white">Select Sport</label>
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          {["All", "Football", "Cricket", "Basketball", "Badminton"].map((sport) => (
-            <label key={sport} className="flex items-center gap-2 cursor-pointer dark:text-gray-300">
-              <input
-                type="radio"
-                name="sport"
-                value={sport}
-                checked={selectedSport === sport}
-                onChange={(e) => setSelectedSport(e.target.value)}
-              />
-              {sport}
-            </label>
-          ))}
-        </div>
-
-        <label className="font-bold dark:text-white">Price Range</label>
-        <input
-          type="range"
-          min="500"
-          max="2000"
-          step="100"
-          value={priceRange}
-          onChange={(e) => setPriceRange(Number(e.target.value))}
-          className="cursor-pointer w-full"
-        />
-        <span className="block text-center font-medium dark:text-white">₹{priceRange}</span>
-
-        <label className="font-bold dark:text-white">Sorting</label>
-        <select
-          className="w-full px-4 py-2 border rounded-lg mt-2 dark:bg-gray-700 dark:text-white"
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
+        <button
+          onClick={handleReviewSubmit}
+          className="mt-4 bg-green-500 text-white py-2 px-4 rounded"
         >
-          <option value="none">Sort By</option>
-          <option value="low-to-high">Price: Low to High</option>
-          <option value="high-to-low">Price: High to Low</option>
-        </select>
+          Submit Review
+        </button>
       </div>
 
-      {/* Turf Listing Section */}
-      <div className="w-full md:w-3/4 flex flex-col h-screen">
-        <div className="bg-white dark:bg-gray-800 shadow-md p-4">
-          <input
-            type="text"
-            placeholder="Search for a turf..."
-            className="w-full px-4 py-2 border rounded-lg border-green-500 focus:outline-none focus:ring-2 focus:ring-green-600 dark:bg-gray-700 dark:text-white"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 overflow-y-auto flex-grow">
-          {filteredTurfs.map((turf) => (
-            <div
-              key={turf._id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:scale-105 hover:shadow-xl transition-all relative h-[370px]"
+
+      {/* Existing Reviews Section */}
+<div className="mt-6">
+  <h3 className="font-semibold text-lg">⭐ Comments</h3>
+  {turf?.comments?.length > 0 ? (
+    turf.comments.map((comment) => (
+      <div key={comment._id} className="mt-4 flex items-start space-x-4">
+        <img
+          src={comment?.userId?.image}
+          alt="User Avatar"
+          className="w-12 h-12 rounded-full object-cover"
+        />
+        <div className="flex-1">
+          <div className="flex justify-between items-center">
+            <p className="font-semibold">
+              {comment?.userId?.firstName} {comment?.userId?.lastName}
+            </p>
+            <p className="text-sm text-gray-500">
+              {new Date(comment.createdAt).toLocaleString()}
+            </p>
+          </div>
+          <p className="mt-2">{comment.commentText}</p>
+          <div className="mt-2 flex space-x-4 text-blue-500">
+            <button
+              onClick={() => handleUpdateComment(comment._id)} 
+              className="text-sm"
             >
-              <img
-                src={turf.turfImages[0]} // Use the first image from the array
-                alt={turf.turfName}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{turf.turfName}</h2>
-                <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                  <i className="bx bx-map text-red-500"></i> {turf.turfLocation}
-                </p>
-                <p className="text-green-600 dark:text-green-400 font-bold mt-2">₹{turf.turfPricePerHour}/hr</p>
-                <div className="flex justify-between items-center mt-4">
-                  <button
-                    className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-all"
-                    onClick={() => navigateToTurfPage(turf._id)}
-                  >
-                    View Details
-                  </button>
-                  <button onClick={() => toggleLike(turf._id)}>
-                    {likedTurfs.includes(turf._id) ? (
-                      <i className="bx bxs-heart text-red-500 text-xl"></i>
-                    ) : (
-                      <i className="bx bx-heart text-gray-500 text-xl hover:text-red-500 transition"></i>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+              Update
+            </button>
+            <button
+              onClick={() => handleDeleteComment(comment._id)}
+              className="text-sm text-red-500"
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    ))
+  ) : (
+    <p className="text-gray-600">No comments yet. Be the first to review!</p>
+  )}
+</div>
+  </div>
   );
 };
 
-export default TurfPage;
+export default TurfDetailsPage;
