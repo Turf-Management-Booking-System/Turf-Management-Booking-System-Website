@@ -45,6 +45,55 @@ const AdminPanel = () => {
           sport: "Tennis",
           image: "",
         },
+        {
+          id: 4,
+          name: "City Central Arena",
+          location: "Delhi",
+          price: 1500,
+          sport: "Cricket",
+          image: "",
+        },
+        {
+          id: 5,
+          name: "City Central Arena",
+          location: "Delhi",
+          price: 1500,
+          sport: "Cricket",
+          image: "",
+        },
+        {
+          id: 6,
+          name: "City Central Arena",
+          location: "Delhi",
+          price: 1500,
+          sport: "Cricket",
+          image: "",
+        },
+        {
+          id: 7,
+          name: "City Central Arena",
+          location: "Delhi",
+          price: 1500,
+          sport: "Cricket",
+          image: "",
+        },
+        {
+          id: 8,
+          name: "City Central Arena",
+          location: "Delhi",
+          price: 1500,
+          sport: "Cricket",
+          image: "",
+        },
+        {
+          id: 9,
+          name: "City Central Arena",
+          location: "Delhi",
+          price: 1500,
+          sport: "Cricket",
+          image: "",
+        },
+        
       ])
       setIsLoading(false)
     }, 1000)
@@ -82,7 +131,7 @@ const AdminPanel = () => {
   }
 
   return (
-    <div className={`min-h-screen p-8  mt-16 ${darkMode ? "dark" : ""}`}>
+    <div className="min-h-screen p-8  mt-16">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-gray-800 dark:text-white">Turf Management</h1>
 

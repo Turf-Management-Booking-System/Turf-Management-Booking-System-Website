@@ -158,7 +158,7 @@ function Home() {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 1.2 }}
-        className="relative min-h-screen mt-16 w-full bg-cover bg-center flex items-center justify-end"
+        className="relative min-h-screen mt-16 w-full bg-cover bg-center flex items-center justify-end overflow-hidden"
       >
         <motion.div
           initial={{ opacity: 0, x: 50 }}
@@ -240,7 +240,7 @@ function Home() {
                 <p className="text-gray-600 dark:text-gray-300">{item.desc}</p>
               </div>
             </div>
-            <div className="w-10 h-10 bg-[#5886a7] dark:bg-[#9fbfd8] rounded-full absolute left-1/2  text-white font-bold transform -translate-x-1/2 flex items-center justify-center">{index + 1}</div>
+            <div className="w-14 h-14 bg-[#5886a7] dark:bg-[#9fbfd8] rounded-full absolute left-1/2  text-white text-xl font-bold transform -translate-x-1/2 flex items-center justify-center">{index + 1}</div>
           </motion.div>
         ))}
       </section>
