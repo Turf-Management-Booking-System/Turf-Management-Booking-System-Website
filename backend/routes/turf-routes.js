@@ -14,5 +14,4 @@ router.get("/getAllTurfLocations/:location",auth,getTurfSelectedLocation);
 router.get("/getTurfById/:id",auth,getTurfById);
 router.get("/:turfId/slots",auth,isUser,getTurfSlots);
 router.get("/getAllSports",auth,isUser,getAllSports)
-router.get("/weather",auth,isUser,getFutureWeatherData);
 module.exports = router;

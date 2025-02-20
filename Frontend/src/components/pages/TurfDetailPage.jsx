@@ -246,76 +246,43 @@ const TurfDetailsPage = () => {
       </div>
 
       <div className="">
-        <h3 className="text-xl font-semibold mb-2">Sports Types</h3>
-        <div className="mb-8">
-          <ul className="grid grid-cols-2 mr-[50rem]">
-            <li className="flex items-center">
-              <FaCheckCircle className="text-green-500 mr-2" /> Cricket
-            </li>
-            <li className="flex items-center">
-              <FaCheckCircle className="text-green-500 mr-2" /> Cricket
-            </li>
-            <li className="flex items-center">
-              <FaCheckCircle className="text-green-500 mr-2" /> Cricket
-            </li>
-            <li className="flex items-center">
-              <FaCheckCircle className="text-green-500 mr-2" /> Cricket
-            </li>
-          </ul>
-        </div>
-      </div>
-
+  <h3 className="text-xl font-semibold mb-2">Sports Types</h3>
+  <div className="mb-8">
+    <ul className="grid grid-cols-2 mr-[50rem]">
+      {turf?.sports[0]?.sports.map((sport, index) => (
+        <li key={index} className="flex items-center">
+          <FaCheckCircle className="text-green-500 mr-2" /> {sport}
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
       <div className="mt-2 flex justify-between">
-        <div>
-          <h3 className="text-xl font-semibold">📜 Turf Rules</h3>
-          <ul className="mt-2 space-y-2">
-            <li className="flex items-center">
-              <FaCheckCircle className="text-red-500 mr-2" /> No smoking or
-              alcohol consumption
-            </li>
-            <li className="flex items-center">
-              <FaCheckCircle className="text-red-500 mr-2" /> Non-marking shoes
-              only
-            </li>
-            <li className="flex items-center">
-              <FaCheckCircle className="text-red-500 mr-2" /> Maintain
-              cleanliness
-            </li>
-            <li className="flex items-center">
-              <FaCheckCircle className="text-red-500 mr-2" /> No food or drinks
-              on the playing area
-            </li>
-            <li className="flex items-center">
-              <FaCheckCircle className="text-red-500 mr-2" /> Follow time slot
-              strictly
-            </li>
-            <li className="flex items-center">
-              <FaCheckCircle className="text-red-500 mr-2" /> Any damage to
-              property will be chargeable
-            </li>
-          </ul>
-        </div>
-        <div className="mt-7 mr-[21rem]">
-          <h3 className="text-xl font-semibold flex items-center">
-            <span className="mr-2">
-              <FaTrophy />
-            </span>{" "}
-            Amenities
-          </h3>
-          <ul className="mt-2 space-y-2">
-            <li className="flex items-center">
-              <FaCheckCircle className="text-green-500 mr-2" /> Well-maintained
-              turf
-            </li>
-            <li className="flex items-center">
-              <FaCheckCircle className="text-green-500 mr-2" /> Proper lighting
-            </li>
-            <li className="flex items-center">
-              <FaCheckCircle className="text-green-500 mr-2" /> Washroom
-              facilities
-            </li>
-          </ul>
-        </div>
+      <div>
+  <h3 className="text-xl font-semibold">📜 Turf Rules</h3>
+  <ul className="mt-2 space-y-2">
+    {turf?.turfRules.map((rule, index) => (
+      <li key={index} className="flex items-center">
+        <FaCheckCircle className="text-red-500 mr-2" /> {rule}
+      </li>
+    ))}
+  </ul>
+</div>
+<div className="mt-7 mr-[21rem]">
+  <h3 className="text-xl font-semibold flex items-center">
+    <span className="mr-2">
+      <FaTrophy />
+    </span>{" "}
+    Amenities
+  </h3>
+  <ul className="mt-2 space-y-2">
+    {turf?.turfAmentities.map((amenity, index) => (
+      <li key={index} className="flex items-center">
+        <FaCheckCircle className="text-green-500 mr-2" /> {amenity}
+      </li>
+    ))}
+  </ul>
+</div>
       </div>
 
       {/* Rating and Review Section */}

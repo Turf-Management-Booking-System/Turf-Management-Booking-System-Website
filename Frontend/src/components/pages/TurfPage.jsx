@@ -6,7 +6,7 @@ import { setTurfs } from "../../slices/turfSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import whiteBg from "../../assets/Images/whiteBg.png"
+import whiteBg from "../../assets/Images/whiteBg.png";
 
 const TurfPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,7 +16,7 @@ const TurfPage = () => {
   const [selectedSport, setSelectedSport] = useState("All");
   const [showFavorites, setShowFavorites] = useState(false);
   const [likedTurfs, setLikedTurfs] = useState([]);
-  const [isFilterOpen, setIsFilterOpen] = useState(false); // Added missing state
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const navigate = useNavigate();
   const locations = useSelector((state) => state.turf.locations);
   const token = useSelector((state) => state.auth.token);
@@ -42,7 +42,7 @@ const TurfPage = () => {
       );
       if (response.data.success) {
         setSports(["All", ...response.data.sports]);
-        console.log("repsonse of sports", response.data.sports);
+        console.log("Response of sports:", response.data.sports);
       }
     } catch (error) {
       console.error("Error fetching sports:", error);
@@ -117,12 +117,11 @@ const TurfPage = () => {
     (turf) =>
       turf.turfName.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (selectedLocation === "All" || turf.turfLocation === selectedLocation) &&
-      (selectedSport === "All" || turf.sport === selectedSport) &&
+      (selectedSport === "All" || turf.sports[0].sports.includes(selectedSport)) &&
       turf.turfPricePerHour >= minPrice &&
       turf.turfPricePerHour <= priceRange &&
       (!showFavorites || likedTurfs.includes(turf._id))
   );
-  //  let filteredTurfs = turfs;
 
   if (sortOrder === "low-to-high") {
     filteredTurfs.sort((a, b) => a.turfPricePerHour - b.turfPricePerHour);
@@ -135,9 +134,12 @@ const TurfPage = () => {
   };
 
   return (
-    <div style={{
-            backgroundImage: `url(${whiteBg}`,
-          }} className="min-h-screen flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900 pt-[80px] transition-colors duration-300">
+    <div
+      style={{
+        backgroundImage: `url(${whiteBg})`,
+      }}
+      className="min-h-screen flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900 pt-[80px] transition-colors duration-300"
+    >
       {/* Mobile Filter Button */}
       <button
         className="md:hidden fixed top-4 right-14 z-50 bg-white text-black py-2 px-3 rounded-full shadow-lg"
@@ -153,7 +155,7 @@ const TurfPage = () => {
         }`}
       >
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-2xl  font-semibold dark:text-white">Filters</h2>
+          <h2 className="text-2xl font-semibold dark:text-white">Filters</h2>
           <button className="md:hidden" onClick={() => setIsFilterOpen(false)}>
             <i className="bx bx-x text-2xl"></i>
           </button>
@@ -173,7 +175,7 @@ const TurfPage = () => {
           {["All", ...locations.map((location) => location._id)].map(
             (location) => (
               <label
-                key={location.docId}
+                key={location}
                 className="flex items-center gap-2 cursor-pointer dark:text-gray-300"
               >
                 <input
@@ -185,11 +187,10 @@ const TurfPage = () => {
                   className="hidden peer"
                 />
                 <span
-                  className={`w-3 h-3 rounded-full border-2 flex items-center justify-center 
-                ${
-                  selectedLocation === location
-                    ? "bg-green-500 border-green-600"
-                    : "border-gray-400 bg-white"
+                  className={`w-3 h-3 rounded-full border-2 flex items-center justify-center ${
+                    selectedLocation === location
+                      ? "bg-green-500 border-green-600"
+                      : "border-gray-400 bg-white"
                   }`}
                 ></span>
                 {location}
@@ -213,13 +214,12 @@ const TurfPage = () => {
                 onChange={(e) => setSelectedSport(e.target.value)}
                 className="hidden peer"
               />
-               <span
-                  className={`w-3 h-3 rounded-full border-2 flex items-center justify-center 
-                ${
+              <span
+                className={`w-3 h-3 rounded-full border-2 flex items-center justify-center ${
                   selectedSport === sport
                     ? "bg-green-500 border-green-600"
                     : "border-gray-400 bg-white"
-                  }`}
+                }`}
               ></span>
               {sport}
             </label>
@@ -281,9 +281,26 @@ const TurfPage = () => {
                 <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
                   <i className="bx bx-map text-red-500"></i> {turf.turfLocation}
                 </p>
-                <p className="text-green-600 dark:text-green-400 font-bold mt-2">
+                <p className="text-green-600 dark:text-green-400 font-bold mt-1">
                   ₹{turf.turfPricePerHour}/hr
                 </p>
+                {/* Display Sports */}
+                <div className="mt-2">
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {turf.sports && turf.sports.length > 0 ? (
+                      turf.sports[0].sports.map((sport, index) => (
+                        <span
+                          key={index}
+                          className="bg-green-100 text-green-800 text-sm font-medium px-2 py-1 rounded-full"
+                        >
+                          {sport}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-gray-500">No sports available</span>
+                    )}
+                  </div>
+                </div>
                 <div className="flex justify-between items-center mt-4">
                   <button
                     className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-all"
