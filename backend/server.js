@@ -3,6 +3,8 @@ const connectDB = require("./config/database");
 const cors = require("cors");
 const app = express();
 const cookieParser = require("cookie-parser")
+require("./cron/weatherCron");
+const {getWeather} = require("./controllers/weather-controller")
 
 // defines the ports
 const PORT =  process.env.PORT || 4000;
@@ -43,10 +45,13 @@ app.use("/api/v1/comment",commentRoutes);
 app.get("/",(req,res)=>{
        res.send("hello jee kaise ho")
 })
-
+app.get('/weather', getWeather);
 // connection to db
 connectDB();
 // activate the server
 app.listen(PORT,(req,res)=>{
     console.log(`server is running on port ${PORT}`)
 });
+
+// api think
+

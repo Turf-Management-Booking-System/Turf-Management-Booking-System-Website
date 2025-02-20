@@ -117,8 +117,6 @@ try{
 }
 }
 
-
-
 exports.addRating= async (req, res) => {
   try {
     const { value,userId,turfId} = req.body;
@@ -188,4 +186,29 @@ exports.getCommentsWithRatings = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// get only comments for testimonals
+exports.getCommentWithTestimonals = async (req,res)=>{
+  try{
+     const testimonals = await Comment.find({}).populate({
+       path:"userId",
+       select:"firstName lastName email image"
+     }).populate({
+      path:"rating",
+      select:"rating"
+     })
+     return res.status(200).json({
+      success:true,
+      message:"Comment fetch!",
+      testimonals,
+     })
+  }catch(error){
+       console.log("error",error);
+       return res.status(500),json({
+        success:false,
+        message:"Error while fetching Testimonals",
+        error:error.message
+       })
+  }
+}
 

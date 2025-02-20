@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const SlotSchema = new mongoose.Schema({
         time: { type: String, required: true }, 
-        status: { type: String, enum: ["available", "booked"], default: "available" }
+        status: { type: String, enum: ["available", "booked"], default: "available" },
       });
 // create the schema
 const turfSchema = mongoose.Schema({

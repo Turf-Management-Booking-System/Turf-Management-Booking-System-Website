@@ -1,6 +1,8 @@
 
 const Turf = require("../models/turf");
 const Sport = require("../models/sports")
+const { fetchWeatherForCity } = require("../utils/weatherService"); // Make sure the path is correct
+
 // create turf
 exports.createTurf=async(req,res)=>{
     try{
@@ -368,3 +370,37 @@ exports.getAllSports = async (req, res) => {
       
       
 };
+exports.getFutureWeatherData = async (req, res) => {
+    try {
+      const { city, date } = req.query;
+  
+      if (!city || !date) {
+        return res.status(400).json({ message: "City and Date are required!" });
+      }
+  
+      // Validate the date
+      const currentDate = new Date();
+      const requestedDate = new Date(date);
+      const maxDate = new Date();
+      maxDate.setDate(currentDate.getDate() + 5); // 5 days from now
+  
+      if (requestedDate > maxDate) {
+        return res.status(400).json({
+          message: "Date is out of range. Weather data is only available for the next 5 days.",
+        });
+      }
+  
+      const weatherData = await fetchWeatherForCity(city, date);
+      if (!weatherData) {
+        return res.status(404).json({
+          message: "Weather data not found for the specified date!",
+        });
+      }
+  
+      res.json({ city, date, weather: weatherData });
+    } catch (error) {
+      console.log("error",error);
+      console.error("Error fetching weather data:", error.message);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
