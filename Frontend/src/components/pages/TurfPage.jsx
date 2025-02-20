@@ -6,51 +6,52 @@ import { setTurfs } from "../../slices/turfSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import whiteBg from "../../assets/Images/whiteBg.png"
 
 const TurfPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState(["All"]);
-  const [priceRange, setPriceRange] = useState(500);
+  const [selectedLocation, setSelectedLocation] = useState("All");
+  const [priceRange, setPriceRange] = useState("");
   const [sortOrder, setSortOrder] = useState("none");
   const [selectedSport, setSelectedSport] = useState("All");
   const [showFavorites, setShowFavorites] = useState(false);
   const [likedTurfs, setLikedTurfs] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false); // Added missing state
   const navigate = useNavigate();
-  const locations = useSelector((state)=>state.turf.locations)
-  console.log("locations",locations)
+  const locations = useSelector((state) => state.turf.locations);
   const token = useSelector((state) => state.auth.token);
   const turfs = useSelector((state) => state.turf.turfs);
   const dispatch = useDispatch();
-  const selectedlocations = JSON.parse(localStorage.getItem("selectedTurf")) || null;
+  const selectedlocations =
+    JSON.parse(localStorage.getItem("selectedTurf")) || null;
   const [sports, setSports] = useState([]);
-  const [minPrice,setMinPrice]= useState(200);
-  const [maxPrice,setMaxPrice]= useState(2000);
+  const [minPrice, setMinPrice] = useState(200);
+  const [maxPrice, setMaxPrice] = useState(2000);
 
-
-const fetchSports = async () => {
-  try {
-    const response = await axios.get("http://localhost:4000/api/v1/turf/getAllSports",{
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-
-      },
-      withCredentials: true,
-
-    });
-    if (response.data.success) {
-      setSports(["All", ...response.data.sports]); 
-      console.log("repsonse of sports",response.data.sports)
+  const fetchSports = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:4000/api/v1/turf/getAllSports",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+      if (response.data.success) {
+        setSports(["All", ...response.data.sports]);
+        console.log("repsonse of sports", response.data.sports);
+      }
+    } catch (error) {
+      console.error("Error fetching sports:", error);
     }
-  } catch (error) {
-    console.error("Error fetching sports:", error);
-  }
-};
+  };
 
-useEffect(() => {
-  fetchSports();
-}, [token]);
+  useEffect(() => {
+    fetchSports();
+  }, [token]);
 
   // Fetch turf data based on user-selected location or all turfs
   const fetchTurfByLocationsOrAll = async () => {
@@ -59,7 +60,7 @@ useEffect(() => {
       const url = selectedlocations
         ? `http://localhost:4000/api/v1/turf/getAllTurfLocations/${selectedlocations}`
         : "http://localhost:4000/api/v1/turf/getAllTurf";
-        
+
       const response = await axios.get(url, {
         headers: {
           "Content-Type": "application/json",
@@ -67,32 +68,34 @@ useEffect(() => {
         },
         withCredentials: true,
       });
-  
+
       if (response.data.success) {
         const fetchedTurfs = response.data.fetchAllTurf;
         dispatch(setTurfs(fetchedTurfs));
-  
+
         if (fetchedTurfs.length > 0) {
           const prices = fetchedTurfs.map((turf) => turf.turfPricePerHour);
           setMinPrice(Math.min(...prices));
           setMaxPrice(Math.max(...prices));
-          setPriceRange(Math.min(...prices)); 
+          setPriceRange(Math.max(...prices));
         } else {
           setMinPrice(200);
           setMaxPrice(2000);
           setPriceRange(200);
         }
-  
-        console.log( "fetched turfs",fetchedTurfs);
+
+        console.log(fetchedTurfs);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something went wrong while fetching turf data!");
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while fetching turf data!"
+      );
       console.error(error);
     } finally {
       dispatch(setLoader(false));
     }
   };
-  
 
   useEffect(() => {
     fetchTurfByLocationsOrAll();
@@ -104,15 +107,22 @@ useEffect(() => {
     );
   };
 
-  // let filteredTurfs = turfs.filter(
-    // (turf) =>
-      // turf.turfName.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      // (selectedLocation === "All" || turf.turfLocation.includes(selectedLocation)) &&
-      // (selectedSport === "All" || turf.sport === selectedSport) &&
-      // (priceRange === 2000 || turf.turfPricePerHour <= priceRange) &&
-      // (!showFavorites || likedTurfs.includes(turf._id))
-  // );
-  let filteredTurfs = turfs;  
+  useEffect(() => {
+    if (maxPrice) {
+      setPriceRange(maxPrice);
+    }
+  }, [maxPrice]);
+
+  let filteredTurfs = turfs.filter(
+    (turf) =>
+      turf.turfName.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (selectedLocation === "All" || turf.turfLocation === selectedLocation) &&
+      (selectedSport === "All" || turf.sport === selectedSport) &&
+      turf.turfPricePerHour >= minPrice &&
+      turf.turfPricePerHour <= priceRange &&
+      (!showFavorites || likedTurfs.includes(turf._id))
+  );
+  //  let filteredTurfs = turfs;
 
   if (sortOrder === "low-to-high") {
     filteredTurfs.sort((a, b) => a.turfPricePerHour - b.turfPricePerHour);
@@ -125,7 +135,9 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900 pt-[80px] transition-colors duration-300">
+    <div style={{
+            backgroundImage: `url(${whiteBg}`,
+          }} className="min-h-screen flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900 pt-[80px] transition-colors duration-300">
       {/* Mobile Filter Button */}
       <button
         className="md:hidden fixed top-4 right-14 z-50 bg-white text-black py-2 px-3 rounded-full shadow-lg"
@@ -140,14 +152,14 @@ useEffect(() => {
           isFilterOpen ? "fixed inset-0 z-40" : "hidden md:flex"
         }`}
       >
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold dark:text-white">Filters</h2>
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-2xl  font-semibold dark:text-white">Filters</h2>
           <button className="md:hidden" onClick={() => setIsFilterOpen(false)}>
             <i className="bx bx-x text-2xl"></i>
           </button>
         </div>
 
-        <label className="flex items-center gap-2 cursor-pointer mb-4 font-bold dark:text-white">
+        <label className="flex items-center gap-2 cursor-pointer mb-2 font-bold dark:text-white">
           <input
             type="checkbox"
             checked={showFavorites}
@@ -157,32 +169,58 @@ useEffect(() => {
         </label>
 
         <label className="font-bold dark:text-white">Select Location</label>
-        <div className="grid grid-cols-2 gap-2 mb-4">
-        {["All", ...locations.map((location) => location._id)].map((location) => (
-            <label key={location.docId} className="flex items-center gap-2 cursor-pointer dark:text-gray-300">
-              <input
-                type="radio"
-                name="location"
-                value={location}
-                checked={selectedLocation === location}
-                onChange={(e) => setSelectedLocation(e.target.value)}
-              />
-              {location}
-            </label>
-          ))}
+        <div className="grid grid-cols-2 gap-1 mb-2">
+          {["All", ...locations.map((location) => location._id)].map(
+            (location) => (
+              <label
+                key={location.docId}
+                className="flex items-center gap-2 cursor-pointer dark:text-gray-300"
+              >
+                <input
+                  type="radio"
+                  name="location"
+                  value={location}
+                  checked={selectedLocation === location}
+                  onChange={() => setSelectedLocation(location)}
+                  className="hidden peer"
+                />
+                <span
+                  className={`w-3 h-3 rounded-full border-2 flex items-center justify-center 
+                ${
+                  selectedLocation === location
+                    ? "bg-green-500 border-green-600"
+                    : "border-gray-400 bg-white"
+                  }`}
+                ></span>
+                {location}
+              </label>
+            )
+          )}
         </div>
 
         <label className="font-bold dark:text-white">Select Sport</label>
-        <div className="grid grid-cols-2 gap-2 mb-4">
+        <div className="grid grid-cols-2 gap-1 mb-2">
           {sports.map((sport) => (
-            <label key={sport} className="flex items-center gap-2 cursor-pointer dark:text-gray-300">
+            <label
+              key={sport}
+              className="flex items-center gap-2 cursor-pointer dark:text-gray-300"
+            >
               <input
                 type="radio"
                 name="sport"
                 value={sport}
                 checked={selectedSport === sport}
                 onChange={(e) => setSelectedSport(e.target.value)}
+                className="hidden peer"
               />
+               <span
+                  className={`w-3 h-3 rounded-full border-2 flex items-center justify-center 
+                ${
+                  selectedSport === sport
+                    ? "bg-green-500 border-green-600"
+                    : "border-gray-400 bg-white"
+                  }`}
+              ></span>
               {sport}
             </label>
           ))}
@@ -198,11 +236,13 @@ useEffect(() => {
           onChange={(e) => setPriceRange(Number(e.target.value))}
           className="cursor-pointer w-full"
         />
-        <span className="block text-center font-medium dark:text-white">₹{priceRange}</span>
+        <span className="block text-center font-medium dark:text-white">
+          ₹{priceRange}
+        </span>
 
         <label className="font-bold dark:text-white">Sorting</label>
         <select
-          className="w-full px-4 py-2 border rounded-lg mt-2 dark:bg-gray-700 dark:text-white"
+          className="w-full px-4 py-2 border rounded-lg mt-1 dark:bg-gray-700 dark:text-white"
           value={sortOrder}
           onChange={(e) => setSortOrder(e.target.value)}
         >
@@ -235,11 +275,15 @@ useEffect(() => {
                 className="w-full h-48 object-cover"
               />
               <div className="p-4">
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{turf.turfName}</h2>
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                  {turf.turfName}
+                </h2>
                 <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
                   <i className="bx bx-map text-red-500"></i> {turf.turfLocation}
                 </p>
-                <p className="text-green-600 dark:text-green-400 font-bold mt-2">₹{turf.turfPricePerHour}/hr</p>
+                <p className="text-green-600 dark:text-green-400 font-bold mt-2">
+                  ₹{turf.turfPricePerHour}/hr
+                </p>
                 <div className="flex justify-between items-center mt-4">
                   <button
                     className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-all"

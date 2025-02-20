@@ -15,6 +15,7 @@ import { DarkModeContext } from "../../context/DarkModeContext";
 import { motion ,AnimatePresence} from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Link } from "react-router-dom";
+import whiteBg from "../../assets/Images/whiteBg.png"
 
 function Home() {
   const { darkMode } = useContext(DarkModeContext);
@@ -158,7 +159,7 @@ function Home() {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 1.2 }}
-        className="relative min-h-screen mt-16 w-full bg-cover bg-center flex items-center justify-end"
+        className="relative min-h-screen mt-16 w-full bg-cover bg-center flex items-center justify-end overflow-hidden"
       >
         <motion.div
           initial={{ opacity: 0, x: 50 }}
@@ -209,6 +210,9 @@ function Home() {
       {/* Search, Book, Play Timeline */}
       <section
         ref={ref}
+        style={{
+                backgroundImage: `url(${whiteBg}`,
+              }}
         className="py-16 flex flex-col items-center relative bg-gray-100 dark:bg-gray-800"
       >
         <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">How It Works</h2>
@@ -240,12 +244,15 @@ function Home() {
                 <p className="text-gray-600 dark:text-gray-300">{item.desc}</p>
               </div>
             </div>
-            <div className="w-10 h-10 bg-[#5886a7] dark:bg-[#9fbfd8] rounded-full absolute left-1/2  text-white font-bold transform -translate-x-1/2 flex items-center justify-center">{index + 1}</div>
+            <div className="w-14 h-14 bg-[#5886a7] dark:bg-[#9fbfd8] rounded-full absolute left-1/2  text-white text-xl font-bold transform -translate-x-1/2 flex items-center justify-center">{index + 1}</div>
           </motion.div>
         ))}
       </section>
       {/* Featured Turfs */}
       <section 
+      style={{
+              backgroundImage: `url(${whiteBg}`,
+            }}
       className="py-16 bg-white dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center dark:text-white">
@@ -298,7 +305,9 @@ function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 bg-gray-100 dark:bg-gray-800">
+      <section style={{
+              backgroundImage: `url(${whiteBg}`,
+            }} className="py-16 bg-gray-100 dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">What Our Users Say</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -327,7 +336,9 @@ function Home() {
       </section>
 
       {/*Faqs*/}
-      <section className="py-16 bg-gray-100 dark:bg-gray-800">
+      <section style={{
+              backgroundImage: `url(${whiteBg}`,
+            }} className="py-16 bg-gray-100 dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center dark:text-white">
             Frequently Asked Questions
