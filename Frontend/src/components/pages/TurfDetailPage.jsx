@@ -4,6 +4,7 @@ import "swiper/css";
 import "swiper/css/autoplay";
 import { Autoplay } from "swiper/modules";
 import axios from "axios";
+import { AiFillStar } from "react-icons/ai";
 import {
   FaMapMarkerAlt,
   FaRupeeSign,
@@ -18,9 +19,10 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoader } from "../../slices/authSlice";
 import { toast } from "react-hot-toast";
-import {  setComment, } from "../../slices/commentSlice";
+import { setComment } from "../../slices/commentSlice";
 import { useNavigate } from "react-router-dom";
 import { DarkModeContext } from "../../context/DarkModeContext";
+import whiteBg from "../../assets/Images/whiteBg.png";
 
 const TurfDetailsPage = () => {
   const navigate = useNavigate();
@@ -30,7 +32,6 @@ const TurfDetailsPage = () => {
   const { id } = useParams();
   const { darkmode } = useState(DarkModeContext);
   const [turf, setTurf] = useState(null);
-  const [currentImage, setCurrentImage] = useState(0);
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
   const [userRating, setUserRating] = useState(0);
@@ -45,7 +46,7 @@ const TurfDetailsPage = () => {
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization:` Bearer ${token}`,
+              Authorization: ` Bearer ${token}`,
             },
             withCredentials: true,
           }
@@ -72,22 +73,8 @@ const TurfDetailsPage = () => {
     }
   }, [id, dispatch, token]);
 
-  const nextImage = () => {
-    if (turf.turfImages && turf.turfImages.length > 0) {
-      setCurrentImage((prev) => (prev + 1) % turf.turfImages.length);
-    }
-  };
-
-  const prevImage = () => {
-    if (turf.turfImages && turf.turfImages.length > 0) {
-      setCurrentImage(
-        (prev) => (prev - 1 + turf.turfImages.length) % turf.turfImages.length
-      );
-    }
-  };
-
   const handleBooking = (turfId) => {
-    navigate(`/booking/${turfId}/slots`);
+    navigate(`/booking/${turfId}/slots`, { state: { turfName: turf.turfName } });
   };
 
   const handleReviewSubmit = async () => {
@@ -112,7 +99,7 @@ const TurfDetailsPage = () => {
         setReview("");
         setRating(0);
         setUserRating(0);
-        dispatch(setComment([...turf.comments,response.data.comment]));
+        dispatch(setComment([...turf.comments, response.data.comment]));
         setTurf((prevTurf) => ({
           ...prevTurf,
           comments: [...prevTurf.comments, response.data.comment],
@@ -133,17 +120,15 @@ const TurfDetailsPage = () => {
     setRating(star);
   };
 
-
-   console.log("userRating",userRating)
-  const  fetchTurfRatingAndReview =async ()=>{
-      try{
-        const response = await axios.get(
-          `http://localhost:4000/api/v1/comment/getCommentWithRating/${id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization:` Bearer ${token}`,
-
+  console.log("userRating", userRating);
+  const fetchTurfRatingAndReview = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:4000/api/v1/comment/getCommentWithRating/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: ` Bearer ${token}`,
           },
         }
       );
@@ -162,7 +147,11 @@ const TurfDetailsPage = () => {
   useEffect(() => {
     fetchTurfRatingAndReview();
   }, [id, token]);
+
   return (
+    <div style={{
+            backgroundImage: `url(${whiteBg}`,
+          }} className="miin-h-screen">
     <div
       className={`max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-24`}
     >
@@ -192,6 +181,7 @@ const TurfDetailsPage = () => {
             <FaUser className="text-gray-500 mr-2" /> Owner: {turf?.turfOwner} (
             {turf?.turfOwnerPhoneNumber})
           </p>
+          <p className="mt-2 flex items-center">Turf Size: {turf?.turfSize}</p>
           <p className="mt-2">Description: {turf?.turfDescription}</p>
           <p className="mt-2 flex items-center">
             <FaStar className="text-yellow-300" />
@@ -253,6 +243,26 @@ const TurfDetailsPage = () => {
             ))}
           </div>
         </motion.div>
+      </div>
+
+      <div className="">
+        <h3 className="text-xl font-semibold mb-2">Sports Types</h3>
+        <div className="mb-8">
+          <ul className="grid grid-cols-2 mr-[50rem]">
+            <li className="flex items-center">
+              <FaCheckCircle className="text-green-500 mr-2" /> Cricket
+            </li>
+            <li className="flex items-center">
+              <FaCheckCircle className="text-green-500 mr-2" /> Cricket
+            </li>
+            <li className="flex items-center">
+              <FaCheckCircle className="text-green-500 mr-2" /> Cricket
+            </li>
+            <li className="flex items-center">
+              <FaCheckCircle className="text-green-500 mr-2" /> Cricket
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div className="mt-2 flex justify-between">
@@ -332,7 +342,7 @@ const TurfDetailsPage = () => {
             value={review}
             onChange={(e) => setReview(e.target.value)}
             placeholder="Write your review here..."
-            className="w-full border p-2 rounded"
+            className="w-[40rem] border p-2 rounded"
           />
         </div>
         <button
@@ -364,9 +374,13 @@ const TurfDetailsPage = () => {
                   </p>
                 </div>
                 <p className="mt-2">{comment.commentText}</p>
-                <p>{comment.rating?.rating}</p>
-                </div>
+                <p className="flex text-yellow-500">
+                  {[...Array(comment.rating?.rating || 0)].map((_, i) => (
+                    <AiFillStar key={i} />
+                  ))}
+                </p>
               </div>
+            </div>
           ))
         ) : (
           <p className="text-gray-600">
@@ -375,6 +389,7 @@ const TurfDetailsPage = () => {
         )}
       </div>
     </div>
+  </div>
   );
 };
 

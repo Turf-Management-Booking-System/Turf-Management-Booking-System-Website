@@ -15,6 +15,7 @@ import { DarkModeContext } from "../../context/DarkModeContext";
 import { motion ,AnimatePresence} from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Link } from "react-router-dom";
+import whiteBg from "../../assets/Images/whiteBg.png"
 
 function Home() {
   const { darkMode } = useContext(DarkModeContext);
@@ -209,6 +210,9 @@ function Home() {
       {/* Search, Book, Play Timeline */}
       <section
         ref={ref}
+        style={{
+                backgroundImage: `url(${whiteBg}`,
+              }}
         className="py-16 flex flex-col items-center relative bg-gray-100 dark:bg-gray-800"
       >
         <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">How It Works</h2>
@@ -246,6 +250,9 @@ function Home() {
       </section>
       {/* Featured Turfs */}
       <section 
+      style={{
+              backgroundImage: `url(${whiteBg}`,
+            }}
       className="py-16 bg-white dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center dark:text-white">
@@ -298,7 +305,9 @@ function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 bg-gray-100 dark:bg-gray-800">
+      <section style={{
+              backgroundImage: `url(${whiteBg}`,
+            }} className="py-16 bg-gray-100 dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">What Our Users Say</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -327,7 +336,9 @@ function Home() {
       </section>
 
       {/*Faqs*/}
-      <section className="py-16 bg-gray-100 dark:bg-gray-800">
+      <section style={{
+              backgroundImage: `url(${whiteBg}`,
+            }} className="py-16 bg-gray-100 dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center dark:text-white">
             Frequently Asked Questions
