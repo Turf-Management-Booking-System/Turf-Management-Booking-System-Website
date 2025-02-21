@@ -31,6 +31,8 @@ import TurfDetailPage from "./components/pages/TurfDetailPage";
 import BookingPage from "./components/pages/BookingPage";
 import BookedConfirmPage from "./components/pages/BookedConfirmPage";
 import BookingConfirmedPage from "./components/pages/BookingConfirmedPage";
+import { isTokenExpired } from "./utils/authUtils";
+import { logout } from "./slices/authSlice";
 const App = () => {
   const dispatch = useDispatch(); 
   const location = useLocation();
@@ -45,7 +47,9 @@ const App = () => {
     const token = localStorage.getItem("token");
     const storedUser = localStorage.getItem("userData");
     const user = storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null;
-    if (token && user) {
+    if (isTokenExpired()) {
+      dispatch(logout());
+    } else {
       dispatch(login({ user, token }));
     }
   }, [dispatch]); 

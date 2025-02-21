@@ -1,5 +1,6 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState,useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { HiStar, HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import {
   faFutbol,
   faSearch,
@@ -122,25 +123,68 @@ function Home() {
     {
       id: 1,
       name: "John Doe",
-      image:"",
+      image:"https://up.yimg.com/ib/th?id=OIP.n5CeR93916slWXGyV13PuAHaHa&pid=Api&rs=1&c=1&qlt=95&w=113&h=113",
+      turf:"Andred fields turf",
       comment: "Great experience booking through this platform. The turf was in excellent condition!",
       rating: 5,
     },
     {
       id: 2,
       name: "Jane Smith",
-      image:"",
+      image:"https://up.yimg.com/ib/th?id=OIP.n5CeR93916slWXGyV13PuAHaHa&pid=Api&rs=1&c=1&qlt=95&w=113&h=113",
+      turf:"Andred fields turf",
       comment: "Easy to use and a wide variety of turfs to choose from. Highly recommended!",
       rating: 4,
     },
     {
       id: 3,
       name: "Mike Johnson",
-      image:"",
+      image:"https://up.yimg.com/ib/th?id=OIP.n5CeR93916slWXGyV13PuAHaHa&pid=Api&rs=1&c=1&qlt=95&w=113&h=113",
+      turf:"Andred fields turf",
+      comment: "Smooth booking process and excellent customer support. Will definitely use again!",
+      rating: 5,
+    },
+    {
+      id: 4,
+      name: "Mike Johnson",
+      image:"https://up.yimg.com/ib/th?id=OIP.n5CeR93916slWXGyV13PuAHaHa&pid=Api&rs=1&c=1&qlt=95&w=113&h=113",
+      turf:"Andred fields turf",
+      comment: "Smooth booking process and excellent customer support. Will definitely use again!",
+      rating: 5,
+    },
+    {
+      id: 5,
+      name: "Mike Johnson",
+      image:"https://up.yimg.com/ib/th?id=OIP.n5CeR93916slWXGyV13PuAHaHa&pid=Api&rs=1&c=1&qlt=95&w=113&h=113",
+      turf:"Andred fields turf",
+      comment: "Smooth booking process and excellent customer support. Will definitely use again!",
+      rating: 5,
+    },
+    {
+      id: 6,
+      name: "Mike Johnson",
+      image:"https://up.yimg.com/ib/th?id=OIP.n5CeR93916slWXGyV13PuAHaHa&pid=Api&rs=1&c=1&qlt=95&w=113&h=113",
+      turf:"Andred fields turf",
       comment: "Smooth booking process and excellent customer support. Will definitely use again!",
       rating: 5,
     },
   ]
+  const [index, setIndex] = useState(0)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prevIndex) => (prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1));
+    }, 5000); 
+
+    return () => clearInterval(interval); 
+  }, [testimonials.length]);
+
+  const prevTestimonials = () => {
+    setIndex((prevIndex) => (prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1));
+  };
+
+  const nextTestimonials = () => {
+    setIndex((prevIndex) => (prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -305,35 +349,89 @@ function Home() {
       </section>
 
       {/* Testimonials */}
-      <section style={{
-              backgroundImage: `url(${whiteBg}`,
-            }} className="py-16 bg-gray-100 dark:bg-gray-800">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">What Our Users Say</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={testimonial.id}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg"
-              >
-                <p className="text-gray-600 dark:text-gray-300 mb-4">{testimonial.comment}</p>
-                <div className="flex items-center gap-2">
-                  <span className="w-12 h-12 border border-black rounded-full"></span>
-                  <span className="font-semibold dark:text-white">{testimonial.name}</span>
-                  <div className="flex ml-[10rem]">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <FontAwesomeIcon key={i} icon={faStar} className="text-yellow-500" />
-                    ))}
+      {/* Testimonials */}
+      <section className="py-16 bg-gray-100 dark:bg-gray-800">
+      <div className="container mx-auto px-4">
+        <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">What Our Users Say</h2>
+        <div className="relative w-full max-w-5xl mx-auto">
+          {/* Left Arrow */}
+          <button
+            onClick={prevTestimonials}
+            className="absolute -left-20 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-700 p-2 rounded-full shadow-md z-10"
+          >
+            <HiChevronLeft className="text-gray-600 dark:text-white text-2xl" />
+          </button>
+
+          {/* Testimonials Grid */}
+          <div className="overflow-hidden  w-[70vw]">
+            <div className="flex transition-transform duration-300" style={{ transform: `translateX(-${index * 33.33}%)` }}>
+              {testimonials.map((testimonial, i) => (
+                <div
+                  key={testimonial.id}
+                  className={`w-[30vw] flex-shrink-0 p-4 transition-all duration-300 pt-20  // Middle testimonial is larger
+                  }`}
+                >
+                  <div className="relative bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg flex flex-col items-center text-center">
+      
+                    <div className="absolute -top-12">
+                      <img
+                        src={testimonial.image}
+                        alt={testimonial.name}
+                        className="w-25 h-25 rounded-full border-4 border-gray-300 dark:border-gray-500 "
+                        style={{ zIndex: 1 }}>
+                      </img>
+                    </div>
+
+                    <div className="pt-12">
+                      {/* Comment */}
+                      <p className="text-gray-600 dark:text-gray-300 mb-4">{testimonial.comment}</p>
+
+                      {/* User Info */}
+                      <div>
+                        <span className="block font-semibold dark:text-white">{testimonial.name}</span>
+                        <span className="block text-sm text-gray-500 dark:text-gray-400">{testimonial.turf}</span>
+                      </div>
+
+                      {/* Star Rating */}
+                      <div className="flex justify-center mt-2">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <HiStar key={i} className="text-yellow-500 text-lg" />
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </motion.div>
-            ))}
+              ))}
+            </div>
           </div>
+
+          {/* Right Arrow */}
+          <button
+            onClick={nextTestimonials}
+            className="absolute -right-24 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-700 p-2 rounded-full shadow-md z-10"
+          >
+            <HiChevronRight className="text-gray-600 dark:text-white text-2xl" />
+          </button>
         </div>
-      </section>
+
+        {/* Dots (Indicators) */}
+        <div className="flex justify-center mt-8 space-x-2">
+          {testimonials.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                i === index + 1 ? "bg-blue-600 scale-125" : "bg-gray-400"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+      {/* Testimonials */}
+
+
+    
 
       {/*Faqs*/}
       <section style={{
