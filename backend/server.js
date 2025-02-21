@@ -34,11 +34,13 @@ const turfRoutes = require("./routes/turf-routes");
 const notifyRoutes = require("./routes/notify-routes");
 const chatBotRoutes =require("./routes/chatBot-routes");
 const commentRoutes = require("./routes/comment-routes");
+const bookingRoutes = require("./routes/booking-routes");
 app.use("/api/v1/auth",authRoutes);
 app.use("/api/v1/turf",turfRoutes);
 app.use("/api/v1/notify",notifyRoutes);
 app.use("/api/v1/ai",chatBotRoutes);
 app.use("/api/v1/comment",commentRoutes);
+app.use("/api/v1/booking",bookingRoutes);
 // root route
 app.get("/",(req,res)=>{
        res.send("hello jee kaise ho")

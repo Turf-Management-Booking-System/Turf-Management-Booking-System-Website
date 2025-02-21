@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 const SlotSchema = new mongoose.Schema({
+        turfId:{
+           type:mongoose.Schema.Types.ObjectId,
+           ref:"Turf"
+        },
         time: { type: String, required: true }, 
         status: { type: String, enum: ["available", "booked"], default: "available" },
       });

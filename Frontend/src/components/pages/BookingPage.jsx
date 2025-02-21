@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { DarkModeContext } from "../../context/DarkModeContext";
 import whiteBg from "../../assets/Images/whiteBg.png";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import {
   faCalendarAlt,
   faClock,
@@ -11,70 +14,101 @@ import {
   faExclamationCircle,
   faInfoCircle,
 } from "@fortawesome/free-solid-svg-icons";
+import { useSelector } from "react-redux";
 
 const BookingPage = () => {
+  const {turfId} = useParams();
+  const navigate = useNavigate();
+  console.log("id",turfId)
   const location = useLocation();
-  const { darkMode } = useState(DarkModeContext);
+  const { darkMode } = useContext(DarkModeContext);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlots, setSelectedSlots] = useState([]);
+  const [slots, setSlots] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const selectedTurfName = location.state?.turfName || "Unknown Turf";
-
-  const slots = [
-    { time: "6 AM - 7 AM", price: 500, status: "available" },
-    { time: "7 AM - 8 AM", price: 500, status: "booked" },
-    { time: "8 AM - 9 AM", price: 500, status: "available" },
-    { time: "9 AM - 10 AM", price: 500, status: "available" },
-    { time: "10 AM - 11 AM", price: 600, status: "available" },
-    { time: "11 AM - 12 PM", price: 600, status: "booked" },
-    { time: "12 PM - 1 PM", price: 600, status: "available" },
-    { time: "1 PM - 2 PM", price: 600, status: "available" },
-    { time: "2 PM - 3 PM", price: 700, status: "booked" },
-    { time: "3 PM - 4 PM", price: 700, status: "available" },
-    { time: "4 PM - 5 PM", price: 700, status: "available" },
-    { time: "5 PM - 6 PM", price: 800, status: "available" },
-    { time: "6 PM - 7 PM", price: 800, status: "booked" },
-    { time: "7 PM - 8 PM", price: 800, status: "available" },
-    { time: "8 PM - 9 PM", price: 800, status: "available" },
-    { time: "9 PM - 10 PM", price: 700, status: "available" },
-  ];
-
-  const toggleSlot = (slot) => {
-    if (slot.status === "booked") return;
-
-    setSelectedSlots((prevSlots) => {
-      let newSlots;
-
-      if (prevSlots.includes(slot.time)) {
-        newSlots = prevSlots.filter((s) => s !== slot.time);
-      } else {
-        newSlots = [...prevSlots, slot.time];
-      }
-
-      // total price
-      const newTotalPrice = newSlots.reduce((total, slotTime) => {
-        const slotObj = slots.find((s) => s.time === slotTime);
-        return total + (slotObj ? slotObj.price : 0);
-      }, 0);
-
-      setTotalPrice(newTotalPrice);
-      return newSlots;
-    });
-  };
-
+  const token = useSelector((state)=>state.auth.token);
+  const [priceTurf,setPriceTurf] = useState(0);
+  const [userId,setUserId]= useState(0);
   const weatherInfo = {
     temperature: 28,
     condition: "Partly Cloudy",
     icon: faCloud,
   };
+  // api call for turf slots details
+  const fetchTurfSlots = async ()=>{
+    try {
+      const response = await axios.get(
+        `http://localhost:4000/api/v1/turf/${turfId}/slots`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: ` Bearer ${token}`,
+          },
+        }
+      );
+      if (response.data.success) {
+        console.log("resposne from slots data", response.data.turf);
+        setSlots(response.data.turf.slots);
+        setPriceTurf(response.data.turf.turfPricePerHour);
+        setUserId(response.data.turf._id)
 
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while fetching the slots details"
+      );
+      console.log("error",error)
+  }
+}
+  useEffect(()=>{
+   fetchTurfSlots();
+  },[turfId,token])
+
+  const toggleSlot = (slot) => {
+    if (slot.status === "booked") return;
+  
+    setSelectedSlots((prevSlots) => {
+      let newSlots;
+  
+      if (prevSlots.includes(slot.time)) {
+        newSlots = prevSlots.filter((s) => s !== slot.time);
+      } else {
+        newSlots = [...prevSlots, slot.time];
+      }
+  
+
+      const newTotalPrice = newSlots.length * priceTurf;
+      setTotalPrice(newTotalPrice);
+  
+      return newSlots;
+    });
+  }
+  const handleProceedToPayment = () => {
+    if (!selectedDate || selectedSlots.length === 0) {
+      toast.error("Please select a date and at least one slot.");
+      return;
+    }
+    navigate(`/confirmBooking/${turfId}/${userId}` , {
+      state: {
+        selectedTurfName,
+        selectedDate,
+        selectedSlots,
+        totalPrice,
+      },
+    });
+  };
+  console.log("selected date",selectedDate);
+  console.log("selected time",selectedSlots);
+  console.log("Selected price",totalPrice);
   return (
     <div
-      style={{
-        backgroundImage: `url(${whiteBg}`,
-      }}
-      className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 mt-12"
-    >
+  style={{
+    backgroundImage: `url('${whiteBg}')`, 
+  }}
+  className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 mt-12"
+>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -140,7 +174,7 @@ const BookingPage = () => {
                     disabled={slot.status === "booked"}
                   >
                     <div>{slot.time}</div>
-                    <div className="text-sm">₹{slot.price}</div>
+                    <div className="text-sm">₹{priceTurf}</div>
                   </motion.button>
                 ))}
               </div>
@@ -237,6 +271,7 @@ const BookingPage = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="w-full p-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition"
+                onClick={handleProceedToPayment}
                 disabled={!selectedDate || selectedSlots.length === 0}
               >
                 Proceed to Payment

@@ -341,7 +341,7 @@ exports.getTurfSlots = async(req,res)=>{
         return res.status(200).json({
             success:true,
             message:"Fetch the Turf Slots",
-            slots :fetchTurfSlots.slots,
+            turf :fetchTurfSlots,
           })
         
     }catch(error){

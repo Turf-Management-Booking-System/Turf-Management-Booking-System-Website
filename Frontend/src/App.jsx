@@ -29,6 +29,8 @@ import { setNotification } from "./slices/notificationSlice";
 import AdminPanel from "./components/pages/AdminPanel";
 import TurfDetailPage from "./components/pages/TurfDetailPage";
 import BookingPage from "./components/pages/BookingPage";
+import BookedConfirmPage from "./components/pages/BookedConfirmPage";
+import BookingConfirmedPage from "./components/pages/BookingConfirmedPage";
 const App = () => {
   const dispatch = useDispatch(); 
   const location = useLocation();
@@ -86,6 +88,9 @@ const App = () => {
         <Route path="turf/turfDetails/:id" element={<TurfDetailPage/>}/>
         <Route path="/booking/:turfId/slots" element={<BookingPage/>}/>
         <Route path="/adminpanel" element={<AdminPanel/>}/>
+        <Route path="/confirmBooking/:turfId/:userId" element={<BookedConfirmPage/>}/>
+        <Route path="/booking-confirmation/:bookingId" element={<BookingConfirmedPage />} />
+
          {/* work is pending for private routing */}
 
       </Routes>
