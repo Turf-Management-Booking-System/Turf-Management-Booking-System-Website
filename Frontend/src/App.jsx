@@ -31,9 +31,8 @@ import TurfDetailPage from "./components/pages/TurfDetailPage";
 import BookingPage from "./components/pages/BookingPage";
 import BookedConfirmPage from "./components/pages/BookedConfirmPage";
 import BookingConfirmedPage from "./components/pages/BookingConfirmedPage";
-import { isTokenExpired } from "./utils/authUtils";
-import { logout } from "./slices/authSlice";
 import MyBookings from "./components/pages/MyBookings";
+import AutoLogout from "./utils/AutoLogout";
 const App = () => {
   const dispatch = useDispatch(); 
   const location = useLocation();
@@ -49,20 +48,8 @@ const App = () => {
     const storedUser = localStorage.getItem("userData");
     const user = storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null;
 
-    if (isTokenExpired()) {
-      dispatch(logout());
-    } else if (token && user) {
+     if (token && user) {
       dispatch(login({ user, token }));
-      const expirationTime = localStorage.getItem("tokenExpiration");
-      const remainingTime = parseInt(expirationTime, 10) - new Date().getTime();
-
-      if (remainingTime > 0) {
-        const timeoutId = setTimeout(() => {
-          dispatch(logout());
-        }, remainingTime);
-
-        return () => clearTimeout(timeoutId);
-      }
     }
   }, [dispatch]);
    useEffect( ()=>{
@@ -84,6 +71,7 @@ const App = () => {
        <LocationPopup/>
       {loader && <Spinner />}
       {!isAuthPage && <Navbar />}
+      <AutoLogout/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />

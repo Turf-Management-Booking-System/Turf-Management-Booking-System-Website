@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { DarkModeContext } from "../../context/DarkModeContext";
 import whiteBg from "../../assets/Images/whiteBg.png";
-import { useLocation, useParams } from "react-router-dom";
+import { UNSAFE_RouteContext, useLocation, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -30,6 +30,7 @@ const BookingPage = () => {
   const token = useSelector((state)=>state.auth.token);
   const [priceTurf,setPriceTurf] = useState(0);
   const [userId,setUserId]= useState(0);
+  const user = useSelector((state)=>state.auth.user);
   const weatherInfo = {
     temperature: 28,
     condition: "Partly Cloudy",
@@ -51,7 +52,7 @@ const BookingPage = () => {
         console.log("resposne from slots data", response.data.turf);
         setSlots(response.data.turf.slots);
         setPriceTurf(response.data.turf.turfPricePerHour);
-        setUserId(response.data.turf._id)
+        setUserId(user._id)
 
       }
     } catch (error) {

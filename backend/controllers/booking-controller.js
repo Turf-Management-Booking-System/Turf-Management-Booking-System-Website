@@ -1,5 +1,6 @@
 const Booking = require("../models/booking");
 const Turf = require("../models/turf");
+const User = require("../models/user");
 exports.bookingTurf =async(req,res)=>{
     try{
         // getting data from the user
@@ -7,7 +8,7 @@ exports.bookingTurf =async(req,res)=>{
        console.log("Requested TimeSlot:", typeof timeSlot); 
        const {userId,turfId} = req.params;
         //  validations
-       if(!date || !timeSlot ||!price||!paymentMode){
+       if(!date || !timeSlot ||!price||!paymentMode ||!userId){
         return res.status(401).json({
             success:false,
             message:"Please enter the date and Time slots",
@@ -55,6 +56,19 @@ exports.bookingTurf =async(req,res)=>{
     //    update in the turf model
        slotInTurf.status = "booked";
        await turf.save();
+    // Update the user's previousBooked array with the new booking ID
+    const user = await User.findById(userId);
+    if (!user) {
+        return res.status(404).json({
+            success: false,
+            message: "User not found.",
+        });
+    }
+
+    // Add the new booking ID to the previousBooked array
+    user.previousBooked.push(newBooking._id);
+    await user.save();
+
     //    return the repsonse
        return res.status(200).json({
         success:true,
@@ -220,4 +234,25 @@ exports.cancelBooking = async (req, res) => {
             error: error.message,
         });
     }
+};
+
+exports.getUserBookingDetails = async (req, res) => {
+  try {
+      const userId = req.params.userId;
+      const user = await User.findById(userId);
+
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+
+      const { recentBookings, previousBookings } = await user.getRecentAndPreviousBookings();
+
+      res.status(200).json({
+          recentBookings,
+          previousBookings
+      });
+
+  } catch (error) {
+      res.status(500).json({ message: "Something went wrong", error: error.message });
+  }
 };

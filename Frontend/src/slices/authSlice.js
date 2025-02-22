@@ -21,8 +21,8 @@ const authSlice = createSlice({
       state.user = action.payload.user;
       localStorage.setItem("token", action.payload.token);
       localStorage.setItem("userData", JSON.stringify(action.payload.user));
-      const expirationTime = new Date().getTime() + 6 * 60 * 60 * 1000;
-      localStorage.setItem("tokenExpiration", expirationTime.toString());
+      localStorage.setItem("loginTime", new Date().getTime()); // Store login time
+
     },
     logout: (state) => {
       state.user = null;
@@ -30,7 +30,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       localStorage.removeItem("userData");
       localStorage.removeItem("token");
-      localStorage.removeItem("tokenExpiration");
+      localStorage.removeItem("loginTime");
 
     },
     setUser: (state, action) => {

@@ -4,9 +4,9 @@ const{auth,isAdmin,isUser} = require("../middlewares/auth-middleware");
 
 const express= require("express");
 const router = express.Router();
-router.post("/createTurf",auth,isAdmin,createTurf);
-router.post("/updateTurf",auth,isAdmin,updateTurf);
-router.post("/deleteTurf",auth,isAdmin,deleteTurf);
+router.post("/createTurf",auth,createTurf);
+router.post("/updateTurf",auth,updateTurf);
+router.delete("/deleteTurf",auth,deleteTurf);
 router.get("/getAllTurf",getAllTurf);
 router.get("/viewAllUser",auth,isAdmin,viewAllUsers);
 router.get("/getAllTurfLocations",auth,getAllTurfLocations);
