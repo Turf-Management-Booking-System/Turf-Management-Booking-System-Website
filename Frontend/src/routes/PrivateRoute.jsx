@@ -1,16 +1,23 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 
-const PrivateRoute = ({ children }) => {
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../slices/authSlice";
+import { isTokenExpired } from "../utils/authUtils";
+import { useNavigate } from "react-router-dom";
+
+function ProtectedRoute({ children }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
+  useEffect(() => {
+    if (isAuthenticated && isTokenExpired()) {
+      dispatch(logout());
+      navigate("/login"); 
+    }
+  }, [isAuthenticated, dispatch, navigate]);
 
-  return children;
-};
+  return isAuthenticated ? children : null;
+}
 
-// Ensure this is a default export
-export default PrivateRoute;
+export default ProtectedRoute;

@@ -164,7 +164,7 @@ function Navbar() {
                   </Link>
 
                   <Link
-                    to="/bookings"
+                    to="/myBookings"
                     className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
                   >
                     <div className="flex items-center gap-5">

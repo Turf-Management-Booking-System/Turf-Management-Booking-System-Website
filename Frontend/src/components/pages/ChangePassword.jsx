@@ -43,6 +43,7 @@ const ChangePassword = () => {
       ,{
         headers:{
          "Content-Type":"application/json",withCredentials:true,
+         Authorization:`Bearer ${token}`
         }
       });
       console.log("response from change password",response.data);
