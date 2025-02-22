@@ -1,6 +1,7 @@
 import React, { useContext, useState,useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { HiStar, HiChevronLeft, HiChevronRight } from "react-icons/hi";
+import blackBg from "../../assets/Images/blackBg.png";
 import {
   faFutbol,
   faSearch,
@@ -198,7 +199,7 @@ function Home() {
       {/* Hero Section */}
       <motion.div
         style={{
-          backgroundImage: `url(${darkMode ? TurfImageNight : TurfImageDay})`,
+          backgroundImage: `url(${darkMode ? TurfImageNight : TurfImageDay})`
         }}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -255,9 +256,9 @@ function Home() {
       <section
         ref={ref}
         style={{
-                backgroundImage: `url(${whiteBg}`,
-              }}
-        className="py-16 flex flex-col items-center relative bg-gray-100 dark:bg-gray-800"
+          backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+        }}
+        className="py-16 flex flex-col items-center relative"
       >
         <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">How It Works</h2>
         <div className="w-1 mt-10 h-[61rem] absolute left-1/2 transform -translate-x-1/2 bg-gray-300 dark:bg-gray-600"></div>
@@ -295,9 +296,9 @@ function Home() {
       {/* Featured Turfs */}
       <section 
       style={{
-              backgroundImage: `url(${whiteBg}`,
-            }}
-      className="py-16 bg-white dark:bg-gray-900">
+        backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+      }}
+      className="py-16 ">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center dark:text-white">
             Featured Turfs
@@ -349,17 +350,18 @@ function Home() {
       </section>
 
       {/* Testimonials */}
-      {/* Testimonials */}
-      <section className="py-16 bg-gray-100 dark:bg-gray-800">
+      <section style={{
+          backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+        }} className="py-16">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">What Our Users Say</h2>
         <div className="relative w-full max-w-5xl mx-auto">
           {/* Left Arrow */}
           <button
             onClick={prevTestimonials}
-            className="absolute -left-20 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-700 p-2 rounded-full shadow-md z-10"
+            className="absolute -left-20 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10"
           >
-            <HiChevronLeft className="text-gray-600 dark:text-white text-2xl" />
+            <HiChevronLeft className="text-white text-2xl" />
           </button>
 
           {/* Testimonials Grid */}
@@ -408,9 +410,9 @@ function Home() {
           {/* Right Arrow */}
           <button
             onClick={nextTestimonials}
-            className="absolute -right-24 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-700 p-2 rounded-full shadow-md z-10"
+            className="absolute -right-24 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10"
           >
-            <HiChevronRight className="text-gray-600 dark:text-white text-2xl" />
+            <HiChevronRight className="text-white text-2xl" />
           </button>
         </div>
 
@@ -427,22 +429,18 @@ function Home() {
           ))}
         </div>
       </div>
-    </section>
-      {/* Testimonials */}
-
-
-    
+    </section>    
 
       {/*Faqs*/}
       <section style={{
-              backgroundImage: `url(${whiteBg}`,
-            }} className="py-16 bg-gray-100 dark:bg-gray-800">
+          backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+        }} className="py-16 bg-gray-100 dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center dark:text-white">
             Frequently Asked Questions
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className=" ml-32 mr-32 grid grid-cols-1 md:grid-cols-2 gap-6">
             {faqs.map((faq, index) => (
               <motion.div
                 key={index}

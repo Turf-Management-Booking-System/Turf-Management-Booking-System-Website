@@ -1,15 +1,16 @@
-"use client"
-
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import toast from "react-hot-toast"
 import axios from "axios"
 import { useSelector } from "react-redux"
 import { motion } from "framer-motion"
-import { FaCalendarAlt, FaClock, FaMoneyBillWave, FaCreditCard, FaMoneyBill } from "react-icons/fa"
+import { FaCalendarAlt, FaClock, FaMoneyBillWave, FaCreditCard, FaMoneyBill } from "react-icons/fa";
+import { DarkModeContext } from "../../context/DarkModeContext"
 import whiteBg from "../../assets/Images/whiteBg.png";
+import blackBg from "../../assets/Images/blackBg.png";
 
 const BookedConfirmPage = () => {
+  const {darkMode} = useContext(DarkModeContext);
   const { userId, turfId } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
@@ -75,15 +76,14 @@ const BookedConfirmPage = () => {
   return (
     <div 
     style={{
-            backgroundImage: `url(${whiteBg})`,
-          }} className="min-h-screen mt-24 py-12 px-4 sm:px-6 lg:px-8  transition-colors duration-300">
+              backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
+            }} className="min-h-screen mt-16 pt-28 py-12 px-4 sm:px-6 lg:px-8  transition-colors duration-300">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-2xl overflow-hidden"
+        className="max-w-5xl mx-auto rounded-xl shadow-2xl overflow-hidden"
       >
-        <div className="hidden dark:block absolute top-0 left-0 w-full h-full bg-black opacity-100 z-10"></div>
         <div className="md:flex relative z-20">
           <div className="md:w-1/2 p-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Confirm Your Booking</h1>

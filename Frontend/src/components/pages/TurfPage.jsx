@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "boxicons/css/boxicons.min.css";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoader } from "../../slices/authSlice";
@@ -6,9 +6,12 @@ import { setTurfs } from "../../slices/turfSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import {DarkModeContext} from "../../context/DarkModeContext";
 import whiteBg from "../../assets/Images/whiteBg.png";
+import blackBg from "../../assets/Images/blackBg.png";
 
 const TurfPage = () => {
+  const {darkMode} = useContext(DarkModeContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("All");
   const [priceRange, setPriceRange] = useState("");
@@ -135,12 +138,11 @@ const TurfPage = () => {
 
   return (
     <div
-      style={{
-        backgroundImage: `url(${whiteBg})`,
-      }}
+    style={{
+      backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
+    }}
       className="min-h-screen flex flex-col md:flex-row pt-[80px] transition-colors duration-300"
     >
-      <div className="hidden dark:block absolute top-0 left-0 w-full h-full bg-black opacity-100 z-10"></div>
       {/* Mobile Filter Button */}
       <button
         className="md:hidden fixed top-4 right-14 z-50 bg-white text-black py-2 px-3 rounded-full shadow-lg"
@@ -151,7 +153,7 @@ const TurfPage = () => {
 
       {/* Filters Section */}
       <div
-        className={`w-full relative z-20 md:w-1/4 bg-white dark:bg-gray-800 p-4 shadow-lg md:h-screen md:sticky top-0 flex flex-col transition-all duration-300 ${
+        className={`w-full md:w-1/4 bg-white dark:bg-gray-800 p-4 shadow-lg md:h-screen md:sticky top-0 flex flex-col transition-all duration-300 ${
           isFilterOpen ? "fixed inset-0 z-40" : "hidden md:flex"
         }`}
       >
@@ -254,7 +256,7 @@ const TurfPage = () => {
       </div>
 
       {/* Turf Listing Section */}
-      <div className="relative z-20 w-full md:w-3/4 flex flex-col h-screen">
+      <div className=" w-full md:w-3/4 flex flex-col h-screen">
         <div className="bg-white dark:bg-gray-800 shadow-md p-4">
           <input
             type="text"

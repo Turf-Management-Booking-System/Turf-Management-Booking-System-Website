@@ -34,6 +34,7 @@ import BookingConfirmedPage from "./components/pages/BookingConfirmedPage";
 import { isTokenExpired } from "./utils/authUtils";
 import { logout } from "./slices/authSlice";
 import MyBookings from "./components/pages/MyBookings";
+import BookingHistory from "./components/pages/BookingHistory";
 const App = () => {
   const dispatch = useDispatch(); 
   const location = useLocation();
@@ -107,6 +108,7 @@ const App = () => {
         <Route path="/confirmBooking/:turfId/:userId" element={<BookedConfirmPage/>}/>
         <Route path="/booking-confirmation/:bookingId" element={<BookingConfirmedPage />} />
         <Route path="/myBookings" element={<MyBookings/>}/>
+        <Route path="/bookinghistory" element={<BookingHistory/>}/>
 
          {/* work is pending for private routing */}
 
