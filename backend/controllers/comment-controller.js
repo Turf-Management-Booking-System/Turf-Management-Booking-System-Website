@@ -190,12 +190,18 @@ exports.getCommentsWithRatings = async (req, res) => {
 // get only comments for testimonals
 exports.getCommentWithTestimonals = async (req,res)=>{
   try{
-     const testimonals = await Comment.find({}).populate({
-       path:"userId",
-       select:"firstName lastName email image"
-     }).populate({
+     const testimonals = await Comment.find({})
+     .populate({
+      path:"userId",
+      select:"firstName lastName image email"
+     })
+     .populate({
       path:"rating",
       select:"rating"
+     })
+     .populate({
+      path:"turfId",
+      select:"turfName"
      })
      return res.status(200).json({
       success:true,

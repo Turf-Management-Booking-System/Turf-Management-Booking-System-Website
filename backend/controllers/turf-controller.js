@@ -59,48 +59,71 @@ exports.createTurf=async(req,res)=>{
         })
     }
 }
-// update turf
-exports.updateTurf = async(req,res)=>{
-    try{
-    // get the turf id 
-    const {turfId,...updateData} = req.body;
-    if(!turfId){
-        return res.status(400).json({
-            success:false,
-            message:"please enter the correct turfId"
-        })
+
+exports.updateTurf = async (req, res) => {
+  try {
+    const { turfId, sports, ...updateData } = req.body;
+
+    // Validate turfId
+    if (!turfId) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a valid turfId",
+      });
     }
-    // find the turf in the databse
+
+    // Find the turf in the database
     const findTurf = await Turf.findById(turfId);
-    if(!findTurf){
-        return res.status(400).json({
-            success:false,
-            message:"turf not found in the database"
-        })
+    if (!findTurf) {
+      return res.status(404).json({
+        success: false,
+        message: "Turf not found in the database",
+      });
     }
-    // if find update the turf
+
+    // Update the turf fields (excluding sports)
     Object.keys(updateData).forEach((key) => {
-        findTurf[key] = updateData[key];
+      findTurf[key] = updateData[key];
     });
 
-    // save in the databse
-    const updatedData = await findTurf.save();
-    // return the response
-    return res.status(200).json({
-        success:true,
-        message:"Turf uPdated successfully!",
-        turf:updateData,
-    })
+    // Save the updated turf in the database
+    const updatedTurf = await findTurf.save();
 
-    }catch(error){
-        console.log("error",error);
-        return res.status(500).json({
-            success:false,
-            message:"error while updating the turf",
-            error:error.message,
-        })
+    // Update the sports field in the Sport model
+    if (sports && Array.isArray(sports)) {
+      // Find the Sport document associated with the turfId
+      let sportDoc = await Sport.findOne({ turfId });
+
+      if (!sportDoc) {
+        // If no Sport document exists, create a new one
+        sportDoc = new Sport({
+          turfId,
+          sports,
+        });
+      } else {
+        // If a Sport document exists, update the sports field
+        sportDoc.sports = sports;
+      }
+
+      // Save the updated Sport document
+      await sportDoc.save();
     }
-}
+
+    // Return the response
+    return res.status(200).json({
+      success: true,
+      message: "Turf and associated sports updated successfully!",
+      turf: updatedTurf,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error while updating the turf and sports",
+      error: error.message,
+    });
+  }
+};
 // delete turf
 exports.deleteTurf = async(req,res)=>{
     try{

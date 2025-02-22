@@ -18,12 +18,19 @@ import { motion ,AnimatePresence} from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Link } from "react-router-dom";
 import whiteBg from "../../assets/Images/whiteBg.png"
-
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { setLoader } from "../../slices/authSlice";
+import axios from "axios";
+import toast from "react-hot-toast";
 function Home() {
+  const dispatch = useDispatch();
   const { darkMode } = useContext(DarkModeContext);
   const [ref, inView] = useInView({ triggerOnce: false, threshold: 0.2 });
   const [openIndex, setOpenIndex] = useState(null);
   const [email,setEmail] = useState("");
+  const [testimonials,setTestimonials] = useState([]);
+  const token = useSelector((state)=>state.auth.token)
 
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -119,57 +126,36 @@ function Home() {
       image: "",
     },
   ];
+  const fetchAllTestimonals = async()=>{
+    try {
+      dispatch(setLoader(true));
+      const url = "http://localhost:4000/api/v1/comment/getCommentWithTestimonals";
 
-  const testimonials = [
-    {
-      id: 1,
-      name: "John Doe",
-      image:"https://up.yimg.com/ib/th?id=OIP.n5CeR93916slWXGyV13PuAHaHa&pid=Api&rs=1&c=1&qlt=95&w=113&h=113",
-      turf:"Andred fields turf",
-      comment: "Great experience booking through this platform. The turf was in excellent condition!",
-      rating: 5,
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      image:"https://up.yimg.com/ib/th?id=OIP.n5CeR93916slWXGyV13PuAHaHa&pid=Api&rs=1&c=1&qlt=95&w=113&h=113",
-      turf:"Andred fields turf",
-      comment: "Easy to use and a wide variety of turfs to choose from. Highly recommended!",
-      rating: 4,
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      image:"https://up.yimg.com/ib/th?id=OIP.n5CeR93916slWXGyV13PuAHaHa&pid=Api&rs=1&c=1&qlt=95&w=113&h=113",
-      turf:"Andred fields turf",
-      comment: "Smooth booking process and excellent customer support. Will definitely use again!",
-      rating: 5,
-    },
-    {
-      id: 4,
-      name: "Mike Johnson",
-      image:"https://up.yimg.com/ib/th?id=OIP.n5CeR93916slWXGyV13PuAHaHa&pid=Api&rs=1&c=1&qlt=95&w=113&h=113",
-      turf:"Andred fields turf",
-      comment: "Smooth booking process and excellent customer support. Will definitely use again!",
-      rating: 5,
-    },
-    {
-      id: 5,
-      name: "Mike Johnson",
-      image:"https://up.yimg.com/ib/th?id=OIP.n5CeR93916slWXGyV13PuAHaHa&pid=Api&rs=1&c=1&qlt=95&w=113&h=113",
-      turf:"Andred fields turf",
-      comment: "Smooth booking process and excellent customer support. Will definitely use again!",
-      rating: 5,
-    },
-    {
-      id: 6,
-      name: "Mike Johnson",
-      image:"https://up.yimg.com/ib/th?id=OIP.n5CeR93916slWXGyV13PuAHaHa&pid=Api&rs=1&c=1&qlt=95&w=113&h=113",
-      turf:"Andred fields turf",
-      comment: "Smooth booking process and excellent customer support. Will definitely use again!",
-      rating: 5,
-    },
-  ]
+      const response = await axios.get(url, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
+      console.log("fetch the testimonals", response.data.testimonals);
+      if (response.data.success) {
+         setTestimonials(response.data.testimonals)
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while deleting turf data!"
+      );
+      console.log(error.response?.data?.message);
+    } finally {
+      dispatch(setLoader(false));
+    }
+  }
+  useEffect(()=>{
+    if(token) fetchAllTestimonals()
+  },[token])
+  
   const [index, setIndex] = useState(0)
   useEffect(() => {
     const interval = setInterval(() => {
@@ -369,34 +355,34 @@ function Home() {
             <div className="flex transition-transform duration-300" style={{ transform: `translateX(-${index * 33.33}%)` }}>
               {testimonials.map((testimonial, i) => (
                 <div
-                  key={testimonial.id}
+                  key={testimonial._id}
                   className={`w-[30vw] flex-shrink-0 p-4 transition-all duration-300 pt-20  // Middle testimonial is larger
                   }`}
                 >
                   <div className="relative bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg flex flex-col items-center text-center">
       
-                    <div className="absolute -top-12">
+                    <div className="absolute -top-7">
                       <img
-                        src={testimonial.image}
-                        alt={testimonial.name}
-                        className="w-25 h-25 rounded-full border-4 border-gray-300 dark:border-gray-500 "
+                        src={testimonial?.userId?.image}
+                        alt={testimonial.firstName}
+                        className="w-16 h-16 rounded-full border-4 border-gray-300 dark:border-gray-500 "
                         style={{ zIndex: 1 }}>
                       </img>
                     </div>
 
                     <div className="pt-12">
                       {/* Comment */}
-                      <p className="text-gray-600 dark:text-gray-300 mb-4">{testimonial.comment}</p>
+                      <p className="text-gray-600 dark:text-gray-300 mb-4">{testimonial.commentText}</p>
 
                       {/* User Info */}
                       <div>
-                        <span className="block font-semibold dark:text-white">{testimonial.name}</span>
-                        <span className="block text-sm text-gray-500 dark:text-gray-400">{testimonial.turf}</span>
+                        <span className="block font-semibold capitalize  dark:text-white">{`${testimonial?.userId?.firstName} ${testimonial?.userId?.lastName}`}</span>
+                        <span className="block text-sm text-gray-500 dark:text-gray-400">{testimonial?.turfId?.turfName}</span>
                       </div>
 
                       {/* Star Rating */}
                       <div className="flex justify-center mt-2">
-                        {[...Array(testimonial.rating)].map((_, i) => (
+                        {[...Array(testimonial?.rating?.rating)].map((_, i) => (
                           <HiStar key={i} className="text-yellow-500 text-lg" />
                         ))}
                       </div>

@@ -34,7 +34,6 @@ const AdminPanel = () => {
     sports: [],
   });
 
-  // Fetching all turfs
   const fetchTurfByLocationsOrAll = async () => {
     try {
       dispatch(setLoader(true));
@@ -77,22 +76,23 @@ const AdminPanel = () => {
     const { value } = e.target;
     setFormData({ ...formData, [field]: value.split(",") });
   };
-   const addTurf =async(data)=>{
+
+  const addTurf = async (data) => {
     try {
-      console.log("formData",data)
+      console.log("formData", data);
       dispatch(setLoader(true));
       const url = "http://localhost:4000/api/v1/turf/createTurf";
 
-      const response = await axios.post(url,data, {
+      const response = await axios.post(url, data, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
       });
-       console.log("craeted turf",response.data)
+      console.log("created turf", response.data);
       if (response.data.success) {
-        toast.success("Turf Created Successfully!")
+        toast.success("Turf Created Successfully!");
         await fetchTurfByLocationsOrAll();
       }
     } catch (error) {
@@ -105,69 +105,125 @@ const AdminPanel = () => {
       dispatch(setLoader(false));
       setIsLoading(false);
     }
-   }
-   const updateTurf =async(id,data)=>{
+  };
+
+  const updateTurf = async (id, data) => {
     try {
+      console.log("update data", data);
       dispatch(setLoader(true));
       const url = "http://localhost:4000/api/v1/turf/updateTurf";
 
-      const response = await axios.put(url,{
-        turfId:id,
-        data,
-      },{
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await axios.put(
+        url,{
+           turfId:id,
+           data,
         },
-        withCredentials: true,
-      });
-       console.log("updated turf",response.data)
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("updated turf", response.data);
       if (response.data.success) {
         toast.success("Turf Updated Successfully!");
         await fetchTurfByLocationsOrAll();
       }
     } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-          "Something went wrong while updating turf data!"
-      );
-      console.error(error);
+      console.error("Error:", error.response?.data || error.message);
+    toast.error(error.response?.data?.message || "Error sending data to backend");
     } finally {
       dispatch(setLoader(false));
       setIsLoading(false);
     }
-   }
-   const cleanArray = (arr) => {
-    return arr.map((item) => item.replace(/"/g, ""));
   };
-  
+
+  const getChangedFields = (formData, currentTurf) => {
+    const changedFields = {};
+
+    for (const key in formData) {
+      if (key === "sports") {
+        // Special handling for the sports field
+        const formattedSports = formData[key].map((sport) =>
+          typeof sport === "object" ? sport.sports : sport
+        );
+        const currentSports = currentTurf[key].map((sport) =>
+          typeof sport === "object" ? sport.sports : sport
+        );
+
+        if (JSON.stringify(formattedSports) !== JSON.stringify(currentSports)) {
+          changedFields[key] = formData[key];
+        }
+      } else if (Array.isArray(formData[key])) {
+        // Handle other arrays (e.g., turfImages, turfAmentities, etc.)
+        if (JSON.stringify(formData[key]) !== JSON.stringify(currentTurf[key])) {
+          changedFields[key] = formData[key];
+        }
+      } else if (formData[key] !== currentTurf[key]) {
+        // Handle non-array fields
+        changedFields[key] = formData[key];
+      }
+    }
+
+    return changedFields;
+  };
+
+  const handleEdit = (turf) => {
+    setCurrentTurf(turf);
+    const formattedSports = turf.sports.map((sport) =>
+      typeof sport === "object" ? sport.sports : sport
+    );
+
+    setFormData({
+      ...turf,
+      sports: formattedSports,
+    });
+
+    setIsModalOpen(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Clean array fields
     const cleanedFormData = {
       ...formData,
       turfImages: cleanArray(formData.turfImages),
       turfAmentities: cleanArray(formData.turfAmentities),
       turfRules: cleanArray(formData.turfRules),
       sports: cleanArray(formData.sports),
-      turfPricePerHour: Number(formData.turfPricePerHour), 
+      turfPricePerHour: Number(formData.turfPricePerHour),
       turfSize: Number(formData.turfSize),
     };
 
-  
     if (currentTurf) {
-      await updateTurf(currentTurf._id, cleanedFormData);
+      const changedFields = getChangedFields(cleanedFormData, currentTurf);
+      if (Object.keys(changedFields).length === 0) {
+        toast.error("No changes were made!");
+        return;
+      }
+
+      await updateTurf(currentTurf._id, changedFields);
     } else {
+
       await addTurf(cleanedFormData);
     }
+
     handleCloseModal();
   };
 
-  const handleEdit = (turf) => {
-    setCurrentTurf(turf);
-    setFormData(turf);
-    setIsModalOpen(true);
+  const cleanArray = (arr) => {
+    if (!Array.isArray(arr)) {
+      return []; 
+    }
+    return arr.map((item) => {
+      if (typeof item === "string") {
+        return item.replace(/"/g, ""); 
+      } else if (item && typeof item === "object" && item.sports) {
+        return item.sports.replace(/"/g, ""); 
+      }
+      return item;
+    });
   };
 
   const handleDelete = async (id) => {
@@ -175,18 +231,18 @@ const AdminPanel = () => {
       dispatch(setLoader(true));
       const url = "http://localhost:4000/api/v1/turf/deleteTurf";
 
-      const response = await axios.delete(url,{
-          data: { turfId: id },
+      const response = await axios.delete(url, {
+        data: { turfId: id },
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
       });
-       console.log("deleted turf",response.data)
+      console.log("deleted turf", response.data);
       if (response.data.success) {
-        toast.error("Deleted THe Turf!")
-        dispatch(setTurfs(turfs.filter((turf) => turf._id !== id)) )
+        toast.success("Deleted The Turf Successfully!!");
+        dispatch(setTurfs(turfs.filter((turf) => turf._id !== id)));
       }
     } catch (error) {
       toast.error(
@@ -194,7 +250,6 @@ const AdminPanel = () => {
           "Something went wrong while deleting turf data!"
       );
       console.log(error.response?.data?.message);
-
     } finally {
       dispatch(setLoader(false));
       setIsLoading(false);
