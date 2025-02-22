@@ -1,55 +1,58 @@
-import { useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import toast from "react-hot-toast";
-import axios from "axios";
-import { useSelector } from "react-redux";
+"use client"
+
+import { useState } from "react"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
+import toast from "react-hot-toast"
+import axios from "axios"
+import { useSelector } from "react-redux"
+import { motion } from "framer-motion"
+import { FaCalendarAlt, FaClock, FaMoneyBillWave, FaCreditCard, FaMoneyBill } from "react-icons/fa"
+import whiteBg from "../../assets/Images/whiteBg.png";
 
 const BookedConfirmPage = () => {
-const {userId} = useParams();
-const {turfId} = useParams();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const token = useSelector((state) => state.auth.token);
+  const { userId, turfId } = useParams()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const token = useSelector((state) => state.auth.token)
 
-  const { selectedTurfName, selectedDate, selectedSlots, totalPrice } = location.state;
+  const { selectedTurfName, selectedDate, selectedSlots, totalPrice } = location.state
 
-  const [paymentMode, setPaymentMode] = useState("");
+  const [paymentMode, setPaymentMode] = useState("")
 
   const handlePaymentModeChange = (e) => {
-    const capitalize = e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1).toLowerCase();
-    setPaymentMode(capitalize);
-  };
-  console.log("payemnt mode",paymentMode);
-  // Handle confirm booking
+    const capitalize = e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1).toLowerCase()
+    setPaymentMode(capitalize)
+  }
+
   const handleConfirmBooking = async () => {
     if (!paymentMode) {
-      toast.error("Please select a payment mode.");
-      return;
+      toast.error("Please select a payment mode.")
+      return
     }
-    if(paymentMode === "Online"){
-        toast.error("Online Mode is not available right now!");
-        return;
+    if (paymentMode === "Online") {
+      toast.error("Online Mode is not available right now!")
+      return
     }
 
     try {
       const response = await axios.post(
         `http://localhost:4000/api/v1/booking/bookingTurf/${turfId}/${userId}`,
         {
-           "date":selectedDate,
-          "timeSlot":selectedSlots,
-            "price":totalPrice,
-          "paymentMode":paymentMode,
+          date: selectedDate,
+          timeSlot: selectedSlots,
+          price: totalPrice,
+          paymentMode: paymentMode,
         },
         {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
-      );
+        },
+      )
 
       if (response.data.success) {
-        toast.success("Booking confirmed successfully!");
+        toast.success("Booking confirmed successfully!")
         navigate(`/booking-confirmation/${response.data.newBooking._id}`, {
           state: {
             bookingId: response.data.newBooking._id,
@@ -59,88 +62,106 @@ const {turfId} = useParams();
             totalPrice,
             paymentMode,
           },
-        });
+        })
       } else {
-        toast.error(response.data.message || "Failed to confirm booking.");
+        toast.error(response.data.message || "Failed to confirm booking.")
       }
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Something went wrong during booking."
-      );
-      console.error("Booking error:", error);
+      toast.error(error.response?.data?.message || "Something went wrong during booking.")
+      console.error("Booking error:", error)
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-          Confirm Your Booking
-        </h1>
+    <div 
+    style={{
+            backgroundImage: `url(${whiteBg})`,
+          }} className="min-h-screen mt-24 py-12 px-4 sm:px-6 lg:px-8  transition-colors duration-300">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-2xl overflow-hidden"
+      >
+        <div className="hidden dark:block absolute top-0 left-0 w-full h-full bg-black opacity-100 z-10"></div>
+        <div className="md:flex relative z-20">
+          <div className="md:w-1/2 p-8">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Confirm Your Booking</h1>
 
-        {/* Booking Details */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-            Booking Summary
-          </h2>
-          <div className="space-y-2">
-            <p>
-              <span className="font-semibold">Turf:</span> {selectedTurfName}
-            </p>
-            <p>
-              <span className="font-semibold">Date:</span> {selectedDate}
-            </p>
-            <p>
-              <span className="font-semibold">Time Slots:</span>{" "}
-              {selectedSlots.join(", ")}
-            </p>
-            <p>
-              <span className="font-semibold">Total Price:</span> ₹{totalPrice}
-            </p>
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Booking Summary</h2>
+                <div className="space-y-3">
+                  <p className="flex items-center text-gray-600 dark:text-gray-300">
+                    <FaCalendarAlt className="mr-2 text-green-500" />
+                    <span className="font-semibold mr-2">Turf:</span> {selectedTurfName}
+                  </p>
+                  <p className="flex items-center text-gray-600 dark:text-gray-300">
+                    <FaCalendarAlt className="mr-2 text-blue-500" />
+                    <span className="font-semibold mr-2">Date:</span> {selectedDate}
+                  </p>
+                  <p className="flex items-center text-gray-600 dark:text-gray-300">
+                    <FaClock className="mr-2 text-yellow-500" />
+                    <span className="font-semibold mr-2">Time Slots:</span> {selectedSlots.join(", ")}
+                  </p>
+                  <p className="flex items-center text-gray-600 dark:text-gray-300">
+                    <FaMoneyBillWave className="mr-2 text-red-500" />
+                    <span className="font-semibold mr-2">Total Price:</span> ₹{totalPrice}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Select Payment Mode</h2>
+                <div className="space-y-3">
+                  <label className="flex items-center space-x-3 p-3 rounded-lg bg-gray-100 dark:bg-gray-700 cursor-pointer transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-600">
+                    <input
+                      type="radio"
+                      name="paymentMode"
+                      value="Online"
+                      checked={paymentMode === "Online"}
+                      onChange={handlePaymentModeChange}
+                      className="form-radio h-5 w-5 text-green-500"
+                    />
+                    <FaCreditCard className="text-blue-500" />
+                    <span className="text-gray-700 dark:text-gray-200">Online Payment</span>
+                  </label>
+                  <label className="flex items-center space-x-3 p-3 rounded-lg bg-gray-100 dark:bg-gray-700 cursor-pointer transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-600">
+                    <input
+                      type="radio"
+                      name="paymentMode"
+                      value="Cash"
+                      checked={paymentMode === "Cash"}
+                      onChange={handlePaymentModeChange}
+                      className="form-radio h-5 w-5 text-green-500"
+                    />
+                    <FaMoneyBill className="text-green-500" />
+                    <span className="text-gray-700 dark:text-gray-200">Cash on Arrival</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="md:w-1/2 bg-green-500 p-8 flex items-center justify-center">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-white mb-4">Ready to Play?</h2>
+              <p className="text-white text-lg mb-6">Confirm your booking and get ready for an amazing time!</p>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleConfirmBooking}
+                className="bg-white text-green-500 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:bg-gray-100 transition duration-300"
+              >
+                Confirm Booking
+              </motion.button>
+            </div>
           </div>
         </div>
-
-        {/* Payment Mode Selection */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-            Select Payment Mode
-          </h2>
-          <div className="space-y-2">
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="paymentMode"
-                value="Online"
-                checked={paymentMode === "Online"}
-                onChange={handlePaymentModeChange}
-                className="form-radio h-4 w-4 text-green-500"
-              />
-              <span>Online Payment</span>
-            </label>
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="paymentMode"
-                value="Cash"
-                checked={paymentMode === "Cash"}
-                onChange={handlePaymentModeChange}
-                className="form-radio h-4 w-4 text-green-500"
-              />
-              <span>Cash on Arrival</span>
-            </label>
-          </div>
-        </div>
-
-        {/* Confirm Booking Button */}
-        <button
-          onClick={handleConfirmBooking}
-          className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg"
-        >
-          Confirm Booking
-        </button>
-      </div>
+      </motion.div>
     </div>
-  );
-};
+  )
+}
 
-export default BookedConfirmPage;
+export default BookedConfirmPage
+
