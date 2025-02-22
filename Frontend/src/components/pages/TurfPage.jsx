@@ -138,8 +138,9 @@ const TurfPage = () => {
       style={{
         backgroundImage: `url(${whiteBg})`,
       }}
-      className="min-h-screen flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900 pt-[80px] transition-colors duration-300"
+      className="min-h-screen flex flex-col md:flex-row pt-[80px] transition-colors duration-300"
     >
+      <div className="hidden dark:block absolute top-0 left-0 w-full h-full bg-black opacity-100 z-10"></div>
       {/* Mobile Filter Button */}
       <button
         className="md:hidden fixed top-4 right-14 z-50 bg-white text-black py-2 px-3 rounded-full shadow-lg"
@@ -150,7 +151,7 @@ const TurfPage = () => {
 
       {/* Filters Section */}
       <div
-        className={`w-full md:w-1/4 bg-white dark:bg-gray-800 p-4 shadow-lg md:h-screen md:sticky top-0 flex flex-col transition-all duration-300 ${
+        className={`w-full relative z-20 md:w-1/4 bg-white dark:bg-gray-800 p-4 shadow-lg md:h-screen md:sticky top-0 flex flex-col transition-all duration-300 ${
           isFilterOpen ? "fixed inset-0 z-40" : "hidden md:flex"
         }`}
       >
@@ -253,7 +254,7 @@ const TurfPage = () => {
       </div>
 
       {/* Turf Listing Section */}
-      <div className="w-full md:w-3/4 flex flex-col h-screen">
+      <div className="relative z-20 w-full md:w-3/4 flex flex-col h-screen">
         <div className="bg-white dark:bg-gray-800 shadow-md p-4">
           <input
             type="text"
@@ -270,9 +271,9 @@ const TurfPage = () => {
               className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:scale-105 hover:shadow-xl transition-all relative h-[370px]"
             >
               <img
-                src={turf.turfImages[0]} // Use the first image from the array
+                src={turf.turfImages[0]}
                 alt={turf.turfName}
-                className="w-full h-48 object-cover"
+                className="w-full h-44 object-cover"
               />
               <div className="p-4">
                 <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
@@ -281,12 +282,13 @@ const TurfPage = () => {
                 <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
                   <i className="bx bx-map text-red-500"></i> {turf.turfLocation}
                 </p>
+                
                 <p className="text-green-600 dark:text-green-400 font-bold mt-1">
                   ₹{turf.turfPricePerHour}/hr
                 </p>
                 {/* Display Sports */}
-                <div className="mt-2">
-                  <div className="flex flex-wrap gap-2 mt-1">
+                <div className="mt-1">
+                  <div className="flex flex-wrap gap-1 mt-1 ">
                     {turf.sports && turf.sports.length > 0 ? (
                       turf.sports[0].sports.map((sport, index) => (
                         <span

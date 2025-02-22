@@ -69,7 +69,7 @@ function Navbar() {
    console.log("unreadCount",unreadCount);
 
   return (
-    <nav className="p-3 flex bg-[#5886a7] dark:bg-gray-900 text-white justify-between items-center fixed top-0 left-0 right-0 z-20 shadow-md">
+    <nav className="p-3 flex bg-[#5886a7] dark:bg-gray-900 text-white justify-between items-center fixed top-0 left-0 right-0 z-50 shadow-md">
       {/* Logo */}
       <Link to="/" className="flex gap-2 items-center flex-1 ml-3">
         <span className="text-xl font-orbitron font-bold">KickOnTurf</span>

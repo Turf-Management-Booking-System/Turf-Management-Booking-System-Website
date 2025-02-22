@@ -3,7 +3,7 @@ import React from "react";
 function footer() {
   return (
     <>
-      <footer className="bg-[#587990] dark:bg-black text-white py-10">
+      <footer className="bg-[#587990] dark:bg-black text-white py-10 z-50">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo & About Section */}
           <div>
