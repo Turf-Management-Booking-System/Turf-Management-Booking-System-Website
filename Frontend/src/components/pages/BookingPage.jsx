@@ -7,6 +7,7 @@ import { UNSAFE_RouteContext, useLocation, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import blackBg from "../../assets/Images/blackBg.png";
 import {
   faCalendarAlt,
   faClock,
@@ -106,8 +107,8 @@ const BookingPage = () => {
   return (
     <div
   style={{
-    backgroundImage: `url('${whiteBg}')`, 
-  }}
+            backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
+          }}
   className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 mt-12"
 >
       <motion.div

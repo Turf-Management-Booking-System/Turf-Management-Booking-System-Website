@@ -33,6 +33,7 @@ import BookedConfirmPage from "./components/pages/BookedConfirmPage";
 import BookingConfirmedPage from "./components/pages/BookingConfirmedPage";
 import MyBookings from "./components/pages/MyBookings";
 import AutoLogout from "./utils/AutoLogout";
+import BookingHistory from "./components/pages/BookingHistory";
 const App = () => {
   const dispatch = useDispatch(); 
   const location = useLocation();
@@ -95,6 +96,7 @@ const App = () => {
         <Route path="/confirmBooking/:turfId/:userId" element={<BookedConfirmPage/>}/>
         <Route path="/booking-confirmation/:bookingId" element={<BookingConfirmedPage />} />
         <Route path="/myBookings" element={<MyBookings/>}/>
+        <Route path="/bookinghistory" element={<BookingHistory/>}/>
 
          {/* work is pending for private routing */}
 

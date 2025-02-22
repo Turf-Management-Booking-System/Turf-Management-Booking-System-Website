@@ -1,6 +1,4 @@
-"use client"
-
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback,useRef } from "react"
 import { Swiper, SwiperSlide } from "swiper/react"
 import "swiper/css"
 import "swiper/css/autoplay"
@@ -17,6 +15,7 @@ import { setComment } from "../../slices/commentSlice"
 import { useNavigate } from "react-router-dom"
 import { DarkModeContext } from "../../context/DarkModeContext"
 import whiteBg from "../../assets/Images/whiteBg.png"
+import blackBg from "../../assets/Images/blackBg.png"
 
 const TurfDetailsPage = () => {
   const navigate = useNavigate()
@@ -30,7 +29,8 @@ const TurfDetailsPage = () => {
   const [review, setReview] = useState("")
   const [userRating, setUserRating] = useState(0)
   const [averageRating, setAverageRating] = useState(0)
-  const [commentWithRating, setCommentWithRating] = useState([])
+  const [commentWithRating, setCommentWithRating] = useState([]);
+  const swiperRef = useRef(null);
 
   useEffect(() => {
     const fetchTurfDetails = async () => {
@@ -122,12 +122,20 @@ const TurfDetailsPage = () => {
     fetchTurfRatingAndReview()
   }, [fetchTurfRatingAndReview])
 
+  const handleThumbnailClick = (index) => {
+    if (swiperRef.current) {
+      swiperRef.current.slideTo(index); 
+    }
+  };
+
   return (
-    <div className={`min-h-screen ${darkMode ? "dark" : whiteBg}`}>
-      <div className="bg-white dark:bg-gray-900 min-h-screen transition-colors duration-300">
+    <div style={{
+          backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
+        }} className="min-h-screen ">
+      <div className="min-h-screen transition-colors duration-300">
         <div className="max-w-6xl mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8">
           <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-            <div className="grid md:grid-cols-2 gap-6 p-6">
+            <div className="flex flex-col md:grid md:grid-cols-2 gap-6 p-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -163,7 +171,7 @@ const TurfDetailsPage = () => {
                       ✅ Available for Booking
                       <button
                         onClick={() => handleBooking(turf._id)}
-                        className="ml-4 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition duration-300"
+                        className="lg:ml-4 md:ml-4 mt-4 lg:mt-0 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition duration-300"
                       >
                         Book Turf Now
                       </button>
@@ -179,13 +187,22 @@ const TurfDetailsPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
-                <Swiper modules={[Autoplay]} autoplay={{ delay: 3000 }} loop className="rounded-lg overflow-hidden">
+                <Swiper
+                  onSwiper={(swiper) => (swiperRef.current = swiper)}
+                  modules={[Autoplay]}
+                  autoplay={{ delay: 3000 }}
+                  loop
+                  className="rounded-lg overflow-hidden h-48 sm:h-64 md:h-80"
+                >
                   {turf?.turfImages?.map((img, index) => (
                     <SwiperSlide key={index}>
                       <img
                         src={img || "/placeholder.svg"}
                         alt={`Turf ${index + 1}`}
-                        className="w-full h-64 sm:h-80 object-cover"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = "/placeholder.svg";
+                        }}
                       />
                     </SwiperSlide>
                   ))}
@@ -197,7 +214,7 @@ const TurfDetailsPage = () => {
                       src={img || "/placeholder.svg"}
                       alt={`Thumb ${index + 1}`}
                       className="w-16 h-16 object-cover cursor-pointer rounded-md flex-shrink-0"
-                      onClick={() => (document.querySelector(".swiper-slide-active img").src = img)}
+                      onClick={() => handleThumbnailClick(index)}
                     />
                   ))}
                 </div>
@@ -207,7 +224,7 @@ const TurfDetailsPage = () => {
             <div className="grid md:grid-cols-2 gap-6 p-6 border-t border-gray-200 dark:border-gray-700">
               <div>
                 <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Sports Types</h3>
-                <ul className="grid grid-cols-2 mr-52">
+                <ul className="grid grid-cols-2 lg:mr-52">
                   {turf?.sports[0]?.sports.map((sport, index) => (
                     <li key={index} className="flex items-center text-gray-600 dark:text-gray-300">
                       <FaCheckCircle className="text-green-500 mr-2" /> {sport}
@@ -260,7 +277,7 @@ const TurfDetailsPage = () => {
                 value={review}
                 onChange={(e) => setReview(e.target.value)}
                 placeholder="Write your review here..."
-                className="w-full border border-gray-300 dark:border-gray-600 p-2 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                className="w-full border border-gray-300 dark:border-gray-600 p-2 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
                 rows="4"
               />
               <button
@@ -272,8 +289,8 @@ const TurfDetailsPage = () => {
             </div>
 
             <div className="p-6 border-t border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl font-semibold mb-1 text-gray-800 dark:text-white">Comments</h3>
-              <p className="mb-4">See What users says about this turf...</p>
+              <h3 className="text-xl font-orbitron font-semibold mb-1 text-gray-800 dark:text-white">Comments</h3>
+              <p className="mb-6 font-poppins dark:text-white">See What users says about this turf...</p>
               {commentWithRating.length > 0 ? (
                 <div className="space-y-6">
                   {commentWithRating.map((comment) => (

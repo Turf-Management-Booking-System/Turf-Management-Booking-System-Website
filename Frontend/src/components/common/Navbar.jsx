@@ -165,6 +165,7 @@ function Navbar() {
 
                   <Link
                     to="/myBookings"
+                    onClick={() => setDropdownOpen(false)}
                     className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
                   >
                     <div className="flex items-center gap-5">
@@ -175,7 +176,8 @@ function Navbar() {
                   </Link>
 
                   <Link
-                    to="/history"
+                    to="/bookinghistory"
+                    onClick={() => setDropdownOpen(false)}
                     className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
                   >
                     <div className="flex items-center gap-5">
