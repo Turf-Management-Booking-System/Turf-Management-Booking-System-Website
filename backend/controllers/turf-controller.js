@@ -200,7 +200,10 @@ exports.getTurfSelectedLocation = async(req,res)=>{
       }
       const fetchAllTurf = await Turf.find({
         turfLocation:location
-      }).populate("comments");
+      }).populate("comments").populate({
+        path:"sports",
+        select:"sports"
+      });
       return res.status(200).json({
         success:true,
         message:"Turf Fetch by Location",

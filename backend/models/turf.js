@@ -31,8 +31,6 @@ const turfSchema = mongoose.Schema({
   turfPricePerHour:{
          type:Number,
          required:[true,"Please enter the turf price per hour!"],
-         max:1000,
-         min:200,
 
   },
   turfLocation:{

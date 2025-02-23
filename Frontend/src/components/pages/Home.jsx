@@ -23,6 +23,7 @@ import { useDispatch } from "react-redux";
 import { setLoader } from "../../slices/authSlice";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { loadNotification,setNotification } from "../../slices/notificationSlice";
 function Home() {
   const dispatch = useDispatch();
   const { darkMode } = useContext(DarkModeContext);
@@ -30,7 +31,8 @@ function Home() {
   const [openIndex, setOpenIndex] = useState(null);
   const [email,setEmail] = useState("");
   const [testimonials,setTestimonials] = useState([]);
-  const token = useSelector((state)=>state.auth.token)
+  const notifications = useSelector((state)=>state.notification.notifications);
+  const user = useSelector((state)=>state.auth.user)
 
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -134,13 +136,13 @@ function Home() {
       const response = await axios.get(url, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
       });
       console.log("fetch the testimonals", response.data.testimonals);
       if (response.data.success) {
          setTestimonials(response.data.testimonals)
+  
       }
     } catch (error) {
       toast.error(
@@ -153,14 +155,14 @@ function Home() {
     }
   }
   useEffect(()=>{
-    if(token) fetchAllTestimonals()
-  },[token])
+    fetchAllTestimonals()
+  },[])
   
   const [index, setIndex] = useState(0)
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prevIndex) => (prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1));
-    }, 5000); 
+    }, 1000); 
 
     return () => clearInterval(interval); 
   }, [testimonials.length]);
@@ -173,10 +175,61 @@ function Home() {
     setIndex((prevIndex) => (prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault()
     // Handle newsletter subscription
-    console.log("Subscribed with email:", email)
+    try {
+      dispatch(setLoader(true));
+      const response = await axios.post(
+        `http://localhost:4000/api/v1/auth/subscription`,{
+          email:email
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("response",response.data.success)
+
+      if (response.data.success) {
+        toast.success(response?.data?.message);
+        if(user?._id){
+          dispatch(loadNotification())
+          try {
+            const notificationResponse = await axios.get(
+              `http://localhost:4000/api/v1/notify/getNotifications/${user._id}`,
+              {
+                headers: { "Content-Type": "application/json", withCredentials: true },
+              }
+            );
+            if (notificationResponse.data.success) {
+              console.log("fetch notification",notificationResponse.data.currentMessage);
+              dispatch(setNotification(notificationResponse.data.currentMessage || []));
+              localStorage.setItem(
+                "userNotification",
+                JSON.stringify(notificationResponse.data.currentMessage || [])
+              );
+              console.log("notifications state",notifications);
+          
+            }
+          } catch (error) {
+            toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!");
+            console.log(error.response?.data?.message)
+          }
+        }
+       
+        setEmail("")
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message  || "Error While Subscribing!"
+      );
+      console.error("Error:", error.response?.data?.message);
+    } finally {
+      dispatch(setLoader(false));
+    }
     setEmail("")
   }
 

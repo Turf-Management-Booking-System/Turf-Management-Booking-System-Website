@@ -3,7 +3,7 @@ import { setLoader } from "../../slices/authSlice";
 import { setLocation } from "../../slices/turfSlice";
 import toast from "react-hot-toast";
 
-export const fetchTurfLocations = (token) => async (dispatch) => {
+export const fetchTurfLocations = () => async (dispatch) => {
   try {
     dispatch(setLoader(true));
 
@@ -12,7 +12,6 @@ export const fetchTurfLocations = (token) => async (dispatch) => {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
       }

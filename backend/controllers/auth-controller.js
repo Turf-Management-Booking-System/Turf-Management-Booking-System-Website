@@ -10,6 +10,8 @@ const Contact = require("../models/contact");
 const Notification = require("../models/notification")
 const {sendAccountDeletionEmail} = require("../mail/templates/sendAccountDeletionEmail");
 const {sendChangePasswordEmail} = require("../mail/templates/sendChangePasswordEmail");
+const Subscription = require("../models/subscription");
+const { subscriptionEmail } = require("../mail/templates/subscriptionEmail");
 const cloudinary= require("cloudinary").v2;
 
 require("dotenv").config();
@@ -709,6 +711,58 @@ exports.deleteProfile = async(req,res)=>{
             success:false,
             message:"Error while deleting Profile! Please try again later!",
             error:error.message
+        })
+    }
+}
+exports.subscription = async(req,res)=>{
+    try{
+        // get email
+        const{email} = req.body;
+        // validate email
+        if(!email){
+            return res.status(400).json({
+                success:false,
+                message:"Please Enter The Email!"
+            })
+        }
+        // check if email is alraedy subscribed
+        const isSubscribed = await Subscription.findOne({email:email});
+        if(isSubscribed){
+            return res.status(404).json({
+                success:false,
+                message:"You Are Already Subscribed!"
+            })
+        }
+        // insert in db 
+        const subscribed = await Subscription.create({
+            email:email
+        })
+        // send the mail
+        const emailContent = subscriptionEmail(email);
+        await sendEmail(email,"You Are Now Subscribed To kick On Turf!",emailContent)
+        // if user logged in send notification also
+        const userExits = await User.findOne({
+            email:email
+        });
+        if(userExits){
+            const createNotifications = await Notification.create({
+                user:userExits._id,
+                message:"Welcome ...You Are Now Subscribed To kick On Turf!",
+                messageType:"Info"
+            });
+        }
+        // return response
+        return res.status(200).json({
+            success:true,
+            message:"Thanks for Subscriptions!",
+            subscribed,
+        })
+    }catch(error){
+        console.log("error",error);
+        return res.status(500).json({
+            success:false,
+            message:"Error while Sending Subscription",
+            error:error.message,
         })
     }
 }

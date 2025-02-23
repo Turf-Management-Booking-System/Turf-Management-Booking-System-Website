@@ -15,9 +15,10 @@ app.use(cors({ origin: [
 ], 
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials:true,
-    allowedHeaders:["Content-Type","Authorization","withCredentials"]
+    allowedHeaders:["Content-Type","Authorization","withCredentials" ,"Accept"]
 }));
 app.use(cookieParser());
+app.options("*", cors());
 const fileupload =require("express-fileupload");
 app.use(fileupload({
     useTempFiles: true,       // Enable temp files

@@ -45,7 +45,6 @@ const BookingPage = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: ` Bearer ${token}`,
           },
         }
       );
@@ -53,7 +52,10 @@ const BookingPage = () => {
         console.log("resposne from slots data", response.data.turf);
         setSlots(response.data.turf.slots);
         setPriceTurf(response.data.turf.turfPricePerHour);
-        setUserId(user._id)
+        if (user && user._id) {
+          setUserId(user._id);
+        }
+        
 
       }
     } catch (error) {
@@ -66,7 +68,7 @@ const BookingPage = () => {
 }
   useEffect(()=>{
    fetchTurfSlots();
-  },[turfId,token])
+  },[turfId])
 
   const toggleSlot = (slot) => {
     if (slot.status === "booked") return;

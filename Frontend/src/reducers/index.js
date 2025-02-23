@@ -3,6 +3,7 @@ import authReducer from "../slices/authSlice"
 import turfReducer from "../slices/turfSlice"
 import notificationReducer from "../slices/notificationSlice"
 import commentReducer from "../slices/commentSlice"
+import bookingReducer from "../slices/bookingSlice"
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; 
 const commentPersistConfig = {
@@ -16,5 +17,6 @@ const rootReducer = combineReducers({
     turf:turfReducer,
     notification:notificationReducer,
     comment:persistedCommentReducer,
+    booking:bookingReducer,
 })
 export default rootReducer

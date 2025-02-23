@@ -8,6 +8,6 @@ router.post("/updateComment/:turfId/:userId",auth,isUser,updateComment);
 router.delete("/deleteComment/:turfId/:userId/:commentId",auth,isUser,deleteComments);
 router.post("/addRating",auth,isUser,addRating);
 router.post("/createCommentWithRating/:userId/:turfId",auth,isUser,createCommentWithRating);
-router.get("/getCommentWithRating/:turfId",auth,isUser,getCommentsWithRatings);
+router.get("/getCommentWithRating/:turfId",getCommentsWithRatings);
 router.get("/getCommentWithTestimonals",getCommentWithTestimonals)
 module.exports = router;

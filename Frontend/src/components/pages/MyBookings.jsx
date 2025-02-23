@@ -1,10 +1,13 @@
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { DarkModeContext } from "../../context/DarkModeContext"
 import whiteBg from "../../assets/Images/whiteBg.png"
 import blackBg from "../../assets/Images/blackBg.png"
+import  { useBookingsDetailsOfAUser } from "../common/booking"
+import { useDispatch } from "react-redux"
+import { setLoader } from "../../slices/authSlice"
 import {
   faChevronDown,
   faCalendarPlus,
@@ -82,7 +85,13 @@ const MyBookings = () => {
   const [activeTab, setActiveTab] = useState("Upcoming Bookings")
   const [searchQuery, setSearchQuery] = useState("")
   const [allBookings, setAllBookings] = useState(bookings)
-  const [openIndex, setOpenIndex] = useState(null)
+  const [openIndex, setOpenIndex] = useState(null);
+  const dispatch = useDispatch();
+  // caling the all booking api
+ const fetchBookings = useBookingsDetailsOfAUser();
+ useEffect(()=>{
+      fetchBookings()
+ },[dispatch])
 
   const filteredBookings = allBookings.filter((booking) => {
     const searchTerm = searchQuery.toLowerCase()
@@ -93,13 +102,10 @@ const MyBookings = () => {
 
     if (activeTab === "Upcoming Bookings") {
       return matchesSearchQuery && booking.status === "Confirmed"
-    } else if (activeTab === "Previous Bookings") {
-      return matchesSearchQuery && booking.status === "Completed"
     } else if (activeTab === "Cancelled Bookings") {
       return matchesSearchQuery && booking.status === "Cancelled"
     }
-
-    return matchesSearchQuery
+    return 
   })
 
   const deleteBooking = (id) => {

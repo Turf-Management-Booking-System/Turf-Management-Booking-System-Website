@@ -69,7 +69,7 @@ const LoginHandler = async (event) => {
       withCredentials: true,
     });
 
-    console.log("Response from backend:", response.data);
+    console.log("Response from backend:", response.data.user);
     if (response.data.success) {
       toast.success("User Logged in Successfully!");
       dispatch(login({
@@ -162,7 +162,7 @@ const LoginHandler = async (event) => {
     <>
       <div  style={{
                 backgroundImage: `url(${darkMode ? TurfLogin : TurfLoginPage})`,
-              }} className="flex justify-center items-center min-h-screen bg-cover mt-12">
+              }} className="flex justify-center items-center min-h-screen bg-cover bg-center mt-12">
         <div
           className={`relative ${
             isActive ? "active" : ""
@@ -178,7 +178,7 @@ const LoginHandler = async (event) => {
                 <input
                   className="w-[100%] pl-[20px] pr-[50px] pt-[13px] pb-[13px] bg-[#eee] rounded-xl border-none outline-none text-[16px] text-[#333] font-medium"
                   type="text"
-                  placeholder="Email"
+                  placeholder="Username"
                   required
                   onChange={(e)=>setEmail(e.target.value)}
                   name="email"
@@ -212,7 +212,7 @@ const LoginHandler = async (event) => {
               </div>
               <button
                 type="submit"
-                className="w-[100%] h-[48px] bg-[#5886a7] rounded-lg border-none cursor-pointer text-[16px] text-[#fff] font-semibold"
+                className="w-[100%] h-[48px] bg-green-700 rounded-lg border-none cursor-pointer text-[16px] text-[#fff] font-semibold"
                 style={{ boxShadow: "0 0 10px rgba(0,0,0,0.2)" }}
               >
                 Login
@@ -302,7 +302,7 @@ const LoginHandler = async (event) => {
               
               <button
                 type="submit"
-                className="w-[100%] h-[48px] bg-[#5886a7] rounded-lg border-none cursor-pointer text-[16px] text-[#fff] font-semibold"
+                className="w-[100%] h-[48px] bg-green-700 rounded-lg border-none cursor-pointer text-[16px] text-[#fff] font-semibold"
                 style={{ boxShadow: "0 0 30px rgba(0,0,0,0.2" }}
               >
                 Register

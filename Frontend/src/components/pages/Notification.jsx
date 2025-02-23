@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import "boxicons/css/boxicons.min.css";
-import { motion } from "framer-motion";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import { markAsRead as markAsReadAction } from "../../slices/notificationSlice"; // Renamed action import
-import { deleteNotification as deleteNotificationAction } from "../../slices/notificationSlice"; // Renamed action import
+import { motion, AnimatePresence } from "framer-motion";
+import { useSelector, useDispatch } from "react-redux";
+import { markAsRead as markAsReadAction } from "../../slices/notificationSlice";
+import { deleteNotification as deleteNotificationAction } from "../../slices/notificationSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
 
@@ -24,7 +23,7 @@ const Notification = () => {
       );
       if (response.data.success) {
         console.log("Done Mark as Read", response.data);
-        dispatch(markAsReadAction(notificationId)); // Use renamed action
+        dispatch(markAsReadAction(notificationId));
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Something Went Wrong!");
@@ -41,7 +40,7 @@ const Notification = () => {
       );
       if (response.data.success) {
         console.log("Delete the notification", response.data);
-        dispatch(deleteNotificationAction(notificationId)); // Use renamed action
+        dispatch(deleteNotificationAction(notificationId));
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Something Went Wrong!");
@@ -55,18 +54,9 @@ const Notification = () => {
     return true;
   });
 
-  console.log("All Notifications:", notifications);
-
-
-
   return (
     <div className="min-h-screen w-full bg-green-100 dark:bg-black flex justify-center pt-16 mt-10">
-      <motion.div
-        initial={{ y: 500, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
-        className="w-full max-w-4xl"
-      >
+      <div className="w-full max-w-4xl">
         <div className="w-full max-w-4xl bg-gray-200 p-6 rounded-lg shadow-xl">
           {/* Header Section */}
           <div className="flex items-center space-x-3">
@@ -116,62 +106,66 @@ const Notification = () => {
 
           {/* Notifications List */}
           <div className="mt-6 space-y-4">
-            {filteredNotifications.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">No notifications found.</p>
-            ) : (
-              filteredNotifications.map((notif) => (
-                <div
-                  key={notif._id}
-                  className={`p-4 border-l-4 rounded-lg flex justify-between items-center overflow-hidden shadow
-                    ${notif.IsRead ? "bg-green-100" : "bg-gray-50"}
-                    ${notif.messageType === "warn" ? "border-red-300" :
-                    notif.messageType === "alert" ? "border-yellow-200" :
-                    "border-blue-300"
-                    
-                  }`}
-                >
-                  {/* Left Section - Logo & Message */}
-                  <div>
-                    <div className="flex items-center gap-3 w-full">
-                      <div className="w-10 h-10 bg-green-800 text-white flex items-center justify-center rounded-full text-lg font-bold">
-                        KT
+            <AnimatePresence>
+              {filteredNotifications.length === 0 ? (
+                <p className="text-gray-500 text-center py-4">No notifications found.</p>
+              ) : (
+                filteredNotifications.map((notif) => (
+                  <motion.div
+                    key={notif._id}
+                    initial={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: "100%" }}
+                    transition={{ duration: 0.5 }}
+                    className={`p-4 border-l-4 rounded-lg flex justify-between items-center overflow-hidden shadow
+                      ${notif.IsRead ? "bg-green-100" : "bg-gray-50"}
+                      ${notif.messageType === "warn" ? "border-red-300" :
+                      notif.messageType === "alert" ? "border-yellow-200" :
+                      "border-blue-300"
+                    }`}
+                  >
+                    {/* Left Section - Logo & Message */}
+                    <div>
+                      <div className="flex items-center gap-3 w-full">
+                        <div className="w-10 h-10 bg-green-800 text-white flex items-center justify-center rounded-full text-lg font-bold">
+                          KT
+                        </div>
+                        <span className="font-semibold font-orbitron text-lg">{notif.website}</span>
                       </div>
-                      <span className="font-semibold font-orbitron text-lg">{notif.website}</span>
+                      <p className="mt-2 text-gray-700">{notif.message}</p>
+                      <p className="mt-1 text-gray-500 text-sm">{new Date(notif.createdAt).toLocaleString()}</p>
                     </div>
-                    <p className="mt-2 text-gray-700">{notif.message}</p>
-                    <p className="mt-1 text-gray-500 text-sm">{new Date(notif.createdAt).toLocaleString()}</p>
-                  </div>
 
-                  {/* Right Section - Buttons */}
-                  <div className="space-x-3">
-                    {!notif.isRead ?(
+                    {/* Right Section - Buttons */}
+                    <div className="space-x-3">
+                      {!notif.isRead ? (
+                        <button
+                          onClick={() => markAsRead(notif._id)}
+                          className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-semibold shadow-md"
+                        >
+                          Read
+                        </button>
+                      ) : (
+                        <button
+                          disabled
+                          className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-semibold shadow-md"
+                        >
+                          Readed
+                        </button>
+                      )}
                       <button
-                        onClick={() => markAsRead(notif._id)}
-                        className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-semibold shadow-md"
+                        onClick={() => deleteNotification(notif._id)}
+                        className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-semibold shadow-md"
                       >
-                        Read
+                        Delete
                       </button>
-                    ):(
-                      <button
-                        disabled
-                        className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-semibold shadow-md"
-                      >
-                        Readed
-                      </button>
-                    )}
-                    <button
-                      onClick={() => deleteNotification(notif._id)}
-                      className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-semibold shadow-md"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </AnimatePresence>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

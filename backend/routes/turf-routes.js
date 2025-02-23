@@ -9,9 +9,9 @@ router.put("/updateTurf",auth,updateTurf);
 router.delete("/deleteTurf",auth,deleteTurf);
 router.get("/getAllTurf",getAllTurf);
 router.get("/viewAllUser",auth,isAdmin,viewAllUsers);
-router.get("/getAllTurfLocations",auth,getAllTurfLocations);
-router.get("/getAllTurfLocations/:location",auth,getTurfSelectedLocation);
-router.get("/getTurfById/:id",auth,getTurfById);
-router.get("/:turfId/slots",auth,isUser,getTurfSlots);
-router.get("/getAllSports",auth,isUser,getAllSports)
+router.get("/getAllTurfLocations",getAllTurfLocations);
+router.get("/getAllTurfLocations/:location",getTurfSelectedLocation);
+router.get("/getTurfById/:id",getTurfById);
+router.get("/:turfId/slots",getTurfSlots);
+router.get("/getAllSports",getAllSports)
 module.exports = router;
