@@ -1,3 +1,4 @@
+const { model } = require("mongoose");
 const Booking = require("../models/booking");
 const Turf = require("../models/turf");
 const User = require("../models/user");
@@ -68,12 +69,13 @@ exports.bookingTurf =async(req,res)=>{
     // Add the new booking ID to the previousBooked array
     user.previousBooked.push(newBooking._id);
     await user.save();
+    const newBookings = await Booking.findById(newBooking._id).populate("turf");
 
     //    return the repsonse
        return res.status(200).json({
         success:true,
         message:"User Booked a Slots!",
-        newBooking,
+        newBookings,
        })
     }catch(error){
      console.log("error",error)
@@ -256,39 +258,42 @@ exports.getUserBookingDetails = async (req, res) => {
       res.status(500).json({ message: "Something went wrong", error: error.message });
   }
 };
-exports.getAllBookingsOfUser = async(req,res)=>{
-    try{
-      // get user id 
-      const {userId} = req.params;
-      // validate the user id
-      if(!userId){
-        return res.status(400).json({
-          success:false,
-          message:"Please check The data"
-        })
+exports.getAllBookingsOfUser = async (req, res) => {
+  try {
+      // Get user ID from params
+      const { userId } = req.params;
+      if (!userId) {
+          return res.status(400).json({
+              success: false,
+              message: "Please check the data"
+          });
       }
-      // find the previousBooked 
-      const bookings = await User.find({
-        _id:userId
-      }).populate("previousBooked")
-      if(!bookings){
-        return res.status(404).json({
-          success:false,
-          message:"Erorr No User found!"
-        })
+      const user = await User.findById(userId).populate({
+          path: "previousBooked",
+          populate: {
+              path: "turf",
+              model: "Turf"
+          }
+      });
+
+      if (!user) {
+          return res.status(404).json({
+              success: false,
+              message: "Error! No user found."
+          });
       }
-      // return the response
       return res.status(200).json({
-        success:true,
-        message:"User Bookings Founds",
-        bookings
-      })
-    }catch(error){
-      console.log("error",error);
+          success: true,
+          message: "User bookings found",
+          bookings: user.previousBooked 
+      });
+  } catch (error) {
+      console.log("Error:", error);
       return res.status(500).json({
-        success:false,
-        message:"Error while Getting User all Bookings",
-        error:error.message,
-      })
-    }
-}
+          success: false,
+          message: "Error while getting user's all bookings",
+          error: error.message
+      });
+  }
+};
+

@@ -6,8 +6,11 @@ import { DarkModeContext } from "../../context/DarkModeContext"
 import whiteBg from "../../assets/Images/whiteBg.png"
 import blackBg from "../../assets/Images/blackBg.png"
 import  { useBookingsDetailsOfAUser } from "../common/booking"
-import { useDispatch } from "react-redux"
+import { useDispatch,useSelector } from "react-redux"
 import { setLoader } from "../../slices/authSlice"
+import { cancelBooking } from "../../slices/bookingSlice"
+import axios from "axios"
+import toast from "react-hot-toast"
 import {
   faChevronDown,
   faCalendarPlus,
@@ -18,41 +21,6 @@ import {
   faMapMarkerAlt,
   faTag,
 } from "@fortawesome/free-solid-svg-icons"
-
-const bookings = [
-  {
-    id: 1,
-    turfName: "City Football Turf",
-    date: "2024-07-15",
-    time: "19:00",
-    location: "Downtown Arena",
-    status: "Confirmed",
-  },
-  {
-    id: 2,
-    turfName: "GreenField Arena",
-    date: "2024-07-20",
-    time: "16:00",
-    location: "Uptown Park",
-    status: "Completed",
-  },
-  {
-    id: 3,
-    turfName: "SportsCom Turf",
-    date: "2024-07-25",
-    time: "20:00",
-    location: "Central Sports Complex",
-    status: "Cancelled",
-  },
-  {
-    id: 4,
-    turfName: "AstroTurf Zone",
-    date: "2024-08-01",
-    time: "18:00",
-    location: "Westside Grounds",
-    status: "Confirmed",
-  },
-]
 
 const faqs = [
   {
@@ -84,8 +52,11 @@ const MyBookings = () => {
   const {darkMode} = useContext(DarkModeContext)
   const [activeTab, setActiveTab] = useState("Upcoming Bookings")
   const [searchQuery, setSearchQuery] = useState("")
-  const [allBookings, setAllBookings] = useState(bookings)
   const [openIndex, setOpenIndex] = useState(null);
+  const user = useSelector((state)=>state.auth.user);
+  const allBookings = useSelector((state)=>state.booking.allBookings);
+  const token = useSelector((state)=>state.auth.token)
+  console.log("all bookings from redux",allBookings)
   const dispatch = useDispatch();
   // caling the all booking api
  const fetchBookings = useBookingsDetailsOfAUser();
@@ -95,8 +66,8 @@ const MyBookings = () => {
 
   const filteredBookings = allBookings.filter((booking) => {
     const searchTerm = searchQuery.toLowerCase()
-    const turfName = booking.turfName.toLowerCase()
-    const bookingId = String(booking.id)
+    const turfName = booking.turf.turfName.toLowerCase()
+    const bookingId = String(booking._id)
 
     const matchesSearchQuery = turfName.includes(searchTerm) || bookingId.includes(searchTerm)
 
@@ -105,26 +76,55 @@ const MyBookings = () => {
     } else if (activeTab === "Cancelled Bookings") {
       return matchesSearchQuery && booking.status === "Cancelled"
     }
-    return 
+    return matchesSearchQuery
   })
 
-  const deleteBooking = (id) => {
-    setAllBookings((prevBookings) => prevBookings.filter((booking) => booking.id !== id))
+  const handleCancelBooking =async (bookingId) => {
+    console.log("booking",bookingId)
+    try {
+        dispatch(setLoader(true))
+        const response = await axios.delete(
+          `http://localhost:4000/api/v1/booking/cancelBooking/${bookingId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+  
+        if (response.data.success) {
+          toast.success("Booking cancel successfully!");
+          dispatch(cancelBooking(bookingId))
+        } else {
+          toast.error(response.data.message || "Failed to cancel booking.");
+        }
+      } catch (error) {
+        toast.error(
+          error.response?.data?.message || "Something went wrong during booking."
+        );
+        console.error("Booking error:", error);
+      }finally{
+        dispatch(setLoader(false))
+      }
   }
 
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index)
   }
+  const deleteBooking =(id)=>{
 
+  }
   return (
     <div style={{
               backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
             }} className="mt-16 lg:mt-5 min-h-screen p-4 sm:p-6 transition-colors duration-300">
       {/* Hero Section */}
       <div className="bg-cover bg-center h-64 flex items-center justify-center rounded-lg overflow-hidden mb-8">
-        <div className="text-center p-6 bg-green-500  rounded-lg">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Welcome to Your Bookings, Sabina Shaikh</h1>
-          <p className="text-white mb-4">Manage your reservations with ease.</p>
+        <div className="text-center p-6  rounded-lg">
+          <h1 className="text-3xl sm:text-4xl font-bold text-black mb-2 font-orbitron">Welcome to Your Bookings,
+            <span className="capitalize font-orbitron text-green-500"> {user?.firstName}   {user.lastName}</span></h1>
+          <p className="text-black mb-4">Manage your reservations with ease.</p>
           <button className="bg-green-500 text-white border border-white px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300">
             Book a New Turf
           </button>
@@ -185,22 +185,22 @@ const MyBookings = () => {
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredBookings.map((booking) => (
             <motion.div
-              key={booking.id}
+              key={booking._id}
               variants={cardVariants}
               initial="hidden"
               animate="visible"
               className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-shadow duration-300 hover:shadow-lg"
             >
-              <h2 className="text-xl font-semibold mb-2 dark:text-white">{booking.turfName}</h2>
+              <h2 className="text-xl font-semibold mb-2 dark:text-white">{booking.turf.turfName}</h2>
               <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
                 <FontAwesomeIcon icon={faCalendar} className="mr-2" />
                 <span>
-                  {booking.date} | {booking.time}
+                {new Date(booking.date).toLocaleDateString()} | {booking.timeSlot.join(", ")} 
                 </span>
               </div>
               <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
                 <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
-                <span>{booking.location}</span>
+                <span>{booking.turf.turfLocation}</span>
               </div>
               <p className="mt-4 dark:text-white">
                 Status:{" "}
@@ -221,13 +221,15 @@ const MyBookings = () => {
                   View Details
                 </button>
                 {booking.status === "Confirmed" && (
-                  <button className="w-full bg-red-400 dark:bg-red-600 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300">
+                  <button 
+                  onClick={(e)=>handleCancelBooking(booking._id,e)}
+                  className="w-full bg-red-400 dark:bg-red-600 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300">
                     Cancel Booking
                   </button>
                 )}
                 {(booking.status === "Completed" || booking.status === "Cancelled") && (
                   <button
-                    onClick={() => deleteBooking(booking.id)}
+                    onClick={deleteBooking}
                     className="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-300"
                   >
                     Delete
