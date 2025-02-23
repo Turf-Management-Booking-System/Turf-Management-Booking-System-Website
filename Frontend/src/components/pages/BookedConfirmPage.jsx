@@ -8,7 +8,7 @@ import { FaCalendarAlt, FaClock, FaMoneyBillWave, FaCreditCard, FaMoneyBill } fr
 import { DarkModeContext } from "../../context/DarkModeContext"
 import whiteBg from "../../assets/Images/whiteBg.png";
 import blackBg from "../../assets/Images/blackBg.png";
-import { addBooking } from "../../slices/bookingSlice"
+import { addBooking } from "../../slices/bookingSlice";
 
 const BookedConfirmPage = () => {
   const {darkMode} = useContext(DarkModeContext);
@@ -16,7 +16,7 @@ const BookedConfirmPage = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const token = useSelector((state) => state.auth.token);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const { selectedTurfName, selectedDate, selectedSlots, totalPrice } = location.state
 
