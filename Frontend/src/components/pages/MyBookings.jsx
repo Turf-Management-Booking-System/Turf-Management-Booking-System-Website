@@ -9,10 +9,10 @@ import blackBg from "../../assets/Images/blackBg.png";
 import { useBookingsDetailsOfAUser } from "../common/booking";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoader } from "../../slices/authSlice";
-import { cancelBooking } from "../../slices/bookingSlice";
 import axios from "axios";
 import toast from "react-hot-toast";
 import useCurrentAndPreviousBooking from "../common/currentAndPreviousBooking";
+import { cancelBooking, cancelCancelledBookings } from "../../slices/bookingSlice"
 import {
   faChevronDown,
   faCalendarPlus,
@@ -59,15 +59,12 @@ const MyBookings = () => {
   const navigate = useNavigate();
   const { darkMode } = useContext(DarkModeContext);
   const [selectedBooking, setSelectedBooking] = useState(null);
-  const [activeTab, setActiveTab] = useState("Upcoming Bookings");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [openIndex, setOpenIndex] = useState(null);
-  
-  const user = useSelector((state) => state.auth.user);
-  const currentBookings = useSelector((state) => state.booking.currentBookings);
-  const token = useSelector((state) => state.auth.token);
-  const cancelBooked = useSelector((state) => state.booking.cancelBooked);
-  console.log("all bookings from redux", currentBookings);
+  const user = useSelector((state)=>state.auth.user);
+  const currentBookings = useSelector((state)=>state.booking.currentBookings);
+  const token = useSelector((state)=>state.auth.token);
+  const cancelBooked = useSelector((state)=>state.booking.cancelBooked)
+  console.log("all bookings from redux",currentBookings);
+  const [feedBack,setFeedBack] = useState("")
   const dispatch = useDispatch();
 
   const openModal = (booking) => {
@@ -263,10 +260,44 @@ const BookingDetailsModal = ({ booking, onClose }) => {
   };
 
   const toggleFAQ = (index) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
-  const deleteBooking = (id) => {};
-  
+    setOpenIndex(openIndex === index ? null : index)
+  }
+  const deleteBooking =(id)=>{
+    dispatch(cancelCancelledBookings(id));
+    toast.success("Cancel Booking Successfully!")
+  }
+  const data ={
+    "userId":user?._id,
+    "thought":feedBack
+  }
+  const shareFeedBack =async(e)=>{
+    try {
+      dispatch(setLoader(true))
+      const response = await axios.post(
+        `http://localhost:4000/api/v1/booking/getUserFeedback`,data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("FeedBack Sent Successfully!");
+      } else {
+        toast.error(response.data.message || "Failed to send feedback.");
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Something went wrong during feedback."
+      );
+      console.error("feedback error:", error);
+    }finally{
+      dispatch(setLoader(false));
+      setFeedBack("")
+    }
+  }
   return (
     <div
       style={{
@@ -613,8 +644,13 @@ const BookingDetailsModal = ({ booking, onClose }) => {
           placeholder="Share your thoughts..."
           className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
           rows="3"
+          name="feedback"
+          value={feedBack}
+          onChange={(e)=>setFeedBack(e.target.value)}
         ></textarea>
-        <button className="bg-green-500 text-white px-6 py-2 rounded-lg mt-4 hover:bg-green-600 transition duration-300 w-full sm:w-auto">
+        <button 
+        onClick={shareFeedBack}
+        className="bg-green-500 text-white px-6 py-2 rounded-lg mt-4 hover:bg-green-600 transition duration-300 w-full sm:w-auto">
           Submit Feedback
         </button>
       </div>

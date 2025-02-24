@@ -49,9 +49,14 @@ const bookingSlice= createSlice({
         setCurrentBookings:(state,action)=>{
               state.currentBookings=action.payload;
               localStorage.setItem("currentBooked",JSON.stringify(state.currentBookings))
+        },
+        cancelCancelledBookings:(state,action)=>{
+            state.cancelBooked = state.cancelBooked.filter(booking => booking._id  !== action.payload);
+            localStorage.setItem("cancelBookings", JSON.stringify(state.cancelBooked));
+
         }
         
     }
 });
-export const {setAllBookings,addBooking,cancelBooking,setCurrentBookings,setPreviousBookings} = bookingSlice.actions;
+export const {setAllBookings,addBooking,cancelBooking,setCurrentBookings,setPreviousBookings,cancelCancelledBookings} = bookingSlice.actions;
 export default bookingSlice.reducer;

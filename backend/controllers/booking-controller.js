@@ -2,6 +2,7 @@ const { model } = require("mongoose");
 const Booking = require("../models/booking");
 const Turf = require("../models/turf");
 const User = require("../models/user");
+const feedBack = require("../models/feedBack");
 
 exports.bookingTurf = async (req, res) => {
     try {
@@ -304,4 +305,37 @@ exports.getAllBookingsOfUser = async (req, res) => {
       });
   }
 };
-
+exports.getUserFeedback =async (req,res)=>{
+    try{
+     const {userId,thought} = req.body;
+     if(!userId|| !thought){
+        return res.status(404).json({
+            success:false,
+            message:"Please Enter The Data!"
+        })
+     }
+     const user = await User.findById(userId);
+     if(!user){
+        return res.status(404).json({
+            success:false,
+            message:"No User Found By Id!"
+        })
+     }
+     const userThought = await feedBack.create({
+        user:userId,
+        thought:thought
+     });
+     return res.status(200).json({
+        success:true,
+        message:"Thanks For FeedBack!",
+        userThought
+     })
+    }catch(error){
+        console.log("Error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Error while getting user's feedback",
+            error: error.message
+        });
+    }
+}
