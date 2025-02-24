@@ -17,6 +17,9 @@ import {
   faCalendar,
   faMapMarkerAlt,
   faTag,
+  faClock,
+  faCreditCard,
+  faFutbol,
 } from "@fortawesome/free-solid-svg-icons"
 
 const bookings = [
@@ -86,7 +89,125 @@ const MyBookings = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [allBookings, setAllBookings] = useState(bookings)
   const [openIndex, setOpenIndex] = useState(null);
+  const [selectedBooking, setSelectedBooking] = useState(null);
   const dispatch = useDispatch();
+  
+  const openModal = (booking) => {
+    setSelectedBooking(booking);
+  };
+  const closeModal = () => {
+    setSelectedBooking(null);
+  };
+
+  const BookingDetailsModal = ({ booking, onClose }) => {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-xl w-full">
+          {/* Turf Name */}
+          <h2 className="text-2xl font-semibold mb-4 dark:text-white">{booking.turfName}</h2>
+  
+          {/* Turf Image */}
+          <img
+            src={booking.turfImage || "/placeholder-turf.jpg"} // Add a placeholder image if no image is available
+            alt={booking.turfName}
+            className="w-full h-48 object-cover rounded-lg mb-4"
+          />
+  
+          {/* Booking Details */}
+          <div className="space-y-4">
+            {/* Date & Time */}
+            <div className="flex items-center text-gray-600 dark:text-gray-300">
+              <FontAwesomeIcon icon={faCalendar} className="mr-2" />
+              <span>
+                {booking.date} | {booking.time}
+              </span>
+            </div>
+  
+            {/* Location */}
+            <div className="flex items-center text-gray-600 dark:text-gray-300">
+              <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
+              <span>{booking.location}</span>
+            </div>
+  
+            {/* Duration */}
+            <div className="flex items-center text-gray-600 dark:text-gray-300">
+              <FontAwesomeIcon icon={faClock} className="mr-2" />
+              <span>Duration: {booking.duration || "2 hours"}</span>
+            </div>
+  
+            {/* Booking ID */}
+            <div className="flex items-center text-gray-600 dark:text-gray-300">
+              <FontAwesomeIcon icon={faTag} className="mr-2" />
+              <span>Booking ID: #{booking.id}</span>
+            </div>
+  
+            {/* Payment Status */}
+            <div className="flex items-center text-gray-600 dark:text-gray-300">
+              <FontAwesomeIcon icon={faCreditCard} className="mr-2" />
+              <span>Payment Status: {booking.paymentStatus || "Paid"}</span>
+            </div>
+  
+            {/* Sports Types */}
+            <div className="flex items-center text-gray-600 dark:text-gray-300">
+              <FontAwesomeIcon icon={faFutbol} className="mr-2" />
+              <span>
+                Sports: {booking.sports ? booking.sports.join(", ") : "Football, Cricket"}
+              </span>
+            </div>
+  
+            {/* Status */}
+            <p className="dark:text-white">
+              Status:{" "}
+              <span
+                className={`font-semibold ${
+                  booking.status === "Confirmed"
+                    ? "text-green-600 dark:text-green-400"
+                    : booking.status === "Completed"
+                    ? "text-gray-600 dark:text-gray-400"
+                    : "text-red-600 dark:text-red-400"
+                }`}
+              >
+                {booking.status}
+              </span>
+            </p>
+          </div>
+  
+          {/* Action Buttons */}
+          <div className="mt-6 grid grid-cols-2 gap-4">
+            {/* Reschedule Button */}
+            <button
+              onClick={() => {
+                // Add reschedule logic here
+                console.log("Reschedule booking:", booking.id);
+              }}
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+            >
+              Reschedule
+            </button>
+  
+            {/* Invoice Button */}
+            <button
+              onClick={() => {
+                // Add invoice download logic here
+                console.log("Download invoice for booking:", booking.id);
+              }}
+              className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition duration-300"
+            >
+              Download Invoice
+            </button>
+          </div>
+  
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="mt-4 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 w-full"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  };
   // caling the all booking api
  const fetchBookings = useBookingsDetailsOfAUser();
  useEffect(()=>{
@@ -181,45 +302,47 @@ const MyBookings = () => {
           </div>
         </div>
 
-        {/* Booking Cards */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredBookings.map((booking) => (
-            <motion.div
-              key={booking.id}
-              variants={cardVariants}
-              initial="hidden"
-              animate="visible"
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-shadow duration-300 hover:shadow-lg"
-            >
-              <h2 className="text-xl font-semibold mb-2 dark:text-white">{booking.turfName}</h2>
-              <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
-                <FontAwesomeIcon icon={faCalendar} className="mr-2" />
-                <span>
-                  {booking.date} | {booking.time}
-                </span>
-              </div>
-              <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
-                <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
-                <span>{booking.location}</span>
-              </div>
-              <p className="mt-4 dark:text-white">
-                Status:{" "}
-                <span
-                  className={`font-semibold ${
-                    booking.status === "Confirmed"
-                      ? "text-green-600 dark:text-green-400"
-                      : booking.status === "Completed"
-                        ? "text-gray-600 dark:text-gray-400"
-                        : "text-red-600 dark:text-red-400"
-                  }`}
-                >
-                  {booking.status}
-                </span>
-              </p>
-              <div className="mt-4 space-y-2">
-                <button className="w-full bg-green-400 dark:bg-green-600 dark:hover:bg-green-800 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300">
-                  View Details
-                </button>
+        {filteredBookings.map((booking) => (
+          <motion.div
+            key={booking.id}
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-shadow duration-300 hover:shadow-lg"
+          >
+            <h2 className="text-xl font-semibold mb-2 dark:text-white">{booking.turfName}</h2>
+            <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
+              <FontAwesomeIcon icon={faCalendar} className="mr-2" />
+              <span>
+                {booking.date} | {booking.time}
+              </span>
+            </div>
+            <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
+              <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
+              <span>{booking.location}</span>
+            </div>
+            <p className="mt-4 dark:text-white">
+              Status:{" "}
+              <span
+                className={`font-semibold ${
+                  booking.status === "Confirmed"
+                    ? "text-green-600 dark:text-green-400"
+                    : booking.status === "Completed"
+                    ? "text-gray-600 dark:text-gray-400"
+                    : "text-red-600 dark:text-red-400"
+                }`}
+              >
+                {booking.status}
+              </span>
+            </p>
+            <div className="mt-4 space-y-2">
+              <button
+                onClick={() => openModal(booking)} 
+                className="w-full bg-green-400 dark:bg-green-600 dark:hover:bg-green-800 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300"
+              >
+                View Details
+              </button>
                 {booking.status === "Confirmed" && (
                   <button className="w-full bg-red-400 dark:bg-red-600 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300">
                     Cancel Booking
@@ -237,6 +360,9 @@ const MyBookings = () => {
             </motion.div>
           ))}
         </div>
+        {selectedBooking && (
+        <BookingDetailsModal booking={selectedBooking} onClose={closeModal} />
+      )}
       </div>
 
       {/* Special Offers Section */}

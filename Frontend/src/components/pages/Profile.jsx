@@ -1,4 +1,4 @@
-import React, { useEffect, useState  } from "react";
+import React, { useContext, useEffect, useState  } from "react";
 import {useDispatch, useSelector} from "react-redux";
 import toast from "react-hot-toast";
 import axios from "axios"
@@ -7,7 +7,12 @@ import { deleteAccountNotification } from "../../slices/notificationSlice";
 import {useNavigate} from "react-router-dom";
 import { loadNotification,setNotification } from "../../slices/notificationSlice";
 import { setUser } from "../../slices/authSlice";
+import { DarkModeContext } from "../../context/DarkModeContext";
+import whiteBg from "../../assets/Images/whiteBg.png";
+import blackBg from "../../assets/Images/blackBg.png";
+
 const EditProfile = () => {
+  const {darkMode} = useContext(DarkModeContext);
   const dispatch = useDispatch();
   const isForgetPassword = localStorage.getItem("isForgetPassword")||null;
   const email = localStorage.getItem("email")||null;
@@ -187,15 +192,17 @@ const EditProfile = () => {
       }
    } 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#587990] mt-16">
+    <div style={{
+                  backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
+                }} className="min-h-screen flex items-center justify-center bg-[#587990] mt-16">
       <div className="w-full max-w-7xl bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-10 flex flex-col">
         <h2 className="text-3xl font-semibold text-gray-900 dark:text-white mb-8 font-orbitron">Edit Profile</h2>
         <div className="flex gap-8">
-          {/* Profile Picture Section */}
+
           <div className="flex flex-col items-center w-1/4">
             <img
               src={user.image}
-              className="w-36 h-36 rounded-full border-4 border-gray-300 dark:border-gray-700"
+              className="w-36 h-36 rounded-full border-2 border-black dark:border-white"
             />
            <label className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer inline-block">
   Choose File
