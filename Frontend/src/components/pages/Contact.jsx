@@ -8,9 +8,11 @@ import ContactBg from "../../assets/Images/ContactBg.jpg";
 import { DarkModeContext } from "../../context/DarkModeContext";
 import { FaHeart } from "react-icons/fa";
 import { BiPhoneCall } from "react-icons/bi";
+import whiteBg from "../../assets/Images/whiteBg.png";
+import blackBg from "../../assets/Images/blackBg.png";
 
 const ContactForm = () => {
-  const {darkmode} = useContext(DarkModeContext);
+  const {darkMode} = useContext(DarkModeContext);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -43,12 +45,14 @@ const ContactForm = () => {
   };
 
   return (
-    <div style={{backgroundImage : `url(${darkmode ? "" : ContactBg})`}} className="min-h-screen flex flex-col items-center justify-center  bg-cover bg-center text-white py-12 mt-12">
+    <div style={{
+                  backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
+                }} className="min-h-screen flex flex-col items-center justify-center  bg-cover bg-center text-white py-12 mt-12">
       <div className="text-center mb-12 relative z-10">
-        <h1 className="text-4xl font-orbitron font-bold text-black underline flex items-center gap-2">
+        <h1 className="text-4xl font-orbitron font-bold text-black dark:text-white underline flex items-center gap-2">
           <BiPhoneCall/> Let's Connect & Kick Off!
         </h1>
-        <p className="text-lg font-poppins text-white mt-2 max-w-2xl mx-auto">
+        <p className="text-lg font-poppins text-black dark:text-white mt-2 max-w-2xl mx-auto">
           Got questions about bookings, availability, or special events? We’re here to help! 
           Fill out the form below, and our team will get back to you as soon as possible.
         </p>
@@ -69,7 +73,7 @@ const ContactForm = () => {
           
           {/* Address */}
           <div className="flex items-start gap-4">
-            <i className="bx bxs-map text-4xl text-red-600"></i>
+            <i className="bx bxs-map text-4xl text-black dark:text-white"></i>
             <div>
               <h3 className="text-lg font-montserrat text-black dark:text-white font-semibold">Address</h3>
               <p className="text-black dark:text-white font-poppins">400070 Pipe Road, Kurla West, Mumbai.</p>
@@ -78,7 +82,7 @@ const ContactForm = () => {
           
           {/* Phone */}
           <div className="flex items-start gap-4">
-            <i className="bx bxs-phone text-4xl text-green-500"></i>
+            <i className="bx bxs-phone text-4xl text-black dark:text-white"></i>
             <div>
               <h3 className="text-lg font-montserrat text-black dark:text-white font-semibold">Phone</h3>
               <p className="dark:text-white text-black font-poppins">000-000-0000</p>
@@ -87,7 +91,7 @@ const ContactForm = () => {
           
           {/* Email */}
           <div className="flex items-start gap-4">
-            <i className="bx bxs-envelope text-4xl text-blue-500"></i>
+            <i className="bx bxs-envelope text-4xl text-black dark:text-white"></i>
             <div>
               <h3 className="text-lg font-montserrat  text-black dark:text-white font-semibold">Email</h3>
               <p className="text-black dark:text-white font-poppins">sknagma5233@gmail.com</p>
@@ -104,7 +108,7 @@ const ContactForm = () => {
               <p className="text-black dark:text-white font-poppins">Saturday: 10 AM - 4 PM</p>
             </div>
           </div>
-          <div className="space-y-1"><h1 className="text-3xl text-black dark:text-white font-bold font-orbitron flex items-center gap-2"><FaHeart color="black"/> Play, Relax, Repeat!</h1>
+          <div className="space-y-1"><h1 className="text-3xl text-black dark:text-white font-bold font-orbitron flex items-center gap-2"><FaHeart className="text-black dark:text-white"/> Play, Relax, Repeat!</h1>
   <p className="text-lg text-black dark:text-white font-poppins">
     Your game matters to us! We ensure well-maintained turfs, seamless booking, and friendly customer support to make your experience smooth and enjoyable.
   </p></div>
@@ -116,7 +120,7 @@ const ContactForm = () => {
           initial={{ x: "100vw", opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 1.6, ease: "easeOut" }}
-          className="bg-white relative z-10 rounded-tl-[4vw] rounded-br-[4vw] p-8 w-full md:w-1/2 shadow-lg border-2 border-black dark:border-gray-400"
+          className="bg-white relative z-10 rounded-tl-[4vw] rounded-br-[4vw] p-8 w-full md:w-1/2 shadow-lg border-2 border-black dark:border-gray-500"
         >
           <h2 className="text-3xl font-bold mb-6 font-orbitron text-center text-green-900">
             Send Message

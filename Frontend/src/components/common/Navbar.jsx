@@ -17,6 +17,7 @@ function Navbar() {
   const { darkMode, setDarkMode } = useContext(DarkModeContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showChatbot, setShowChatbot] = useState(false);
+  const [openModal,closeModal] = useState(false);
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const notifications = useSelector(
@@ -33,6 +34,7 @@ function Navbar() {
 
   const handleMenu = () => setMenuOpen((prev) => !prev);
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
+
   const handleLogoutClick = (event) => {
     setDropdownOpen(false);
     event.preventDefault();
@@ -155,6 +157,7 @@ function Navbar() {
                   </div>
                   <Link
                     to="/profile"
+                    onClick={() => setDropdownOpen(false)}
                     className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
                   >
                     <div className="flex items-center gap-5">

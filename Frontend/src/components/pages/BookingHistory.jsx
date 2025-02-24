@@ -18,6 +18,7 @@ import {
   faChartBar,
   faHeart,
   faExclamationTriangle,
+  faFutbol,
 } from "@fortawesome/free-solid-svg-icons"
 
 const bookingHistory = [
@@ -110,8 +111,8 @@ const BookingHistory = () => {
               backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
             }} className="mt-16 min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2">Booking History</h1>
+        <header className="mb-5">
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2 mt-5 lg:mt-0">Booking History</h1>
           <p className="text-gray-600 dark:text-gray-400">View and manage your past turf bookings</p>
         </header>
 
@@ -218,8 +219,8 @@ const BookingHistory = () => {
                         {booking.location}
                       </p>
                       <p className="text-gray-600 dark:text-gray-300">
-                        <FontAwesomeIcon icon={faUsers} className="mr-2 text-purple-500" />
-                        {booking.players} players | {booking.sport}
+                        <FontAwesomeIcon icon={faFutbol} className="mr-2 text-purple-500" />
+                         {booking.sport}
                       </p>
                     </div>
                   </div>
@@ -288,12 +289,9 @@ const BookingHistory = () => {
               </p>
             </div>
             <div className="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold mb-2 text-yellow-800 dark:text-yellow-200">Average Rating</h3>
+              <h3 className="text-lg font-semibold mb-2 text-yellow-800 dark:text-yellow-200">Rescheduled</h3>
               <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-300">
-                {(
-                  bookingHistory.reduce((acc, cur) => acc + (cur.rating || 0), 0) /
-                  bookingHistory.filter((b) => b.rating).length
-                ).toFixed(1)}
+               5
               </p>
             </div>
           </div>

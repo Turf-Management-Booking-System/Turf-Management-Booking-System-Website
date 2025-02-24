@@ -1,17 +1,18 @@
-import { useContext, useEffect, useState } from "react"
-import { Link } from "react-router-dom"
-import { motion, AnimatePresence } from "framer-motion"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { DarkModeContext } from "../../context/DarkModeContext"
-import whiteBg from "../../assets/Images/whiteBg.png"
-import blackBg from "../../assets/Images/blackBg.png"
-import  { useBookingsDetailsOfAUser } from "../common/booking"
-import { useDispatch,useSelector } from "react-redux"
-import { setLoader } from "../../slices/authSlice"
-import { cancelBooking } from "../../slices/bookingSlice"
-import axios from "axios"
-import toast from "react-hot-toast"
-import useCurrentAndPreviousBooking from "../common/currentAndPreviousBooking"
+import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { DarkModeContext } from "../../context/DarkModeContext";
+import whiteBg from "../../assets/Images/whiteBg.png";
+import blackBg from "../../assets/Images/blackBg.png";
+import { useBookingsDetailsOfAUser } from "../common/booking";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoader } from "../../slices/authSlice";
+import { cancelBooking } from "../../slices/bookingSlice";
+import axios from "axios";
+import toast from "react-hot-toast";
+import useCurrentAndPreviousBooking from "../common/currentAndPreviousBooking";
 import {
   faChevronDown,
   faCalendarPlus,
@@ -24,7 +25,8 @@ import {
   faClock,
   faCreditCard,
   faFutbol,
-} from "@fortawesome/free-solid-svg-icons"
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
 
 const faqs = [
   {
@@ -39,225 +41,253 @@ const faqs = [
   },
   {
     question: "Can I reschedule my booking?",
-    answer: "Yes, you can reschedule your booking up to 48 hours before the scheduled time, subject to availability.",
+    answer:
+      "Yes, you can reschedule your booking up to 48 hours before the scheduled time, subject to availability.",
   },
   {
     question: "What payment methods do you accept?",
     answer: "We accept all major credit cards, debit cards, and PayPal.",
   },
-]
+];
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-}
+};
 
 const MyBookings = () => {
-  const {darkMode} = useContext(DarkModeContext)
-  const [activeTab, setActiveTab] = useState("Upcoming Bookings")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [openIndex, setOpenIndex] = useState(null);
+  const navigate = useNavigate();
+  const { darkMode } = useContext(DarkModeContext);
   const [selectedBooking, setSelectedBooking] = useState(null);
-  const user = useSelector((state)=>state.auth.user);
-  const currentBookings = useSelector((state)=>state.booking.currentBookings);
-  const token = useSelector((state)=>state.auth.token);
-  const cancelBooked = useSelector((state)=>state.booking.cancelBooked)
-  console.log("all bookings from redux",currentBookings)
-  const dispatch = useDispatch();
+  const [activeTab, setActiveTab] = useState("Upcoming Bookings");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [openIndex, setOpenIndex] = useState(null);
   
+  const user = useSelector((state) => state.auth.user);
+  const currentBookings = useSelector((state) => state.booking.currentBookings);
+  const token = useSelector((state) => state.auth.token);
+  const cancelBooked = useSelector((state) => state.booking.cancelBooked);
+  console.log("all bookings from redux", currentBookings);
+  const dispatch = useDispatch();
+
   const openModal = (booking) => {
-    setSelectedBooking(booking);
+    setSelectedBooking({
+      turfName: booking.turf.turfName,
+      turfImage: booking.turf.turfImage || "/placeholder-turf.jpg",
+      date: new Date(booking.date).toLocaleDateString(),
+      time: booking.timeSlot.join(", "),
+      location: booking.turf.turfLocation,
+      duration: booking.duration || "2 hours",
+      id: booking._id,
+      paymentStatus: booking.paymentStatus || "Paid",
+      sports: booking.sports || ["Football", "Cricket"],
+      status: booking.status,
+    });
   };
   const closeModal = () => {
     setSelectedBooking(null);
   };
 
-  const BookingDetailsModal = ({ booking, onClose }) => {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-xl w-full">
-          {/* Turf Name */}
-          <h2 className="text-2xl font-semibold mb-4 dark:text-white">{booking.turfName}</h2>
-  
-          {/* Turf Image */}
-          <img
-            src={booking.turfImage || "/placeholder-turf.jpg"} // Add a placeholder image if no image is available
-            alt={booking.turfName}
-            className="w-full h-48 object-cover rounded-lg mb-4"
-          />
-  
-          {/* Booking Details */}
-          <div className="space-y-4">
-            {/* Date & Time */}
-            <div className="flex items-center text-gray-600 dark:text-gray-300">
-              <FontAwesomeIcon icon={faCalendar} className="mr-2" />
-              <span>
-                {booking.date} | {booking.time}
-              </span>
-            </div>
-  
-            {/* Location */}
-            <div className="flex items-center text-gray-600 dark:text-gray-300">
-              <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
-              <span>{booking.location}</span>
-            </div>
-  
-            {/* Duration */}
-            <div className="flex items-center text-gray-600 dark:text-gray-300">
-              <FontAwesomeIcon icon={faClock} className="mr-2" />
-              <span>Duration: {booking.duration || "2 hours"}</span>
-            </div>
-  
-            {/* Booking ID */}
-            <div className="flex items-center text-gray-600 dark:text-gray-300">
-              <FontAwesomeIcon icon={faTag} className="mr-2" />
-              <span>Booking ID: #{booking.id}</span>
-            </div>
-  
-            {/* Payment Status */}
-            <div className="flex items-center text-gray-600 dark:text-gray-300">
-              <FontAwesomeIcon icon={faCreditCard} className="mr-2" />
-              <span>Payment Status: {booking.paymentStatus || "Paid"}</span>
-            </div>
-  
-            {/* Sports Types */}
-            <div className="flex items-center text-gray-600 dark:text-gray-300">
-              <FontAwesomeIcon icon={faFutbol} className="mr-2" />
-              <span>
-                Sports: {booking.sports ? booking.sports.join(", ") : "Football, Cricket"}
-              </span>
-            </div>
-  
-            {/* Status */}
-            <p className="dark:text-white">
-              Status:{" "}
-              <span
-                className={`font-semibold ${
-                  booking.status === "Confirmed"
-                    ? "text-green-600 dark:text-green-400"
-                    : booking.status === "Completed"
-                    ? "text-gray-600 dark:text-gray-400"
-                    : "text-red-600 dark:text-red-400"
-                }`}
-              >
-                {booking.status}
-              </span>
-            </p>
-          </div>
-  
-          {/* Action Buttons */}
-          <div className="mt-6 grid grid-cols-2 gap-4">
-            {/* Reschedule Button */}
-            <button
-              onClick={() => {
-                // Add reschedule logic here
-                console.log("Reschedule booking:", booking.id);
-              }}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300"
-            >
-              Reschedule
-            </button>
-  
-            {/* Invoice Button */}
-            <button
-              onClick={() => {
-                // Add invoice download logic here
-                console.log("Download invoice for booking:", booking.id);
-              }}
-              className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition duration-300"
-            >
-              Download Invoice
-            </button>
-          </div>
-  
-          {/* Close Button */}
+const BookingDetailsModal = ({ booking, onClose }) => {
+  if (!booking) return null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-4xl w-full"
+      >
+        <div className="flex justify-between items-start mb-6">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+            {booking?.turf?.turfName || "Unknown Turf"}
+          </h2>
           <button
             onClick={onClose}
-            className="mt-4 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 w-full"
+            className="text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white transition-colors duration-200"
           >
-            Close
+            <FontAwesomeIcon icon={faTimes} size="lg" />
           </button>
         </div>
-      </div>
-    );
-  };
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <img
+              src={booking?.turf?.turfImage || ""}
+              alt={""}
+              className="w-full h-64 object-cover rounded-lg shadow-md"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center text-gray-700 dark:text-gray-300">
+              <FontAwesomeIcon icon={faCalendar} className="mr-3 text-black dark:text-white" />
+              <span className="font-semibold">Date & Time:</span>
+              <span className="ml-2">
+                {booking?.date || "N/A"} | {booking?.time || "N/A"}
+              </span>
+            </div>
+            <div className="flex items-center text-gray-700 dark:text-gray-300">
+              <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-3 text-black dark:text-white" />
+              <span className="font-semibold">Location:</span>
+              <span className="ml-2">{booking?.turf?.location || "Location not available"}</span>
+            </div>
+            <div className="flex items-center text-gray-700 dark:text-gray-300">
+              <FontAwesomeIcon icon={faClock} className="mr-3 text-black dark:text-white" />
+              <span className="font-semibold">Duration:</span>
+              <span className="ml-2">{booking?.duration || "2 hours"}</span>
+            </div>
+            <div className="flex items-center text-gray-700 dark:text-gray-300">
+              <FontAwesomeIcon icon={faTag} className="mr-3 text-black dark:text-white" />
+              <span className="font-semibold">Booking ID:</span>
+              <span className="ml-2">#{booking?._id || "N/A"}</span>
+            </div>
+            <div className="flex items-center text-gray-700 dark:text-gray-300">
+              <FontAwesomeIcon icon={faCreditCard} className="mr-3 text-black dark:text-white" />
+              <span className="font-semibold">Payment Status:</span>
+              <span className="ml-2">{booking?.paymentStatus || "Paid"}</span>
+            </div>
+            <div className="flex items-center text-gray-700 dark:text-gray-300">
+              <FontAwesomeIcon icon={faFutbol} className="mr-3 text-black dark:text-white" />
+              <span className="font-semibold">Sports:</span>
+              <span className="ml-2">
+                {booking?.turf?.sports ? booking?.turf?.sports.join(", ") : "Football, Cricket"}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="font-semibold text-gray-700 dark:text-gray-300">Status:</span>
+              <span
+                className={`ml-2 font-semibold ${
+                  booking?.status === "Confirmed"
+                    ? "text-green-600 dark:text-green-400"
+                    : booking?.status === "Completed"
+                      ? "text-gray-600 dark:text-gray-400"
+                      : "text-red-600 dark:text-red-400"
+                }`}
+              >
+                {booking?.status || "Pending"}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 grid grid-cols-2 gap-4">
+          <button
+            onClick={() => {
+              console.log("Reschedule booking:", booking?._id)
+              //  reschedule ka logic 
+            }}
+            className="bg-[#5c9bc9] text-white px-6 py-3 rounded-lg hover:bg-[#2873a8] transition duration-300 font-semibold"
+          >
+            Reschedule
+          </button>
+          <button
+            onClick={() => {
+              console.log("Download invoice for booking:", booking?._id)
+              //  invoice lka logic yaha
+            }}
+            className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-500 transition duration-300 font-semibold"
+          >
+            Download Invoice
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
   // caling the all booking api
- const currentAndPreviousBookings = useCurrentAndPreviousBooking();
- const fetchBookings = useBookingsDetailsOfAUser();
- useEffect(()=>{
-      fetchBookings();
-      currentAndPreviousBookings();
- },[dispatch])
+  const currentAndPreviousBookings = useCurrentAndPreviousBooking();
+  const fetchBookings = useBookingsDetailsOfAUser();
+  useEffect(() => {
+    fetchBookings();
+    currentAndPreviousBookings();
+  }, [dispatch]);
 
- const filteredBookings = (currentBookings || []).filter((booking) => {
-  if (!booking || !booking.turf) return false; 
-  const searchTerm = searchQuery.toLowerCase();
-  const turfName = booking.turf.turfName?.toLowerCase() || "";
-  const bookingId = String(booking._id || "");
+  const filteredBookings = (currentBookings || []).filter((booking) => {
+    if (!booking || !booking.turf) return false;
+    const searchTerm = searchQuery.toLowerCase();
+    const turfName = booking.turf.turfName?.toLowerCase() || "";
+    const bookingId = String(booking._id || "");
 
-  const matchesSearchQuery = turfName.includes(searchTerm) || bookingId.includes(searchTerm);
+    const matchesSearchQuery =
+      turfName.includes(searchTerm) || bookingId.includes(searchTerm);
 
-  if (activeTab === "Upcoming Bookings") {
-    return matchesSearchQuery && booking.status === "Confirmed";
-  }
-  return matchesSearchQuery;
-});
+    if (activeTab === "Upcoming Bookings") {
+      return matchesSearchQuery && booking.status === "Confirmed";
+    }
+    return matchesSearchQuery;
+  });
 
-const filteredCanceledBookings = (cancelBooked || []).filter((booking) => {
-  if (!booking || !booking.turf) return false; 
-  const searchTerm = searchQuery.toLowerCase();
-  const turfName = booking.turf.turfName?.toLowerCase() || "";
-  const bookingId = String(booking._id || "");
+  const filteredCanceledBookings = (cancelBooked || []).filter((booking) => {
+    if (!booking || !booking.turf) return false;
+    const searchTerm = searchQuery.toLowerCase();
+    const turfName = booking.turf.turfName?.toLowerCase() || "";
+    const bookingId = String(booking._id || "");
 
-  return turfName.includes(searchTerm) || bookingId.includes(searchTerm);
-});
-  const handleCancelBooking =async (bookingId) => {
-    console.log("booking",bookingId)
+    return turfName.includes(searchTerm) || bookingId.includes(searchTerm);
+  });
+  const handleCancelBooking = async (bookingId) => {
+    console.log("booking", bookingId);
     try {
-        dispatch(setLoader(true))
-        const response = await axios.delete(
-          `http://localhost:4000/api/v1/booking/cancelBooking/${bookingId}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-  
-        if (response.data.success) {
-          toast.success("Booking cancel successfully!");
-          dispatch(cancelBooking(bookingId))
-        } else {
-          toast.error(response.data.message || "Failed to cancel booking.");
+      dispatch(setLoader(true));
+      const response = await axios.delete(
+        `http://localhost:4000/api/v1/booking/cancelBooking/${bookingId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (error) {
-        toast.error(
-          error.response?.data?.message || "Something went wrong during booking."
-        );
-        console.error("Booking error:", error);
-      }finally{
-        dispatch(setLoader(false))
+      );
+
+      if (response.data.success) {
+        toast.success("Booking cancel successfully!");
+        dispatch(cancelBooking(bookingId));
+      } else {
+        toast.error(response.data.message || "Failed to cancel booking.");
       }
-  }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Something went wrong during booking."
+      );
+      console.error("Booking error:", error);
+    } finally {
+      dispatch(setLoader(false));
+    }
+  };
 
   const toggleFAQ = (index) => {
-    setOpenIndex(openIndex === index ? null : index)
-  }
-  const deleteBooking =(id)=>{
-
-  }
+    setOpenIndex(openIndex === index ? null : index);
+  };
+  const deleteBooking = (id) => {};
+  
   return (
-    <div style={{
-              backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
-            }} className="mt-16 lg:mt-5 min-h-screen p-4 sm:p-6 transition-colors duration-300">
+    <div
+      style={{
+        backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+      }}
+      className="mt-16 lg:mt-5 min-h-screen p-4 sm:p-6 transition-colors duration-300"
+    >
       {/* Hero Section */}
       <div className="bg-cover bg-center h-64 flex items-center justify-center rounded-lg overflow-hidden mb-8">
         <div className="text-center p-6  rounded-lg">
-          <h1 className="text-3xl sm:text-4xl font-bold text-black mb-2 font-orbitron">Welcome to Your Bookings,
-            <span className="capitalize font-orbitron text-green-500"> {user?.firstName}   {user.lastName}</span></h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-black mb-2 font-orbitron">
+            Welcome to Your Bookings,
+            <span className="capitalize font-orbitron text-green-500">
+              {" "}
+              {user?.firstName} {user.lastName}
+            </span>
+          </h1>
           <p className="text-black mb-4">Manage your reservations with ease.</p>
-          <button className="bg-green-500 text-white border border-white px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300">
+          <button
+          onClick={() => navigate("/turf")}
+          className="bg-green-500 text-white border border-white px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300">
             Book a New Turf
           </button>
         </div>
@@ -266,22 +296,28 @@ const filteredCanceledBookings = (cancelBooked || []).filter((booking) => {
       {/* Policy Section */}
       <div className="max-w-6xl mx-auto mb-8 grid gap-4 sm:grid-cols-2">
         <div className="bg-red-50 dark:bg-red-900 p-4 rounded-lg border border-red-200 dark:border-red-500">
-          <h3 className="font-semibold text-red-700 dark:text-red-300 mb-2">Cancellation & Reschedule Policy</h3>
+          <h3 className="font-semibold text-red-700 dark:text-red-300 mb-2">
+            Cancellation & Reschedule Policy
+          </h3>
           <p className="text-red-700 dark:text-red-300 text-sm">
-            Cancel within 24 hours for a full refund. Reschedule subject to availability.
+            Cancel within 24 hours for a full refund. Reschedule subject to
+            availability.
           </p>
         </div>
         <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg border border-green-200 dark:border-green-500">
-          <h3 className="font-semibold text-green-700 dark:text-green-300 mb-2">Real-Time Updates & Easy Management</h3>
+          <h3 className="font-semibold text-green-700 dark:text-green-300 mb-2">
+            Real-Time Updates & Easy Management
+          </h3>
           <p className="text-green-700 dark:text-green-300 text-sm">
-            Get instant booking updates and manage your reservations effortlessly.
+            Get instant booking updates and manage your reservations
+            effortlessly.
           </p>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-wrap gap-2 mb-6">
-          {["Upcoming Bookings","Cancelled Bookings"].map((tab) => (
+          {["Upcoming Bookings", "Cancelled Bookings"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -314,103 +350,123 @@ const filteredCanceledBookings = (cancelBooked || []).filter((booking) => {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-  {activeTab === "Cancelled Bookings"
-    ? filteredCanceledBookings.map((booking) => (
-        <motion.div
-          key={booking._id}
-          variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-shadow duration-300 hover:shadow-lg"
-        >
-          <h2 className="text-xl font-semibold mb-2 dark:text-white">{booking.turf.turfName}</h2>
-          <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
-            <FontAwesomeIcon icon={faCalendar} className="mr-2" />
-            <span>
-              {new Date(booking.date).toLocaleDateString()} | {booking.timeSlot.join(", ")}
-            </span>
-          </div>
-          <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
-            <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
-            <span>{booking.turf.turfLocation}</span>
-          </div>
-          <p className="mt-4 dark:text-white">
-            Status:{" "}
-            <span className="font-semibold text-red-600 dark:text-red-400">
-              Cancelled
-            </span>
-          </p>
-          <div className="mt-4 space-y-2">
-            <button className="w-full bg-green-400 dark:bg-green-600 dark:hover:bg-green-800 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300">
-              View Details
-            </button>
-            <button
-              onClick={() => deleteBooking(booking._id)}
-              className="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-300"
-            >
-              Delete
-            </button>
-          </div>
-        </motion.div>
-      ))
-    : filteredBookings.map((booking) => (
-        <motion.div
-          key={booking._id}
-          variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-shadow duration-300 hover:shadow-lg"
-        >
-          <h2 className="text-xl font-semibold mb-2 dark:text-white">{booking.turf.turfName}</h2>
-          <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
-            <FontAwesomeIcon icon={faCalendar} className="mr-2" />
-            <span>
-              {new Date(booking.date).toLocaleDateString()} | {booking.timeSlot.join(", ")}
-            </span>
-          </div>
-          <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
-            <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
-            <span>{booking.turf.turfLocation}</span>
-          </div>
-          <p className="mt-4 dark:text-white">
-            Status:{" "}
-            <span
-              className={`font-semibold ${
-                booking.status === "Confirmed"
-                  ? "text-green-600 dark:text-green-400"
-                  : booking.status === "Completed"
-                    ? "text-gray-600 dark:text-gray-400"
-                    : "text-red-600 dark:text-red-400"
-              }`}
-            >
-              {booking.status}
-            </span>
-          </p>
-          <div className="mt-4 space-y-2">
-            <button className="w-full bg-green-400 dark:bg-green-600 dark:hover:bg-green-800 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300">
-              View Details
-            </button>
-            {booking.status === "Confirmed" && (
-              <button
-                onClick={(e) => handleCancelBooking(booking._id, e)}
-                className="w-full bg-red-400 dark:bg-red-600 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300"
-              >
-                Cancel Booking
-              </button>
-            )}
-            {(booking.status === "Completed" || booking.status === "Cancelled") && (
-              <button
-                onClick={() => deleteBooking(booking._id)}
-                className="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-300"
-              >
-                Delete
-              </button>
-            )}
-          </div>
-        </motion.div>
-      ))}
-</div>
-       </div>
+          {activeTab === "Cancelled Bookings"
+            ? filteredCanceledBookings.map((booking) => (
+                <motion.div
+                  key={booking._id}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-shadow duration-300 hover:shadow-lg"
+                >
+                  <h2 className="text-xl font-semibold mb-2 dark:text-white">
+                    {booking.turf.turfName}
+                  </h2>
+                  <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
+                    <FontAwesomeIcon icon={faCalendar} className="mr-2" />
+                    <span>
+                      {new Date(booking.date).toLocaleDateString()} |{" "}
+                      {booking.timeSlot.join(", ")}
+                    </span>
+                  </div>
+                  <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
+                    <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
+                    <span>{booking.turf.turfLocation}</span>
+                  </div>
+                  <p className="mt-4 dark:text-white">
+                    Status:{" "}
+                    <span className="font-semibold text-red-600 dark:text-red-400">
+                      Cancelled
+                    </span>
+                  </p>
+                  <div className="mt-4 space-y-2">
+                    <button
+                      onClick={() => openModal(booking)}
+                      className="w-full bg-green-400 dark:bg-green-600 dark:hover:bg-green-800 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300"
+                    >
+                      View Details
+                    </button>
+                    <button
+                      onClick={() => deleteBooking(booking._id)}
+                      className="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-300"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </motion.div>
+              ))
+            : filteredBookings.map((booking) => (
+                <motion.div
+                  key={booking._id}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-shadow duration-300 hover:shadow-lg"
+                >
+                  <h2 className="text-xl font-semibold mb-2 dark:text-white">
+                    {booking.turf.turfName}
+                  </h2>
+                  <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
+                    <FontAwesomeIcon icon={faCalendar} className="mr-2" />
+                    <span>
+                      {new Date(booking.date).toLocaleDateString()} |{" "}
+                      {booking.timeSlot.join(", ")}
+                    </span>
+                  </div>
+                  <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
+                    <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
+                    <span>{booking.turf.turfLocation}</span>
+                  </div>
+                  <p className="mt-4 dark:text-white">
+                    Status:{" "}
+                    <span
+                      className={`font-semibold ${
+                        booking.status === "Confirmed"
+                          ? "text-green-600 dark:text-green-400"
+                          : booking.status === "Completed"
+                          ? "text-gray-600 dark:text-gray-400"
+                          : "text-red-600 dark:text-red-400"
+                      }`}
+                    >
+                      {booking.status}
+                    </span>
+                  </p>
+                  <div className="mt-4 space-y-2">
+                    <button
+                    onClick={() => openModal(booking)}
+                    className="w-full bg-green-400 dark:bg-green-600 dark:hover:bg-green-800 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300">
+                      View Details
+                    </button>
+                    {booking.status === "Confirmed" && (
+                      <button
+                        onClick={(e) => handleCancelBooking(booking._id, e)}
+                        className="w-full bg-red-400 dark:bg-red-600 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300"
+                      >
+                        Cancel Booking
+                      </button>
+                    )}
+                    {(booking.status === "Completed" ||
+                      booking.status === "Cancelled") && (
+                      <button
+                        onClick={() => deleteBooking(booking._id)}
+                        className="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-300"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+        </div>
+        <AnimatePresence>
+  {selectedBooking && (
+    <BookingDetailsModal
+      booking={selectedBooking}
+      onClose={closeModal}
+    />
+  )}
+</AnimatePresence>
+      </div>
       {/* Special Offers Section */}
       <div className="bg-green-500 dark:bg-green-700 text-white p-6 rounded-lg my-8 mx-auto max-w-4xl text-center">
         <div className="bg-yellow-400 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -418,10 +474,14 @@ const filteredCanceledBookings = (cancelBooked || []).filter((booking) => {
         </div>
         <h3 className="text-2xl font-semibold mb-4">Special Offer!</h3>
         <p className="mb-4">
-          Get <strong>20% off</strong> on your next booking. Hurry, this exclusive offer ends soon!
+          Get <strong>20% off</strong> on your next booking. Hurry, this
+          exclusive offer ends soon!
         </p>
         <div className="w-full max-w-xs mx-auto bg-white bg-opacity-20 rounded-full h-2 mb-2">
-          <div className="bg-yellow-400 h-2 rounded-full" style={{ width: "60%" }}></div>
+          <div
+            className="bg-yellow-400 h-2 rounded-full"
+            style={{ width: "60%" }}
+          ></div>
         </div>
         <p className="text-sm">60% of the offer claimed</p>
       </div>
@@ -442,9 +502,17 @@ const filteredCanceledBookings = (cancelBooked || []).filter((booking) => {
               onClick={() => toggleFAQ(index)}
             >
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{faq.question}</h3>
-                <motion.div animate={{ rotate: openIndex === index ? 180 : 0 }} transition={{ duration: 0.3 }}>
-                  <FontAwesomeIcon icon={faChevronDown} className="text-green-500" />
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                  {faq.question}
+                </h3>
+                <motion.div
+                  animate={{ rotate: openIndex === index ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <FontAwesomeIcon
+                    icon={faChevronDown}
+                    className="text-green-500"
+                  />
                 </motion.div>
               </div>
               <AnimatePresence>
@@ -466,7 +534,7 @@ const filteredCanceledBookings = (cancelBooked || []).filter((booking) => {
       </section>
 
       {/* CTA Buttons Section */}
-      <div className= "py-12 ">
+      <div className="py-12 ">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold mb-8 text-center text-gray-800 dark:text-white">
             What Would You Like to Do Next?
@@ -478,28 +546,28 @@ const filteredCanceledBookings = (cancelBooked || []).filter((booking) => {
                 title: "Book a New Turf",
                 desc: "Reserve your favorite turf for your next game.",
                 color: "blue",
-                link:"/turf",
+                link: "/turf",
               },
               {
                 icon: faSearch,
                 title: "Explore More Turfs",
                 desc: "Discover new turfs and venues near you.",
                 color: "green",
-                link:"/turf",
+                link: "/turf",
               },
               {
                 icon: faHeadset,
                 title: "Contact Support",
                 desc: "Our support team is available 24/7 to assist you.",
                 color: "purple",
-                link:"/contact",
+                link: "/contact",
               },
               {
                 icon: faDownload,
-                title: "Download History",
+                title: "Booking History",
                 desc: "Download your booking history as a PDF or CSV file.",
                 color: "yellow",
-                link:"/bookinghistory"
+                link: "/bookinghistory",
               },
             ].map((item, index) => (
               <div
@@ -509,14 +577,21 @@ const filteredCanceledBookings = (cancelBooked || []).filter((booking) => {
                 <div
                   className={`bg-${item.color}-500 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4`}
                 >
-                  <FontAwesomeIcon icon={item.icon} className="text-white text-xl" />
+                  <FontAwesomeIcon
+                    icon={item.icon}
+                    className="text-white text-xl"
+                  />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">{item.title}</h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">{item.desc}</p>
+                <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">
+                  {item.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  {item.desc}
+                </p>
                 <Link
-            to={item.link}
-            className={`bg-${item.color}-500 text-white px-6 py-2 rounded-lg hover:bg-${item.color}-600 transition duration-300 w-full block`}
-          >
+                  to={item.link}
+                  className={`bg-${item.color}-500 text-white px-6 py-2 rounded-lg hover:bg-${item.color}-600 transition duration-300 w-full block`}
+                >
                   {item.title.split(" ")[0]}
                 </Link>
               </div>
@@ -531,7 +606,8 @@ const filteredCanceledBookings = (cancelBooked || []).filter((booking) => {
           We Value Your Feedback
         </h3>
         <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
-          Your feedback helps us improve. Share your thoughts, suggestions, or any issues you faced.
+          Your feedback helps us improve. Share your thoughts, suggestions, or
+          any issues you faced.
         </p>
         <textarea
           placeholder="Share your thoughts..."
@@ -543,8 +619,7 @@ const filteredCanceledBookings = (cancelBooked || []).filter((booking) => {
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MyBookings
-
+export default MyBookings;
