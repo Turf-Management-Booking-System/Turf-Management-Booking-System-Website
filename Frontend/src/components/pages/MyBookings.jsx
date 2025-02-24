@@ -62,6 +62,9 @@ const MyBookings = () => {
   const user = useSelector((state)=>state.auth.user);
   const currentBookings = useSelector((state)=>state.booking.currentBookings);
   const token = useSelector((state)=>state.auth.token);
+  const [searchQuery,setSearchQuery] = useState("");
+  const [activeTab,setActiveTab] = useState("all")
+  const [openIndex,setOpenIndex] = useState(null)
   const cancelBooked = useSelector((state)=>state.booking.cancelBooked)
   console.log("all bookings from redux",currentBookings);
   const [feedBack,setFeedBack] = useState("")
