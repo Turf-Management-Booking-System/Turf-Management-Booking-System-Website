@@ -23,9 +23,8 @@ export const useBookingsDetailsOfAUser = () => {
           withCredentials: true,
         }
       );
-
-      console.log("Response from backend allBookingsOfAUser", response.data.bookings[0].previousBooked); 
-      dispatch(setAllBookings(response.data.bookings[0].previousBooked))
+      console.log("Response from backend allBookingsOfAUser", response.data.bookings);
+      dispatch(setAllBookings(response.data.bookings))
     } catch (error) {
       console.log("Error", error.response?.data || error.message);
       toast.error(error.response?.data?.message || "Unable to fetch bookings");
@@ -33,6 +32,7 @@ export const useBookingsDetailsOfAUser = () => {
       dispatch(setLoader(false));
     }
   };
-
   return fetchBookings; 
-};
+
+}
+

@@ -1,13 +1,15 @@
 import { useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { cancelBooking } from "../../slices/bookingSlice";
 const BookingConfirmedPage = () => {
   const {bookingId} = useParams();
   const navigate = useNavigate();
   const token = useSelector((state)=>state.auth.token)
   const location = useLocation();
+  const dispatch = useDispatch();
   const {
     selectedTurfName,
     selectedDate,
@@ -30,6 +32,7 @@ const BookingConfirmedPage = () => {
   
         if (response.data.success) {
           toast.success("Booking cancel successfully!");
+          dispatch(cancelBooking(bookingId))
         } else {
           toast.error(response.data.message || "Failed to cancel booking.");
         }

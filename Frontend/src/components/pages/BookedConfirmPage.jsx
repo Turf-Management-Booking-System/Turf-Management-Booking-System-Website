@@ -2,19 +2,21 @@ import { useContext, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import toast from "react-hot-toast"
 import axios from "axios"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { motion } from "framer-motion"
 import { FaCalendarAlt, FaClock, FaMoneyBillWave, FaCreditCard, FaMoneyBill } from "react-icons/fa";
 import { DarkModeContext } from "../../context/DarkModeContext"
 import whiteBg from "../../assets/Images/whiteBg.png";
 import blackBg from "../../assets/Images/blackBg.png";
+import { addBooking } from "../../slices/bookingSlice";
 
 const BookedConfirmPage = () => {
   const {darkMode} = useContext(DarkModeContext);
   const { userId, turfId } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
-  const token = useSelector((state) => state.auth.token)
+  const token = useSelector((state) => state.auth.token);
+  const dispatch = useDispatch();
 
   const { selectedTurfName, selectedDate, selectedSlots, totalPrice } = location.state
 
@@ -54,9 +56,10 @@ const BookedConfirmPage = () => {
 
       if (response.data.success) {
         toast.success("Booking confirmed successfully!")
-        navigate(`/booking-confirmation/${response.data.newBooking._id}`, {
+        dispatch(addBooking(response?.data?.newBookings))
+        navigate(`/booking-confirmation/${response.data.newBookings._id}`, {
           state: {
-            bookingId: response.data.newBooking._id,
+            bookingId: response.data.newBookings._id,
             selectedTurfName,
             selectedDate,
             selectedSlots,
