@@ -58,11 +58,17 @@ userSchema.methods.getRecentAndPreviousBookings = async function () {
 
     // Populate the previousBooked field with the Turf details
     await user.populate({
-        path: "previousBooked",
-        populate: {
-            path: "turf",
-            model: "Turf"
-        }
+    path: "previousBooked",
+      populate: [
+        {
+          path: "turf",
+          model: "Turf",
+          populate: {
+            path: "sports", 
+            model: "Sport",
+          },
+        },
+      ],
     });
 
     console.log("Populated previousBooked:", user.previousBooked);

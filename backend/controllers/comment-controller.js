@@ -210,7 +210,7 @@ exports.getCommentWithTestimonals = async (req,res)=>{
      })
   }catch(error){
        console.log("error",error);
-       return res.status(500),json({
+       return res.status(500).json({
         success:false,
         message:"Error while fetching Testimonals",
         error:error.message

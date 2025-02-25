@@ -20,18 +20,19 @@ import { useSelector } from "react-redux";
 const BookingPage = () => {
   const {turfId} = useParams();
   const navigate = useNavigate();
-  console.log("id",turfId)
   const location = useLocation();
   const { darkMode } = useContext(DarkModeContext);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlots, setSelectedSlots] = useState([]);
+  const { bookingIdRescheduled, turf } = location.state || {};
   const [slots, setSlots] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
-  const selectedTurfName = location.state?.turfName || "Unknown Turf";
+   const selectedTurfName = location.state?.turfName || location.state?.turf?.turfName  ;
   const token = useSelector((state)=>state.auth.token);
   const [priceTurf,setPriceTurf] = useState(0);
   const [userId,setUserId]= useState(0);
   const user = useSelector((state)=>state.auth.user);
+  const [isRescheduled, setIsRescheduled] = useState(false);
   const weatherInfo = {
     temperature: 28,
     condition: "Partly Cloudy",
@@ -89,23 +90,26 @@ const BookingPage = () => {
       return newSlots;
     });
   }
-  const handleProceedToPayment = () => {
+  const handleProceedToPayment =async  () => {
     if (!selectedDate || selectedSlots.length === 0) {
       toast.error("Please select a date and at least one slot.");
       return;
     }
+    console.log("rescheduleId",bookingIdRescheduled)
     navigate(`/confirmBooking/${turfId}/${userId}` , {
       state: {
+        bookingIdRescheduled,
         selectedTurfName,
         selectedDate,
         selectedSlots,
         totalPrice,
+        isRescheduled: !!bookingIdRescheduled,
+
       },
     });
   };
-  console.log("selected date",selectedDate);
-  console.log("selected time",selectedSlots);
-  console.log("Selected price",totalPrice);
+  
+
   return (
     <div
   style={{
@@ -268,7 +272,7 @@ const BookingPage = () => {
                 <span className="font-semibold text-gray-900 dark:text-white">
                   Turf:
                 </span>{" "}
-                {selectedTurfName || "Not selected"}
+                {selectedTurfName || "not selected"}
               </p>
 
               <motion.button

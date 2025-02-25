@@ -18,7 +18,7 @@ const BookedConfirmPage = () => {
   const token = useSelector((state) => state.auth.token);
   const dispatch = useDispatch();
 
-  const { selectedTurfName, selectedDate, selectedSlots, totalPrice } = location.state
+  const { selectedTurfName, selectedDate, selectedSlots, totalPrice ,bookingIdRescheduled,isRescheduled} = location.state
 
   const [paymentMode, setPaymentMode] = useState("")
 
@@ -36,8 +36,48 @@ const BookedConfirmPage = () => {
       toast.error("Online Mode is not available right now!")
       return
     }
-
-    try {
+     const data ={
+          "newTimeSlot":selectedSlots,
+          "bookingId":bookingIdRescheduled
+        }
+        console.log("data",data)
+        if(isRescheduled){
+          try {
+            const response = await axios.post(
+              `http://localhost:4000/api/v1/booking/rescheduleBooking`,data,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+      
+            if (response.data.success) {
+              toast.success("Booking rescheduled successfully!");
+              navigate(`/booking-confirmation/${response.data.booking._id}`, {
+                state: {
+                  bookingId: response.data.booking._id,
+                  selectedTurfName,
+                  selectedDate,
+                  selectedSlots,
+                  totalPrice,
+                  paymentMode,
+                },
+              })
+              return;
+            } else {
+              toast.error(response.data.message || "Failed to rescheduled booking.");
+            }
+          } catch (error) {
+            toast.error(
+              error.response?.data?.message ||
+                "Something went wrong during rescheduled."
+            );
+            console.error("Rescheduled error:", error);
+          }
+        }
+       try {
       const response = await axios.post(
         `http://localhost:4000/api/v1/booking/bookingTurf/${turfId}/${userId}`,
         {
@@ -156,7 +196,7 @@ const BookedConfirmPage = () => {
                 onClick={handleConfirmBooking}
                 className="bg-white text-green-500 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:bg-gray-100 transition duration-300"
               >
-                Confirm Booking
+                  {bookingIdRescheduled ? "Reschedule Booking" : "Confirm Booking"}
               </motion.button>
             </div>
           </div>

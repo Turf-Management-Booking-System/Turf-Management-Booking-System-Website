@@ -36,6 +36,7 @@ const BookingConfirmedPage = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const {
+    
     selectedTurfName,
     selectedDate,
     selectedSlots,
@@ -59,7 +60,7 @@ const BookingConfirmedPage = () => {
       if (response.data.success) {
         toast.success("Booking cancelled successfully!");
         dispatch(cancelBooking(bookingId));
-        navigate("/my-bookings");
+        navigate("/myBookings");
       } else {
         toast.error(response.data.message || "Failed to cancel booking.");
       }

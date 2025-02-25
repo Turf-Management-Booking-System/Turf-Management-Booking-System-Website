@@ -278,11 +278,17 @@ exports.getAllBookingsOfUser = async (req, res) => {
           });
       }
       const user = await User.findById(userId).populate({
-          path: "previousBooked",
-          populate: {
-              path: "turf",
-              model: "Turf"
-          }
+        path: "previousBooked",
+        populate: [
+          {
+            path: "turf",
+            model: "Turf",
+            populate: {
+              path: "sports",
+              model: "Sport", 
+            },
+          },
+        ],
       });
 
       if (!user) {

@@ -71,18 +71,8 @@ const MyBookings = () => {
   const dispatch = useDispatch();
 
   const openModal = (booking) => {
-    setSelectedBooking({
-      turfName: booking.turf.turfName,
-      turfImage: booking.turf.turfImage || "/placeholder-turf.jpg",
-      date: new Date(booking.date).toLocaleDateString(),
-      time: booking.timeSlot.join(", "),
-      location: booking.turf.turfLocation,
-      duration: booking.duration || "2 hours",
-      id: booking._id,
-      paymentStatus: booking.paymentStatus || "Paid",
-      sports: booking.sports || ["Football", "Cricket"],
-      status: booking.status,
-    });
+    console.log("bbokinId",booking)
+    setSelectedBooking(booking);
   };
   const closeModal = () => {
     setSelectedBooking(null);
@@ -106,7 +96,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
       >
         <div className="flex justify-between items-start mb-6">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {booking?.turf?.turfName || "Unknown Turf"}
+            {booking.turf?.turfName || "Unknown Turf"}
           </h2>
           <button
             onClick={onClose}
@@ -119,7 +109,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <img
-              src={booking?.turf?.turfImage || ""}
+              src={booking.turf?.turfImages[0] || ""}
               alt={""}
               className="w-full h-64 object-cover rounded-lg shadow-md"
             />
@@ -130,18 +120,18 @@ const BookingDetailsModal = ({ booking, onClose }) => {
               <FontAwesomeIcon icon={faCalendar} className="mr-3 text-black dark:text-white" />
               <span className="font-semibold">Date & Time:</span>
               <span className="ml-2">
-                {booking?.date || "N/A"} | {booking?.time || "N/A"}
+              {new Date(booking.date).toLocaleDateString()} | {booking.timeSlot.join(", ")}
               </span>
             </div>
             <div className="flex items-center text-gray-700 dark:text-gray-300">
               <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-3 text-black dark:text-white" />
               <span className="font-semibold">Location:</span>
-              <span className="ml-2">{booking?.turf?.location || "Location not available"}</span>
+              <span className="ml-2">{booking.turf?.turfLocation || "Location not available"}</span>
             </div>
             <div className="flex items-center text-gray-700 dark:text-gray-300">
               <FontAwesomeIcon icon={faClock} className="mr-3 text-black dark:text-white" />
               <span className="font-semibold">Duration:</span>
-              <span className="ml-2">{booking?.duration || "2 hours"}</span>
+              <span className="ml-2">1 hours</span>
             </div>
             <div className="flex items-center text-gray-700 dark:text-gray-300">
               <FontAwesomeIcon icon={faTag} className="mr-3 text-black dark:text-white" />
@@ -157,7 +147,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
               <FontAwesomeIcon icon={faFutbol} className="mr-3 text-black dark:text-white" />
               <span className="font-semibold">Sports:</span>
               <span className="ml-2">
-                {booking?.turf?.sports ? booking?.turf?.sports.join(", ") : "Football, Cricket"}
+              {booking.turf?.sports?.sports ? booking.turf.sports?.sports.join(", ") : "Football, Cricket"}
               </span>
             </div>
             <div className="flex items-center">
@@ -179,10 +169,12 @@ const BookingDetailsModal = ({ booking, onClose }) => {
 
         <div className="mt-8 grid grid-cols-2 gap-4">
           <button
-            onClick={() => {
-              console.log("Reschedule booking:", booking?._id)
-              //  reschedule ka logic 
-            }}
+           onClick={() => {
+            navigate(`/booking/${booking.turf._id}/slots`, { 
+                state: { turf: booking.turf, bookingIdRescheduled: booking._id } 
+            });
+            // console.log("Navigating with state:", { turf: booking.turf, bookingId: booking._id }); 
+         }}         
             className="bg-[#5c9bc9] text-white px-6 py-3 rounded-lg hover:bg-[#2873a8] transition duration-300 font-semibold"
           >
             Reschedule
@@ -415,7 +407,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                   </p>
                   <div className="mt-4 space-y-2">
                     <button
-                      onClick={() => openModal(booking)}
+                      onClick={() => openModal(booking._id)}
                       className="w-full bg-green-400 dark:bg-green-600 dark:hover:bg-green-800 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300"
                     >
                       View Details
