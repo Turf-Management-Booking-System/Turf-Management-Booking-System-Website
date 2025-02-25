@@ -36,7 +36,6 @@ const BookingConfirmedPage = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const {
-    
     selectedTurfName,
     selectedDate,
     selectedSlots,
@@ -72,12 +71,6 @@ const BookingConfirmedPage = () => {
       console.error("Cancellation error:", error);
     }
   };
-
-  const handleRescheduleBooking = async (e) => {
-    e.preventDefault();
-    toast.info("Rescheduling feature coming soon!");
-  };
-
   return (
     <div
       style={{
@@ -212,12 +205,6 @@ const BookingConfirmedPage = () => {
               >
                 <FontAwesomeIcon icon={faDownload} className="mr-2" />
                 Download Booking Receipt
-              </button>
-              <button
-                onClick={handleRescheduleBooking}
-                className="w-[20rem] bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-4 rounded-lg transition duration-300"
-              >
-                Reschedule Booking
               </button>
               <button
                 onClick={handleCancelBooking}

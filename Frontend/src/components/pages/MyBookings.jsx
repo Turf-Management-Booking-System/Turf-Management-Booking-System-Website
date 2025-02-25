@@ -63,7 +63,7 @@ const MyBookings = () => {
   const currentBookings = useSelector((state)=>state.booking.currentBookings);
   const token = useSelector((state)=>state.auth.token);
   const [searchQuery,setSearchQuery] = useState("");
-  const [activeTab,setActiveTab] = useState("all")
+  const [activeTab,setActiveTab] = useState("Upcoming Bookings")
   const [openIndex,setOpenIndex] = useState(null)
   const cancelBooked = useSelector((state)=>state.booking.cancelBooked)
   console.log("all bookings from redux",currentBookings);
@@ -71,7 +71,6 @@ const MyBookings = () => {
   const dispatch = useDispatch();
 
   const openModal = (booking) => {
-    console.log("bbokinId",booking)
     setSelectedBooking(booking);
   };
   const closeModal = () => {
@@ -173,7 +172,6 @@ const BookingDetailsModal = ({ booking, onClose }) => {
             navigate(`/booking/${booking.turf._id}/slots`, { 
                 state: { turf: booking.turf, bookingIdRescheduled: booking._id } 
             });
-            // console.log("Navigating with state:", { turf: booking.turf, bookingId: booking._id }); 
          }}         
             className="bg-[#5c9bc9] text-white px-6 py-3 rounded-lg hover:bg-[#2873a8] transition duration-300 font-semibold"
           >

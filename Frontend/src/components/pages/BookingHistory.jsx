@@ -1,14 +1,14 @@
-import { useContext, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useContext, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { DarkModeContext } from "../../context/DarkModeContext";
 import whiteBg from "../../assets/Images/whiteBg.png";
 import blackBg from "../../assets/Images/blackBg.png";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useSelector } from "react-redux";
 import {
   faCalendar,
   faMapMarkerAlt,
   faClock,
-  faUsers,
   faStar,
   faFilter,
   faSearch,
@@ -19,100 +19,61 @@ import {
   faHeart,
   faExclamationTriangle,
   faFutbol,
-} from "@fortawesome/free-solid-svg-icons"
-
-const bookingHistory = [
-  {
-    id: 1,
-    turfName: "Green Valley Turf",
-    date: "2023-11-15",
-    time: "18:00 - 20:00",
-    location: "123 Sports Lane, Mumbai",
-    status: "Completed",
-    players: 10,
-    sport: "Football",
-    price: 1200,
-    rating: 4.5,
-  },
-  {
-    id: 2,
-    turfName: "Sunset Arena",
-    date: "2023-10-22",
-    time: "16:00 - 18:00",
-    location: "456 Play Street, Delhi",
-    status: "Cancelled",
-    players: 6,
-    sport: "Cricket",
-    price: 800,
-    rating: null,
-  },
-  {
-    id: 3,
-    turfName: "City Central Ground",
-    date: "2023-12-05",
-    time: "20:00 - 22:00",
-    location: "789 Game Road, Bangalore",
-    status: "Completed",
-    players: 8,
-    sport: "Basketball",
-    price: 1000,
-    rating: 5,
-  },
-  {
-    id: 4,
-    turfName: "Riverside Pitch",
-    date: "2024-01-10",
-    time: "15:00 - 17:00",
-    location: "321 River View, Kolkata",
-    status: "Completed",
-    players: 12,
-    sport: "Football",
-    price: 1500,
-    rating: 4.8,
-  },
-  {
-    id: 5,
-    turfName: "Mountain Top Field",
-    date: "2024-02-18",
-    time: "09:00 - 11:00",
-    location: "555 Hill Road, Shimla",
-    status: "Cancelled",
-    players: 4,
-    sport: "Tennis",
-    price: 600,
-    rating: null,
-  },
-]
+} from "@fortawesome/free-solid-svg-icons";
 
 const BookingHistory = () => {
-  const {darkMode} = useContext(DarkModeContext);
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("All")
-  const [sortBy, setSortBy] = useState("date")
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const { darkMode } = useContext(DarkModeContext);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("All");
+  const [sortBy, setSortBy] = useState("date");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const filteredBookings = bookingHistory
-    .filter(
-      (booking) =>
-        (booking.turfName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          booking.sport.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        (filterStatus === "All" || booking.status === filterStatus),
-    )
-    .sort((a, b) => {
-      if (sortBy === "date") return new Date(b.date) - new Date(a.date)
-      if (sortBy === "price") return b.price - a.price
-      return 0
+  const allBookings = useSelector((state) => state.booking.allBookings);
+  const cancelBooked = useSelector((state) => state.booking.cancelBooked);
+  const rescheduledBookings = useSelector((state) => state.booking.rescheduledBookings);
+  const previousBookings = useSelector((state) => state.booking.previousBookings);
+
+  // Filtering logic
+  const filteredBookings = allBookings
+    .filter((booking) => {
+      const matchesTurfName = booking.turf?.turfName
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
+      const matchesSport = booking.turf?.sports?.some((sport) =>
+        sport.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      const matchesStatus = filterStatus === "All" || booking.status === filterStatus;
+
+      return (matchesTurfName || matchesSport) && matchesStatus;
     })
+    .sort((a, b) => {
+      if (sortBy === "date") return new Date(b.date) - new Date(a.date);
+      if (sortBy === "price") return b.price - a.price;
+      return 0;
+    });
 
-  const toggleFilter = () => setIsFilterOpen(!isFilterOpen)
-
+  const toggleFilter = () => setIsFilterOpen(!isFilterOpen);
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i < rating; i++) {
+      stars.push(<FontAwesomeIcon key={i} icon={faStar} className="text-yellow-400 mr-1" />);
+    }
+    return stars;
+  };
   return (
-    <div style={{
-              backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
-            }} className="mt-16 min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 transition-colors duration-300">
+    <div
+      style={{
+        backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+      }}
+      className="mt-16 min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 transition-colors duration-300"
+    >
       <div className="max-w-7xl mx-auto">
         <header className="mb-5">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2 mt-5 lg:mt-0">Booking History</h1>
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2 mt-5 lg:mt-0">
+            Booking History
+          </h1>
           <p className="text-gray-600 dark:text-gray-400">View and manage your past turf bookings</p>
         </header>
 
@@ -165,12 +126,14 @@ const BookingHistory = () => {
                       className="w-full p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
                     >
                       <option value="All">All</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Cancelled">Cancelled</option>
+                      <option value="Confirmed">Confirmed</option>
+                      {/* Removed "Cancelled" option */}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort by</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Sort by
+                    </label>
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
@@ -190,7 +153,7 @@ const BookingHistory = () => {
         <section className="space-y-6">
           {filteredBookings.map((booking) => (
             <motion.div
-              key={booking.id}
+              key={booking._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
@@ -199,7 +162,9 @@ const BookingHistory = () => {
               <div className="p-6">
                 <div className="flex flex-wrap justify-between items-start">
                   <div className="w-full sm:w-2/3">
-                    <h2 className="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">{booking.turfName}</h2>
+                    <h2 className="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">
+                      {booking.turf?.turfName}
+                    </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                       <p className="text-gray-600 dark:text-gray-300">
                         <FontAwesomeIcon icon={faCalendar} className="mr-2 text-blue-500" />
@@ -212,42 +177,45 @@ const BookingHistory = () => {
                       </p>
                       <p className="text-gray-600 dark:text-gray-300">
                         <FontAwesomeIcon icon={faClock} className="mr-2 text-green-500" />
-                        {booking.time}
+                        {new Date(booking.date).toLocaleDateString()} | {booking.timeSlot.join(", ")}
                       </p>
                       <p className="text-gray-600 dark:text-gray-300">
                         <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2 text-red-500" />
-                        {booking.location}
+                        {booking.turf?.turfLocation}
                       </p>
                       <p className="text-gray-600 dark:text-gray-300">
                         <FontAwesomeIcon icon={faFutbol} className="mr-2 text-purple-500" />
-                         {booking.sport}
+                        {booking.turf?.sports?.[0]?.sports ? booking.turf?.sports?.[0]?.sports.join(", ") : null}                    
+
                       </p>
                     </div>
                   </div>
                   <div className="w-full sm:w-1/3 mt-4 sm:mt-0 text-right">
                     <p
                       className={`inline-block px-3 py-1 rounded-full text-sm font-semibold mb-2 ${
-                        booking.status === "Completed"
+                        booking.status === "Confirmed"
                           ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                           : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
                       }`}
                     >
                       {booking.status}
                     </p>
-                    <p className="text-2xl font-bold text-gray-800 dark:text-white">₹{booking.price}</p>
-                    {booking.rating && (
-                      <div className="flex items-center justify-end mt-2">
-                        <FontAwesomeIcon icon={faStar} className="text-yellow-400 mr-1" />
-                        <span className="text-gray-600 dark:text-gray-300">{booking.rating}</span>
-                      </div>
-                    )}
+                    <p className="text-2xl font-bold text-gray-800 dark:text-white">
+                      ₹{booking.turf?.turfPricePerHour}
+                    </p>
+                    {
+  booking.turf?.comments?.[0]?.rating && (
+    <div className="flex items-center justify-end mt-2">
+      <FontAwesomeIcon icon={faStar} className="text-yellow-400 mr-1" />
+      {renderStars(booking.turf.comments[0].rating.rating)}
+      <span className="text-gray-600 dark:text-gray-300">
+        {booking.turf.comments[0].rating.rating}
+      </span>
+    </div>
+  )
+}
                   </div>
                 </div>
-                {booking.status === "Completed" && !booking.rating && (
-                  <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300 text-sm font-medium">
-                    Leave a Review
-                  </button>
-                )}
               </div>
             </motion.div>
           ))}
@@ -274,24 +242,24 @@ const BookingHistory = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
               <h3 className="text-lg font-semibold mb-2 text-blue-800 dark:text-blue-200">Total Bookings</h3>
-              <p className="text-3xl font-bold text-blue-600 dark:text-blue-300">{bookingHistory.length}</p>
+              <p className="text-3xl font-bold text-blue-600 dark:text-blue-300">{allBookings.length}</p>
             </div>
             <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
               <h3 className="text-lg font-semibold mb-2 text-green-800 dark:text-green-200">Completed Bookings</h3>
               <p className="text-3xl font-bold text-green-600 dark:text-green-300">
-                {bookingHistory.filter((b) => b.status === "Completed").length}
+                {previousBookings.length}
               </p>
             </div>
             <div className="bg-red-50 dark:bg-red-900 p-4 rounded-lg">
               <h3 className="text-lg font-semibold mb-2 text-red-800 dark:text-red-200">Cancelled Bookings</h3>
               <p className="text-3xl font-bold text-red-600 dark:text-red-300">
-                {bookingHistory.filter((b) => b.status === "Cancelled").length}
+                {cancelBooked.length}
               </p>
             </div>
             <div className="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg">
               <h3 className="text-lg font-semibold mb-2 text-yellow-800 dark:text-yellow-200">Rescheduled</h3>
               <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-300">
-               5
+                {rescheduledBookings.length}
               </p>
             </div>
           </div>
@@ -301,17 +269,17 @@ const BookingHistory = () => {
         <section className="mt-12">
           <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white flex items-center">
             <FontAwesomeIcon icon={faHeart} className="mr-3 text-red-500" />
-            Your Favorite Turfs
+            Booked Turfs
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...new Set(bookingHistory.map((b) => b.turfName))].slice(0, 3).map((turfName, index) => (
+            {[...new Set(allBookings.map((b) => b.turf?.turfName))].slice(0, 3).map((turfName, index) => (
               <div
                 key={index}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
               >
                 <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-white">{turfName}</h3>
                 <p className="text-gray-600 dark:text-gray-300">
-                  Booked {bookingHistory.filter((b) => b.turfName === turfName).length} times
+                  Booked {allBookings.filter((b) => b.turf?.turfName === turfName).length} times
                 </p>
               </div>
             ))}
@@ -333,8 +301,7 @@ const BookingHistory = () => {
         </section>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default BookingHistory
-
+export default BookingHistory;

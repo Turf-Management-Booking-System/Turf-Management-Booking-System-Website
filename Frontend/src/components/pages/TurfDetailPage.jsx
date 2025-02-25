@@ -4,7 +4,7 @@ import "swiper/css";
 import "swiper/css/autoplay";
 import { Autoplay } from "swiper/modules";
 import axios from "axios";
-import { AiFillStar } from "react-icons/ai";
+import { AiFillStar, AiOutlineConsoleSql } from "react-icons/ai";
 import {
   FaMapMarkerAlt,
   FaRupeeSign,
@@ -28,6 +28,7 @@ const TurfDetailsPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
+  console.log("token",token)
   const user = useSelector((state) => state.auth.user);
   const { id } = useParams();
   const { darkmode } = useState(DarkModeContext);
@@ -88,6 +89,7 @@ const TurfDetailsPage = () => {
         {
           headers: {
             "Content-Type": "application/json",
+              Authorization:`Bearer ${token}`
           },
         }
       );
@@ -108,7 +110,8 @@ const TurfDetailsPage = () => {
         error.response?.data?.message ||
           "Something went wrong while creating the comment!"
       );
-      console.log(error.response?.data?.message);
+      console.error("Error:", error.response?.data || error.message);
+
     } finally {
       dispatch(setLoader(false));
     }

@@ -78,8 +78,22 @@ exports.bookingTurf = async (req, res) => {
         user.previousBooked.push(newBooking._id);
         await user.save();
 
-        const newBookings = await Booking.findById(newBooking._id).populate("turf");
-
+        const newBookings = await Booking.findById(newBooking._id).populate({
+            path: "turf",
+            populate: [
+              { path: "sports", model: "Sport" },
+              {
+                path: "comments", 
+                model: "Comment",
+                populate: {
+                  path: "rating", 
+                  model: "Rating",
+                  select: "rating", 
+                },
+              },
+            ],
+          })
+  .exec();
         // Return the response
         return res.status(200).json({
             success: true,
@@ -279,14 +293,26 @@ exports.getAllBookingsOfUser = async (req, res) => {
       }
       const user = await User.findById(userId).populate({
         path: "previousBooked",
+        model: "Booking",
         populate: [
           {
             path: "turf",
             model: "Turf",
-            populate: {
-              path: "sports",
-              model: "Sport", 
-            },
+            populate: [
+              {
+                path: "comments", 
+                model: "Comment",
+                populate:{
+                    path:"rating",
+                    model:"Rating",
+                    select:"rating"
+                }
+              },
+              {
+                path: "sports", 
+                model: "Sport",
+              },
+            ],
           },
         ],
       });

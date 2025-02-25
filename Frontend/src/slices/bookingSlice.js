@@ -8,13 +8,15 @@ const previous = localStorage.getItem("previousBooked");
 const previousBooking = previous && previous !== "undefined" ? JSON.parse(previous) : [];
 const current = localStorage.getItem("currentBooked");
 const currentBooking = current && current !== "undefined" ? JSON.parse(current) : [];
-
+const rescheduled = localStorage.getItem("rescheduledBooked");
+const rescheduledBooking = rescheduled && rescheduled !== "undefined" ? JSON.parse(rescheduled) : [];
 
 const initialState={
     allBookings: allBooked,
     cancelBooked: cancelBookings,
     previousBookings:previousBooking,
     currentBookings:currentBooking,
+    rescheduledBookings:rescheduledBooking,
 }
 
 const bookingSlice= createSlice({
@@ -54,9 +56,13 @@ const bookingSlice= createSlice({
             state.cancelBooked = state.cancelBooked.filter(booking => booking._id  !== action.payload);
             localStorage.setItem("cancelBookings", JSON.stringify(state.cancelBooked));
 
+        },
+        setRescheduledBookings:(state,action)=>{
+            state.rescheduledBookings=[...state.rescheduledBookings,action.payload]
+            localStorage.setItem("rescheduledBooked",JSON.stringify(state.rescheduledBookings))
         }
         
     }
 });
-export const {setAllBookings,addBooking,cancelBooking,setCurrentBookings,setPreviousBookings,cancelCancelledBookings} = bookingSlice.actions;
+export const {setAllBookings,addBooking,cancelBooking,setCurrentBookings,setPreviousBookings,cancelCancelledBookings,setRescheduledBookings} = bookingSlice.actions;
 export default bookingSlice.reducer;

@@ -8,7 +8,7 @@ import { FaCalendarAlt, FaClock, FaMoneyBillWave, FaCreditCard, FaMoneyBill } fr
 import { DarkModeContext } from "../../context/DarkModeContext"
 import whiteBg from "../../assets/Images/whiteBg.png";
 import blackBg from "../../assets/Images/blackBg.png";
-import { addBooking } from "../../slices/bookingSlice";
+import { addBooking, setRescheduledBookings } from "../../slices/bookingSlice";
 
 const BookedConfirmPage = () => {
   const {darkMode} = useContext(DarkModeContext);
@@ -52,9 +52,11 @@ const BookedConfirmPage = () => {
                 },
               }
             );
-      
+            
             if (response.data.success) {
               toast.success("Booking rescheduled successfully!");
+              console.log("response",response.data.booking)
+              dispatch(setRescheduledBookings(response.data.booking))
               navigate(`/booking-confirmation/${response.data.booking._id}`, {
                 state: {
                   bookingId: response.data.booking._id,

@@ -56,20 +56,28 @@ const userSchema = mongoose.Schema({
 userSchema.methods.getRecentAndPreviousBookings = async function () {
     const user = this;
 
-    // Populate the previousBooked field with the Turf details
     await user.populate({
-    path: "previousBooked",
-      populate: [
-        {
-          path: "turf",
-          model: "Turf",
-          populate: {
-            path: "sports", 
-            model: "Sport",
+        path: "previousBooked",
+        model: "Booking",
+        populate: [
+          {
+            path: "turf",
+            model: "Turf",
+            populate: [
+              {
+                path: "sports",
+                model: "Sport",
+              },
+              {
+                path: "comments", 
+                model: "Comment",
+                select: "rating", 
+              },
+            ],
           },
-        },
-      ],
-    });
+        ],
+      });
+  
 
     console.log("Populated previousBooked:", user.previousBooked);
 

@@ -2,7 +2,7 @@ import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { setLoader } from "../../slices/authSlice";
-import { setCurrentBookings } from "../../slices/bookingSlice";
+import { setCurrentBookings, setPreviousBookings } from "../../slices/bookingSlice";
 import { useCallback } from "react";
 
 const useCurrentAndPreviousBooking = () => {
@@ -29,6 +29,8 @@ const useCurrentAndPreviousBooking = () => {
 
       console.log("Response from backend recentBookings:", response.data.recentBookings);
       dispatch(setCurrentBookings(response.data.recentBookings));
+      dispatch(setPreviousBookings(response.data.previousBookings));
+      console.log("previous bookings",response.data.previousBookings);
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
       toast.error(error.response?.data?.message || "Unable to fetch bookings");
