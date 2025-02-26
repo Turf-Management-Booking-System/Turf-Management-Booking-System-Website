@@ -3,6 +3,7 @@ const User = require("../models/user");
 const Comment = require("../models/comment");
 const Turf = require("../models/turf");
 const Rating = require("../models/rating");
+const UserActivity = require("../models/userActivity")
 // create turf comment
 exports.createComment =async(req,res)=>{
    try{
@@ -164,7 +165,13 @@ exports.createCommentWithRating = async (req, res) => {
   const turf = await Turf.findById(turfId);
    turf.comments.push(newComment._id);
    const fetchTurfById = await turf.save();
-
+  const user = User.findById(userId);
+  const activity = await UserActivity.create({
+    userId:user._id,
+    action:"Give Comment And Rating!"
+});
+await user.recentActivity.push(activity._id);
+await user.save();
     res.status(201).json({
       success: true,
       message: "Comment and Rating saved successfully!",

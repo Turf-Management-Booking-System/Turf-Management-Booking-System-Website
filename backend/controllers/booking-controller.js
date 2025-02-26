@@ -3,6 +3,7 @@ const Booking = require("../models/booking");
 const Turf = require("../models/turf");
 const User = require("../models/user");
 const feedBack = require("../models/feedBack");
+const UserActivity = require("../models/userActivity")
 
 exports.bookingTurf = async (req, res) => {
     try {
@@ -31,7 +32,7 @@ exports.bookingTurf = async (req, res) => {
         }
 
         // Check if the turf slots are available
-        const slotInTurf = turf.slots.find(s =>
+        const slotInTurf = turf.slots.filter(s =>
             timeSlotArray.some(slot => s.time?.trim().toLowerCase() === slot.trim().toLowerCase()) &&
             s.status === "available"
         );
@@ -62,7 +63,9 @@ exports.bookingTurf = async (req, res) => {
         }
 
         // Update the turf model
-        slotInTurf.status = "booked";
+        slotInTurf.forEach(slot=>{
+           slot.status = "booked"
+        })
         await turf.save();
 
         // Update the user's previousBooked array with the new booking ID
@@ -73,10 +76,15 @@ exports.bookingTurf = async (req, res) => {
                 message: "User not found.",
             });
         }
-
+   
         // Add the new booking ID to the previousBooked array
         user.previousBooked.push(newBooking._id);
-        await user.save();
+        const activity = await UserActivity.create({
+          userId:user._id,
+          action:"Booked Turf!"
+      });
+      await user.recentActivity.push(activity._id);
+      await user.save();
 
         const newBookings = await Booking.findById(newBooking._id).populate({
             path: "turf",

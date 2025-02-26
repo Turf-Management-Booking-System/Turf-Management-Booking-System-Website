@@ -405,12 +405,6 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                   </p>
                   <div className="mt-4 space-y-2">
                     <button
-                      onClick={() => openModal(booking._id)}
-                      className="w-full bg-green-400 dark:bg-green-600 dark:hover:bg-green-800 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300"
-                    >
-                      View Details
-                    </button>
-                    <button
                       onClick={() => deleteBooking(booking._id)}
                       className="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-300"
                     >

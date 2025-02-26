@@ -3,6 +3,10 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { setLoader } from "../../slices/authSlice"
+import axios from "axios"
+import toast from "react-hot-toast"
+import { useDispatch } from "react-redux"
 import {
   faSearch,
   faUserPlus,
@@ -17,70 +21,59 @@ import {
   faUserTie,
   faUser,
 } from "@fortawesome/free-solid-svg-icons"
-
-// Mock user data
-const mockUsers = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john@example.com",
-    role: "User",
-    status: "Active",
-    lastLogin: "2023-05-15",
-    registrationDate: "2023-01-10",
-    recentActivity: "Updated profile",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "Admin",
-    status: "Active",
-    lastLogin: "2023-05-14",
-    registrationDate: "2022-11-05",
-    recentActivity: "Changed password",
-  },
-  {
-    id: 3,
-    name: "Bob Johnson",
-    email: "bob@example.com",
-    role: "User",
-    status: "Pending",
-    lastLogin: "Never",
-    registrationDate: "2023-05-01",
-    recentActivity: "Registered",
-  },
-  {
-    id: 4,
-    name: "Alice Brown",
-    email: "alice@example.com",
-    role: "User",
-    status: "Active",
-    lastLogin: "2023-05-12",
-    registrationDate: "2023-03-20",
-    recentActivity: "Booked a turf",
-  },
-  {
-    id: 5,
-    name: "Charlie Davis",
-    email: "charlie@example.com",
-    role: "Admin",
-    status: "Active",
-    lastLogin: "2023-05-13",
-    registrationDate: "2022-09-15",
-    recentActivity: "Added new turf",
-  },
-]
+import { useSelector } from "react-redux"
 
 const UserManagement = () => {
-  const [users, setUsers] = useState(mockUsers)
+  const [users, setUsers] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [sortColumn, setSortColumn] = useState("")
   const [sortDirection, setSortDirection] = useState("asc")
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const token = useSelector((state) => state.auth.token)
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    // In a real application, you would fetch users from an API here
-  }, [])
+    const fetchUsers = async () => {
+      try {
+        dispatch(setLoader(true))
+        const response = await axios.get("http://localhost:4000/api/v1/auth/fetchAllUsers", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        })
+
+        if (response.data.success) {
+          toast.success("Fetched All Users Details")
+          const mappedUsers = response.data.allUsers.map((user) => ({
+            id: user._id,
+            name: `${user.firstName} ${user.lastName}`,
+            email: user.email,
+            role: user.role,
+            image:user.image,
+            status: user.isVerified ? "Active" : "Inactive", 
+            lastLogin: new Date(user.lastLogin).toLocaleString(), 
+            registrationDate: new Date(user.createdAt).toLocaleDateString(),
+            recentActivity: user.recentActivity.length > 0 ? user.recentActivity[0].action : "No recent activity", 
+          }))
+          setUsers(mappedUsers)
+        } else {
+          toast.error("Error Fetching Users!")
+        }
+      } catch (error) {
+        console.error("Error:", error.response?.data || error.message)
+        toast.error(error.response?.data?.message || "Error fetching users")
+        setError(error.response?.data?.message || "Error fetching users")
+      } finally {
+        dispatch(setLoader(false))
+        setLoading(false)
+      }
+    }
+
+    fetchUsers()
+  }, [token, dispatch])
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value)
@@ -108,7 +101,14 @@ const UserManagement = () => {
   const statusColors = {
     Active: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
     Inactive: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-    Pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+  }
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>
+  }
+
+  if (error) {
+    return <div className="min-h-screen flex items-center justify-center">Error: {error}</div>
   }
 
   return (
@@ -148,62 +148,59 @@ const UserManagement = () => {
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                {["Name", "Email", "Role", "Registration Date", "Recent Activity", "Actions"].map(
-                  (header) => (
-                    <th
-                      key={header}
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
-                      onClick={() => handleSort(header.toLowerCase())}
-                    >
-                      <div className="flex items-center">
-                        {header}
-                        {sortColumn === header.toLowerCase() && (
-                          <FontAwesomeIcon icon={sortDirection === "asc" ? faSortUp : faSortDown} className="ml-1" />
-                        )}
-                      </div>
-                    </th>
-                  ),
-                )}
+                {["Name", "Email", "Role", "Registration Date", "Recent Activity", "Actions"].map((header) => (
+                  <th
+                    key={header}
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+                    onClick={() => handleSort(header.toLowerCase().replace(" ", ""))}
+                  >
+                    <div className="flex items-center">
+                      {header}
+                      {sortColumn === header.toLowerCase().replace(" ", "") && (
+                        <FontAwesomeIcon icon={sortDirection === "asc" ? faSortUp : faSortDown} className="ml-1" />
+                      )}
+                    </div>
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {sortedUsers.map((user) => (
-                <motion.tr
-                  key={user.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.role}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.registrationDate}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.recentActivity}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
-                      <FontAwesomeIcon icon={faEdit} />
-                    </button>
-                    <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 mr-3">
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                    <button className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300">
-                      <FontAwesomeIcon icon={faEllipsisV} />
-                    </button>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
+  {sortedUsers.map((user) => (
+    <motion.tr
+      key={user.id}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="text-sm text-gray-500 dark:text-gray-300">{user.email}</div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="text-sm text-gray-500 dark:text-gray-300">{user.role}</div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="text-sm text-gray-500 dark:text-gray-300">{user.registrationDate}</div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="text-sm text-gray-500 dark:text-gray-300">
+          {user.recentActivity}
+        </div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
+          <FontAwesomeIcon icon={faEdit} />
+        </button>
+        <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 mr-3">
+          <FontAwesomeIcon icon={faTrash} />
+        </button>
+      </td>
+    </motion.tr>
+  ))}
+</tbody>
           </table>
         </div>
 
@@ -263,7 +260,7 @@ const UserManagement = () => {
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Regular Users</dt>
                     <dd className="text-3xl font-semibold text-gray-900 dark:text-white">
-                      {users.filter((user) => user.role === "User").length}
+                      {users.filter((user) => user.role === "Player").length}
                     </dd>
                   </dl>
                 </div>
@@ -315,32 +312,34 @@ const UserManagement = () => {
 
         {/* Recent User Activities */}
         <div className="mt-8 bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Recent User Activities</h2>
-          <div className="space-y-4">
-            {users.slice(0, 5).map((user) => (
-              <div key={user.id} className="flex items-center space-x-4">
-                <div className="flex-shrink-0">
-                  <img
-                    className="h-8 w-8 rounded-full"
-                    src={`https://ui-avatars.com/api/?name=${user.name}&background=random`}
-                    alt={user.name}
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user.name}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user.recentActivity}</p>
-                </div>
-                <div className="inline-flex items-center text-sm font-semibold text-gray-900 dark:text-white">
-                  {new Date(user.lastLogin).toLocaleDateString()}
-                </div>
-              </div>
-            ))}
+  <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Recent User Activities</h2>
+  <div className="space-y-4">
+    {users
+      .filter((user) => user.recentActivity !== "No recent activity") 
+      .slice(0, 1) 
+      .map((user) => (
+        <div key={user.id} className="flex items-center space-x-4">
+          <div className="flex-shrink-0">
+            <img
+              className="h-8 w-8 rounded-full"
+              src={user.image}
+              alt={user.name}
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user.name}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user.recentActivity}</p>
+          </div>
+          <div className="inline-flex items-center text-sm font-semibold text-gray-900 dark:text-white">
+            {user.lastLogin}
           </div>
         </div>
+      ))}
+  </div>
+</div>
       </div>
     </div>
   )
 }
 
 export default UserManagement
-

@@ -50,64 +50,66 @@ const userSchema = mongoose.Schema({
        //  after otp verification its become true
         type:Boolean,
         default:false
-       }
+       },
+       lastLogin:{
+        type:Date,
+       },
+       recentActivity:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"UserActivity"
+       }],
        
-}) 
+},{timestamps:true}) 
 userSchema.methods.getRecentAndPreviousBookings = async function () {
-    const user = this;
+  const user = this;
 
-    await user.populate({
-        path: "previousBooked",
-        model: "Booking",
-        populate: [
+  await user.populate({
+      path: "previousBooked",
+      model: "Booking",
+      populate: [
           {
-            path: "turf",
-            model: "Turf",
-            populate: [
-              {
-                path: "sports",
-                model: "Sport",
-              },
-              {
-                path: "comments", 
-                model: "Comment",
-                select: "rating", 
-              },
-            ],
+              path: "turf",
+              model: "Turf",
+              populate: [
+                  {
+                      path: "sports",
+                      model: "Sport",
+                  },
+                  {
+                      path: "comments",
+                      model: "Comment",
+                      select: "rating",
+                  },
+              ],
           },
-        ],
-      });
-  
+      ],
+  });
 
-    console.log("Populated previousBooked:", user.previousBooked);
+  if (!user.previousBooked || user.previousBooked.length === 0) {
+      return {
+          recentBookings: [],
+          previousBookings: []
+      };
+  }
 
-    if (!user.previousBooked || user.previousBooked.length === 0) {
-        return {
-            recentBookings: [],
-            previousBookings: []
-        };
-    }
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
 
-    // Get the current date (without time)
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0); // Set time to 00:00:00 to compare only dates
+  const recentBookings = user.previousBooked.filter(booking => {
+      const bookingDate = new Date(booking.date);
+      bookingDate.setHours(0, 0, 0, 0);
+      return bookingDate.getTime() >= currentDate.getTime();
+  });
 
-    // Separate bookings into recent and previous based on the current date
-    const recentBookings = user.previousBooked.filter(booking => {
-        const bookingDate = new Date(booking.date);
-        bookingDate.setHours(0, 0, 0, 0); // Set time to 00:00:00 to compare only dates
-        return bookingDate.getTime() === currentDate.getTime(); // Check if the booking date is today
-    });
+  const previousBookings = user.previousBooked.filter(booking => {
+      const bookingDate = new Date(booking.date);
+      bookingDate.setHours(0, 0, 0, 0);
+      return bookingDate.getTime() < currentDate.getTime(); 
+  });
 
-    const previousBookings = user.previousBooked.filter(booking => {
-        const bookingDate = new Date(booking.date);
-        bookingDate.setHours(0, 0, 0, 0); // Set time to 00:00:00 to compare only dates
-        return bookingDate.getTime() < currentDate.getTime(); // Check if the booking date is before today
-    });
-
-    return {
-        recentBookings,
-        previousBookings
-    };
+  return {
+      recentBookings,
+      previousBookings
+  };
 };
 module.exports = mongoose.model("User", userSchema);

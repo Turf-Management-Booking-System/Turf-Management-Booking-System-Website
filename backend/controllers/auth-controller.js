@@ -13,6 +13,7 @@ const {sendChangePasswordEmail} = require("../mail/templates/sendChangePasswordE
 const Subscription = require("../models/subscription");
 const { subscriptionEmail } = require("../mail/templates/subscriptionEmail");
 const cloudinary= require("cloudinary").v2;
+const UserActivity = require("../models/userActivity")
 
 require("dotenv").config();
 const adminPassword = "admin7860@"
@@ -62,7 +63,8 @@ exports.signup = async(req,res)=>{
             password:hashedPassword,
             role,
             image:`https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
-            additionalFields:profile._id
+            additionalFields:profile._id,
+            isVerified:true,
         });
         const populatedUser = await User.findById(userProfile._id).populate("additionalFields");
 
@@ -124,6 +126,18 @@ exports.login = async(req,res)=>{
         });
         console.log("token",token);
         const populatedUser = await User.findById(userExit._id).populate("additionalFields");
+        populatedUser.lastLogin = new Date();
+        const activity = await UserActivity.create({
+            userId:userExit._id,
+            action:"Logged In"
+        })
+        console.log("activity",activity)
+        if (!populatedUser.recentActivity) {
+            populatedUser.recentActivity = []; 
+        }
+        populatedUser.recentActivity.push(activity._id);
+        await populatedUser.save();
+        
         const message = await Notification.create({
             user:userExit._id,
             message:"Welcome To our website! Thanks for Logged in!"
@@ -220,6 +234,12 @@ exports.changePassword = async(req,res)=>{
                 error:error.message
             })
         }
+        const activity = await UserActivity.create({
+            userId:user._id,
+            action:"Password Change!"
+        });
+        await user.recentActivity.push(activity._id);
+        await user.save();
         const message = await Notification.create({
             user:user._id,
             message:"You Have Recently Changed the Password!"
@@ -387,6 +407,11 @@ exports.resetPassword = async(req,res)=>{
     const hashedPassword= await bcrypt.hash(newPassword,10);
     // update in the databse
     userExit.password = hashedPassword;
+    const activity = await UserActivity.create({
+        userId:userExit._id,
+        action:"Password Reset!"
+    });
+    await userExit.recentActivity.push(activity._id);
     await userExit.save();
     // return the response
     return res.status(200).json({
@@ -648,6 +673,12 @@ exports.updateProfile = async (req, res) => {
             { new: true, runValidators: true }
         );
         const updatedProfile = await User.findById(user._id).populate("additionalFields");
+        const activity = await UserActivity.create({
+            userId:user._id,
+            action:"Updated Profile!"
+        });
+        await user.recentActivity.push(activity._id);
+        await user.save();
         const message = await Notification.create({
             user:user._id,
             message:"You Have Recently Updated The Data!"
@@ -766,3 +797,33 @@ exports.subscription = async(req,res)=>{
         })
     }
 }
+exports.fetchAllUsers = async (req, res) => {
+    try {
+        const allUsers = await User.find()
+            .select("+createdAt")
+            .populate({
+                path: "recentActivity",
+                options: { sort: { createdAt: -1 }}, // Get only the latest activity
+            });
+
+        if (!allUsers || allUsers.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No Users Found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "All Users Found!",
+            allUsers,
+        });
+    } catch (error) {
+        console.log("Error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Error while fetching all users!",
+            error: error.message,
+        });
+    }
+};
