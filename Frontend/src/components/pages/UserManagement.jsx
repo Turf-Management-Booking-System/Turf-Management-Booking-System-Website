@@ -52,11 +52,11 @@ const UserManagement = () => {
             name: `${user.firstName} ${user.lastName}`,
             email: user.email,
             role: user.role,
-            image:user.image,
-            status: user.isVerified ? "Active" : "Inactive", 
-            lastLogin: new Date(user.lastLogin).toLocaleString(), 
+            image: user.image,
+            status: user.isVerified ? "Active" : "Inactive",
+            lastLogin: new Date(user.lastLogin).toLocaleString(),
             registrationDate: new Date(user.createdAt).toLocaleDateString(),
-            recentActivity: user.recentActivity.length > 0 ? user.recentActivity[0].action : "No recent activity", 
+            recentActivity: user.recentActivity.length > 0 ? user.recentActivity[0].action : "No recent activity",
           }))
           setUsers(mappedUsers)
         } else {
@@ -148,7 +148,7 @@ const UserManagement = () => {
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                {["Name", "Email", "Role", "Registration Date", "Recent Activity", "Actions"].map((header) => (
+                {["Name", "Email", "Role", "Status", "Registration Date", "Recent Activity", "Actions"].map((header) => (
                   <th
                     key={header}
                     scope="col"
@@ -166,41 +166,46 @@ const UserManagement = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-  {sortedUsers.map((user) => (
-    <motion.tr
-      key={user.id}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-500 dark:text-gray-300">{user.email}</div>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-500 dark:text-gray-300">{user.role}</div>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-500 dark:text-gray-300">{user.registrationDate}</div>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-500 dark:text-gray-300">
-          {user.recentActivity}
-        </div>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-        <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
-          <FontAwesomeIcon icon={faEdit} />
-        </button>
-        <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 mr-3">
-          <FontAwesomeIcon icon={faTrash} />
-        </button>
-      </td>
-    </motion.tr>
-  ))}
-</tbody>
+              {sortedUsers.map((user) => (
+                <motion.tr
+                  key={user.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.email}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.role}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className={`text-sm px-3 py-1  text-center rounded-full ${statusColors[user.status]}`}>
+                      {user.status}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.registrationDate}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 dark:text-gray-300">
+                      {user.recentActivity}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
+                      <FontAwesomeIcon icon={faEdit} />
+                    </button>
+                    <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 mr-3">
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
           </table>
         </div>
 
@@ -312,31 +317,31 @@ const UserManagement = () => {
 
         {/* Recent User Activities */}
         <div className="mt-8 bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-  <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Recent User Activities</h2>
-  <div className="space-y-4">
-    {users
-      .filter((user) => user.recentActivity !== "No recent activity") 
-      .slice(0, 1) 
-      .map((user) => (
-        <div key={user.id} className="flex items-center space-x-4">
-          <div className="flex-shrink-0">
-            <img
-              className="h-8 w-8 rounded-full"
-              src={user.image}
-              alt={user.name}
-            />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user.name}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user.recentActivity}</p>
-          </div>
-          <div className="inline-flex items-center text-sm font-semibold text-gray-900 dark:text-white">
-            {user.lastLogin}
+          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Recent User Activities</h2>
+          <div className="space-y-4">
+            {users
+              .filter((user) => user.recentActivity !== "No recent activity")
+              .slice(0, 2) 
+              .map((user) => (
+                <div key={user.id} className="flex items-center space-x-4">
+                  <div className="flex-shrink-0">
+                    <img
+                      className="h-8 w-8 rounded-full"
+                      src={user.image}
+                      alt={user.name}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user.recentActivity}</p>
+                  </div>
+                  <div className="inline-flex items-center text-sm font-semibold text-gray-900 dark:text-white">
+                    {user.lastLogin}
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
-      ))}
-  </div>
-</div>
       </div>
     </div>
   )

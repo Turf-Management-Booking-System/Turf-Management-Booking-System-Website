@@ -803,7 +803,7 @@ exports.fetchAllUsers = async (req, res) => {
             .select("+createdAt")
             .populate({
                 path: "recentActivity",
-                options: { sort: { createdAt: -1 }}, // Get only the latest activity
+                options: { sort: { createdAt: -1 },limit:3}, // Get only the latest activity
             });
 
         if (!allUsers || allUsers.length === 0) {
