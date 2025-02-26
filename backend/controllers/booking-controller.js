@@ -3,7 +3,12 @@ const Booking = require("../models/booking");
 const Turf = require("../models/turf");
 const User = require("../models/user");
 const feedBack = require("../models/feedBack");
-const UserActivity = require("../models/userActivity")
+const UserActivity = require("../models/userActivity");
+const { bookedTurfEmail } = require("../mail/templates/bookedTurfEmail");
+const sendEmail = require("../config/nodeMailer");
+const Notification = require("../models/notification");
+const {cancelBookingEmail} = require("../mail/templates/cancelBookingEmail");
+const {rescheduleBookingEmail} = require("../mail/templates/rescheduleBookingEmail")
 
 exports.bookingTurf = async (req, res) => {
     try {
@@ -81,11 +86,24 @@ exports.bookingTurf = async (req, res) => {
         user.previousBooked.push(newBooking._id);
         const activity = await UserActivity.create({
           userId:user._id,
-          action:"Booked Turf!"
+          action:"Booked Turf"
       });
       await user.recentActivity.push(activity._id);
       await user.save();
-
+      const message = await Notification.create({
+        user:user._id,
+        message:`Booked ${turf.turfName} Turf `
+    })
+    try{
+     const emailContent =bookedTurfEmail(user.firstName, user.lastName,turf.turfName, newBooking.timeSlot,newBooking.date) ;
+     await sendEmail(user.email,"Turf Booked Successfully!",emailContent);
+    }catch(error){
+    console.log("error",error);
+    return res.status(500).json({
+        success:false,
+        message:error.message
+    })
+    }
         const newBookings = await Booking.findById(newBooking._id).populate({
             path: "turf",
             populate: [
@@ -100,8 +118,13 @@ exports.bookingTurf = async (req, res) => {
                 },
               },
             ],
+  
+          }).populate({
+            path:"user",
+            model:"User"
           })
   .exec();
+         
         // Return the response
         return res.status(200).json({
             success: true,
@@ -127,14 +150,14 @@ exports.cancelBooking = async (req, res) => {
           message: "Please enter the Booking ID!",
         });
       }
-
-      const booking = await Booking.findById(bookingId);
+      const booking = await Booking.findById(bookingId).populate("user")
       if (!booking) {
         return res.status(404).json({
           success: false,
           message: "No Booking Found By This ID!",
         });
       }
+    
       const bookingTime = new Date(booking.createdAt);
       const currentTime = new Date();
       const timeDiff = (currentTime - bookingTime) / (1000 * 60 * 60);
@@ -167,13 +190,45 @@ exports.cancelBooking = async (req, res) => {
           slotInTurf.status = "available";
         }
       }
-
+   
       await turf.save();
       await Booking.findByIdAndDelete(bookingId);
-      
+      const activity = await UserActivity.create({
+        userId: booking.user._id,
+        action: "Cancelled Turf"
+    });
+    await User.findByIdAndUpdate(
+        booking.user._id,
+        { $push: { recentActivity: activity._id } },
+        { new: true, useFindAndModify: false }
+    );
+    
+      const message = await Notification.create({
+        user:booking.user._id,
+        message:`Cancel ${turf.turfName} Turf `
+    })
+    try{
+      const emailContent = cancelBookingEmail(
+        booking.user.firstName,
+        booking.user.lastName,
+        turf.turfName,
+        booking.timeSlot,
+        booking.date
+    );
+    
+     await sendEmail(booking.user.email,"Turf Cancel Successfully!",emailContent);
+    }catch(error){
+    console.log("error",error);
+    return res.status(500).json({
+        success:false,
+        message:error.message
+    })
+    }
+      const user = booking.user;
       return res.status(200).json({
         success: true,
         message: "Booking cancelled. Slot is now available.",
+        user,
       });
     } catch (error) {
       console.log("Error:", error);
@@ -195,7 +250,7 @@ exports.cancelBooking = async (req, res) => {
             });
         }
 
-        const booking = await Booking.findById(bookingId);
+        const booking = await Booking.findById(bookingId).populate("user")
         if (!booking) {
             return res.status(404).json({
                 success: false,
@@ -253,7 +308,40 @@ exports.cancelBooking = async (req, res) => {
         await turf.save();
         booking.timeSlot = newTimeSlot; 
         await booking.save();
-
+        const activity = await UserActivity.create({
+          userId: booking.user._id,
+          action: "Reschedule Turf"
+      });
+      
+      // Find user and push activity ID into recentActivity array
+      await User.findByIdAndUpdate(
+          booking.user._id,
+          { $push: { recentActivity: activity._id } },
+          { new: true, useFindAndModify: false }
+      );
+      
+        const message = await Notification.create({
+          user:booking.user._id,
+          message:`Rescheduled ${turf.turfName} Turf `
+      })
+      try{
+        const emailContent = rescheduleBookingEmail(
+          booking.user.firstName,
+          booking.user.lastName,
+          turf.turfName,
+          booking.oldTimeSlot,
+          booking.newTimeSlot,
+          booking.oldDate,
+          booking.newDate
+      );      
+       await sendEmail(booking.user.email,"Turf Rescheduled Successfully!",emailContent);
+      }catch(error){
+      console.log("error",error);
+      return res.status(500).json({
+          success:false,
+          message:error.message
+      })
+      }
         return res.status(200).json({
             success: true,
             message: "Rescheduling done successfully!",

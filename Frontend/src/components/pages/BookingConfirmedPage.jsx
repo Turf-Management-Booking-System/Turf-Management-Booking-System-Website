@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { DarkModeContext } from "../../context/DarkModeContext";
 import whiteBg from "../../assets/Images/whiteBg.png";
 import blackBg from "../../assets/Images/blackBg.png";
+import { setNotification } from "../../slices/notificationSlice";
 import {
   FaInfoCircle,
   FaClock,
@@ -27,6 +28,7 @@ import {
   faDownload,
 } from "@fortawesome/free-solid-svg-icons";
 import { useContext } from "react";
+import { loadNotification } from "../../slices/notificationSlice";
 
 const BookingConfirmedPage = () => {
   const { darkMode } = useContext(DarkModeContext);
@@ -59,6 +61,27 @@ const BookingConfirmedPage = () => {
       if (response.data.success) {
         toast.success("Booking cancelled successfully!");
         dispatch(cancelBooking(bookingId));
+        dispatch(loadNotification());
+        try {
+          const notificationResponse = await axios.get(
+            `http://localhost:4000/api/v1/notify/getNotifications/${response.data.user._id}`,
+            {
+              headers: { "Content-Type": "application/json", withCredentials: true },
+            }
+          );
+          if (notificationResponse.data.success) {
+            console.log("fetch notification",notificationResponse.data.currentMessage);
+            dispatch(setNotification(notificationResponse.data.currentMessage || []));
+            localStorage.setItem(
+              "userNotification",
+              JSON.stringify(notificationResponse.data.currentMessage || [])
+            );
+        
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!");
+          console.log(error.response?.data?.message)
+        }
         navigate("/myBookings");
       } else {
         toast.error(response.data.message || "Failed to cancel booking.");

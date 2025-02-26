@@ -12,7 +12,10 @@ import { setLoader } from "../../slices/authSlice";
 import axios from "axios";
 import toast from "react-hot-toast";
 import useCurrentAndPreviousBooking from "../common/currentAndPreviousBooking";
-import { cancelBooking, cancelCancelledBookings } from "../../slices/bookingSlice"
+import { cancelBooking, cancelCancelledBookings } from "../../slices/bookingSlice";
+import { setNotification } from "../../slices/notificationSlice";
+import { loadNotification } from "../../slices/notificationSlice";
+
 import {
   faChevronDown,
   faCalendarPlus,
@@ -239,6 +242,28 @@ const BookingDetailsModal = ({ booking, onClose }) => {
       if (response.data.success) {
         toast.success("Booking cancel successfully!");
         dispatch(cancelBooking(bookingId));
+        dispatch(loadNotification());
+        console.log("response",response.data.user)
+        try {
+          const notificationResponse = await axios.get(
+            `http://localhost:4000/api/v1/notify/getNotifications/${response.data.user._id}`,
+            {
+              headers: { "Content-Type": "application/json", withCredentials: true },
+            }
+          );
+          if (notificationResponse.data.success) {
+            console.log("fetch notification",notificationResponse.data.currentMessage);
+            dispatch(setNotification(notificationResponse.data.currentMessage || []));
+            localStorage.setItem(
+              "userNotification",
+              JSON.stringify(notificationResponse.data.currentMessage || [])
+            );
+        
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!");
+          console.log(error.response?.data?.message)
+        }
       } else {
         toast.error(response.data.message || "Failed to cancel booking.");
       }
