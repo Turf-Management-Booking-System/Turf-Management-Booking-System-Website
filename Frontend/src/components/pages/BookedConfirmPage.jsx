@@ -9,7 +9,9 @@ import { DarkModeContext } from "../../context/DarkModeContext"
 import whiteBg from "../../assets/Images/whiteBg.png";
 import blackBg from "../../assets/Images/blackBg.png";
 import { addBooking, setRescheduledBookings } from "../../slices/bookingSlice";
-
+import { setLoader } from "../../slices/authSlice"
+import { loadNotification } from "../../slices/notificationSlice"
+import { setNotification } from "../../slices/notificationSlice"
 const BookedConfirmPage = () => {
   const {darkMode} = useContext(DarkModeContext);
   const { userId, turfId } = useParams()
@@ -42,6 +44,7 @@ const BookedConfirmPage = () => {
         }
         console.log("data",data)
         if(isRescheduled){
+          dispatch(setLoader(true))
           try {
             const response = await axios.post(
               `http://localhost:4000/api/v1/booking/rescheduleBooking`,data,
@@ -67,6 +70,27 @@ const BookedConfirmPage = () => {
                   paymentMode,
                 },
               })
+              dispatch(loadNotification());
+              try {
+                const notificationResponse = await axios.get(
+                  `http://localhost:4000/api/v1/notify/getNotifications/${response.data.booking.user._id}`,
+                  {
+                    headers: { "Content-Type": "application/json", withCredentials: true },
+                  }
+                );
+                if (notificationResponse.data.success) {
+                  console.log("fetch notification",notificationResponse.data.currentMessage);
+                  dispatch(setNotification(notificationResponse.data.currentMessage || []));
+                  localStorage.setItem(
+                    "userNotification",
+                    JSON.stringify(notificationResponse.data.currentMessage || [])
+                  );
+              
+                }
+              } catch (error) {
+                toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!");
+                console.log(error.response?.data?.message)
+              }
               return;
             } else {
               toast.error(response.data.message || "Failed to rescheduled booking.");
@@ -77,9 +101,12 @@ const BookedConfirmPage = () => {
                 "Something went wrong during rescheduled."
             );
             console.error("Rescheduled error:", error);
+          }finally{
+            dispatch(setLoader(false))
           }
         }
        try {
+        dispatch(setLoader(true))
       const response = await axios.post(
         `http://localhost:4000/api/v1/booking/bookingTurf/${turfId}/${userId}`,
         {
@@ -109,12 +136,35 @@ const BookedConfirmPage = () => {
             paymentMode,
           },
         })
+        dispatch(loadNotification());
+        try {
+          const notificationResponse = await axios.get(
+            `http://localhost:4000/api/v1/notify/getNotifications/${response.data.newBookings.user._id}`,
+            {
+              headers: { "Content-Type": "application/json", withCredentials: true },
+            }
+          );
+          if (notificationResponse.data.success) {
+            console.log("fetch notification",notificationResponse.data.currentMessage);
+            dispatch(setNotification(notificationResponse.data.currentMessage || []));
+            localStorage.setItem(
+              "userNotification",
+              JSON.stringify(notificationResponse.data.currentMessage || [])
+            );
+        
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!");
+          console.log(error.response?.data?.message)
+        }
       } else {
         toast.error(response.data.message || "Failed to confirm booking.")
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong during booking.")
       console.error("Booking error:", error)
+    }finally{
+      dispatch(setLoader(false))
     }
   }
 
