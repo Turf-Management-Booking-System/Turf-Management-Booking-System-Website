@@ -22,7 +22,7 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons"
 import { useSelector } from "react-redux"
-
+import { setAllUsers } from "../../slices/adminSlice"
 const UserManagement = () => {
   const [users, setUsers] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
@@ -46,7 +46,8 @@ const UserManagement = () => {
         })
 
         if (response.data.success) {
-          toast.success("Fetched All Users Details")
+          toast.success("Fetched All Users Details");
+          dispatch(setAllUsers(response.data.allUsers))
           const mappedUsers = response.data.allUsers.map((user) => ({
             id: user._id,
             name: `${user.firstName} ${user.lastName}`,

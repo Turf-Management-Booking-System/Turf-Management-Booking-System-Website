@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-
+const turfs = localStorage.getItem("turfs");
+const turf = turfs && turfs !== "undefined" ? JSON.parse(turfs) : []
 const initialState={
-    turfs:[],
+    turfs:turf,
     locations:[],
     isVisited:localStorage.getItem("visited")|| false,
     selectedLocations:localStorage.getItem("selectedTurf")||null,
@@ -23,7 +24,8 @@ const turfSlice = createSlice({
             localStorage.setItem("visited",JSON.stringify(action.payload));
         },
         setTurfs:(state,action)=>{
-            state.turfs = action.payload
+            state.turfs = action.payload;
+            localStorage.setItem("turfs",JSON.stringify(state.turfs));
         }
     }
 })

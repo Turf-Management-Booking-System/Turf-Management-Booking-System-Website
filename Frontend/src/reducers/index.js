@@ -6,6 +6,7 @@ import commentReducer from "../slices/commentSlice"
 import bookingReducer from "../slices/bookingSlice"
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; 
+import adminReducer from "../slices/adminSlice"
 const commentPersistConfig = {
     key: 'comments',
     storage,
@@ -18,5 +19,6 @@ const rootReducer = combineReducers({
     notification:notificationReducer,
     comment:persistedCommentReducer,
     booking:bookingReducer,
+    admin:adminReducer
 })
 export default rootReducer

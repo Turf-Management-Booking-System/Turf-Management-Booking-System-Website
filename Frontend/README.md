@@ -1,279 +1,346 @@
-import { useContext, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { DarkModeContext } from "../../context/DarkModeContext";
-import whiteBg from "../../assets/Images/whiteBg.png";
-import blackBg from "../../assets/Images/blackBg.png";
+"use client"
+
+import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useSelector } from "react-redux";
 import {
-  faCalendar,
-  faMapMarkerAlt,
-  faClock,
-  faUsers,
-  faStar,
-  faFilter,
   faSearch,
-  faChevronDown,
-  faDownload,
-  faPrint,
-  faChartBar,
-  faHeart,
-  faExclamationTriangle,
-  faFutbol,
+  faUserPlus,
+  faFileExport,
+  faUsers,
+  faUserClock,
+  faSortUp,
+  faSortDown,
+  faEdit,
+  faTrash,
+  faEllipsisV,
+  faUserTie,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons"
 
+// Mock user data
+const mockUsers = [
+  {
+    id: 1,
+    name: "John Doe",
+    email: "john@example.com",
+    role: "User",
+    status: "Active",
+    lastLogin: "2023-05-15",
+    registrationDate: "2023-01-10",
+    recentActivity: "Updated profile",
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    email: "jane@example.com",
+    role: "Admin",
+    status: "Active",
+    lastLogin: "2023-05-14",
+    registrationDate: "2022-11-05",
+    recentActivity: "Changed password",
+  },
+  {
+    id: 3,
+    name: "Bob Johnson",
+    email: "bob@example.com",
+    role: "User",
+    status: "Pending",
+    lastLogin: "Never",
+    registrationDate: "2023-05-01",
+    recentActivity: "Registered",
+  },
+  {
+    id: 4,
+    name: "Alice Brown",
+    email: "alice@example.com",
+    role: "User",
+    status: "Active",
+    lastLogin: "2023-05-12",
+    registrationDate: "2023-03-20",
+    recentActivity: "Booked a turf",
+  },
+  {
+    id: 5,
+    name: "Charlie Davis",
+    email: "charlie@example.com",
+    role: "Admin",
+    status: "Active",
+    lastLogin: "2023-05-13",
+    registrationDate: "2022-09-15",
+    recentActivity: "Added new turf",
+  },
+]
 
-const BookingHistory = () => {
-  const {darkMode} = useContext(DarkModeContext);
+const UserManagement = () => {
+  const [users, setUsers] = useState(mockUsers)
   const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("All")
-  const [sortBy, setSortBy] = useState("date")
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const allBookings = useSelector((state)=>state.booking.allBookings)
-  console.log("all bookings",allBookings)
-  const cancelBooked = useSelector((state)=>state.booking.cancelBooked)
-  const rescheduledBookings = useSelector((state)=>state.booking.rescheduledBookings);
-  const previousBookings = useSelector((state)=>state.booking.previousBookings)
-  const filteredBookings = allBookings
-    .filter(
-      (booking) =>
-        (booking.turf?.turfName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          booking.turf?.sports.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        (filterStatus === "All" || booking.status === filterStatus),
-    )
-    .sort((a, b) => {
-      if (sortBy === "date") return new Date(b.date) - new Date(a.date)
-      if (sortBy === "price") return b.price - a.price
-      return 0
-    })
+  const [sortColumn, setSortColumn] = useState("")
+  const [sortDirection, setSortDirection] = useState("asc")
 
-  const toggleFilter = () => setIsFilterOpen(!isFilterOpen)
+  useEffect(() => {
+    // In a real application, you would fetch users from an API here
+  }, [])
+
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value)
+  }
+
+  const filteredUsers = users.filter((user) =>
+    Object.values(user).some((value) => value.toString().toLowerCase().includes(searchTerm.toLowerCase())),
+  )
+
+  const handleSort = (column) => {
+    if (column === sortColumn) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+    } else {
+      setSortColumn(column)
+      setSortDirection("asc")
+    }
+  }
+
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    if (a[sortColumn] < b[sortColumn]) return sortDirection === "asc" ? -1 : 1
+    if (a[sortColumn] > b[sortColumn]) return sortDirection === "asc" ? 1 : -1
+    return 0
+  })
+
+  const statusColors = {
+    Active: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    Inactive: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    Pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+  }
 
   return (
-    <div style={{
-              backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
-            }} className="mt-16 min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 transition-colors duration-300">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <header className="mb-5">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2 mt-5 lg:mt-0">Booking History</h1>
-          <p className="text-gray-600 dark:text-gray-400">View and manage your past turf bookings</p>
-        </header>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">User Management</h1>
 
-        {/* Search and Filter Section */}
-        <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="relative flex-grow max-w-md">
-              <input
-                type="text"
-                placeholder="Search by turf name or sport"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full p-3 pl-10 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
-              />
-              <FontAwesomeIcon
-                icon={faSearch}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              />
-            </div>
-            <button
-              onClick={toggleFilter}
-              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 flex items-center text-sm font-medium"
-            >
-              <FontAwesomeIcon icon={faFilter} className="mr-2" />
-              Filter & Sort
-              <FontAwesomeIcon
-                icon={faChevronDown}
-                className={`ml-2 transition-transform duration-300 ${isFilterOpen ? "rotate-180" : ""}`}
-              />
+        {/* Search and Actions */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+          <div className="relative flex-grow max-w-md">
+            <input
+              type="text"
+              placeholder="Search users..."
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+            <FontAwesomeIcon
+              icon={faSearch}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            />
+          </div>
+          <div className="flex gap-4">
+            <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 flex items-center">
+              <FontAwesomeIcon icon={faUserPlus} className="mr-2" />
+              Add User
+            </button>
+            <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 flex items-center">
+              <FontAwesomeIcon icon={faFileExport} className="mr-2" />
+              Export
             </button>
           </div>
+        </div>
 
-          <AnimatePresence>
-            {isFilterOpen && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
-              >
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Filter by Status
-                    </label>
-                    <select
-                      value={filterStatus}
-                      onChange={(e) => setFilterStatus(e.target.value)}
-                      className="w-full p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
+        {/* User Table */}
+        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                {["Name", "Email", "Role", "Registration Date", "Recent Activity", "Actions"].map(
+                  (header) => (
+                    <th
+                      key={header}
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+                      onClick={() => handleSort(header.toLowerCase())}
                     >
-                      <option value="All">All</option>
-                      <option value="Confirmed">Confirmed</option>
-                      <option value="Cancelled">Cancelled</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort by</label>
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="w-full p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
-                    >
-                      <option value="date">Date</option>
-                      <option value="price">Price</option>
-                    </select>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </section>
-
-        {/* Booking History List */}
-        <section className="space-y-6">
-          {filteredBookings.map((booking) => (
-            <motion.div
-              key={booking._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-            >
-              <div className="p-6">
-                <div className="flex flex-wrap justify-between items-start">
-                  <div className="w-full sm:w-2/3">
-                    <h2 className="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">{booking.turf?.turfName}</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                      <p className="text-gray-600 dark:text-gray-300">
-                        <FontAwesomeIcon icon={faCalendar} className="mr-2 text-blue-500" />
-                        {new Date(booking.date).toLocaleDateString("en-US", {
-  weekday: "long",
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-})}
-                      </p>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        <FontAwesomeIcon icon={faClock} className="mr-2 text-green-500" />
-                        {new Date(booking.date).toLocaleDateString()} |{" "}
-                      {booking.timeSlot.join(", ")}
-                      </p>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2 text-red-500" />
-                        {booking.turf?.turfLocation}
-                      </p>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        <FontAwesomeIcon icon={faFutbol} className="mr-2 text-purple-500" />
-                        {booking.turf?.sports?.[0]?.sports ? booking.turf?.sports?.[0]?.sports.join(", ") : null}                      </p>
-                    </div>
-                  </div>
-                  <div className="w-full sm:w-1/3 mt-4 sm:mt-0 text-right">
-                    <p
-                      className={`inline-block px-3 py-1 rounded-full text-sm font-semibold mb-2 ${
-                        booking.status === "Confirmed"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                          : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                      }`}
-                    >
-                      {booking.status}
-                    </p>
-                    <p className="text-2xl font-bold text-gray-800 dark:text-white">₹{booking.turf?.turfPricePerHour}</p>
-                    {booking.turf?.ratings && (
-                      <div className="flex items-center justify-end mt-2">
-                        <FontAwesomeIcon icon={faStar} className="text-yellow-400 mr-1" />
-                        <span className="text-gray-600 dark:text-gray-300">{booking.turf?.ratings.rating}</span>
+                      <div className="flex items-center">
+                        {header}
+                        {sortColumn === header.toLowerCase() && (
+                          <FontAwesomeIcon icon={sortDirection === "asc" ? faSortUp : faSortDown} className="ml-1" />
+                        )}
                       </div>
-                    )}
-                  </div>
+                    </th>
+                  ),
+                )}
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {sortedUsers.map((user) => (
+                <motion.tr
+                  key={user.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.email}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.role}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.registrationDate}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.recentActivity}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
+                      <FontAwesomeIcon icon={faEdit} />
+                    </button>
+                    <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 mr-3">
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                    <button className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300">
+                      <FontAwesomeIcon icon={faEllipsisV} />
+                    </button>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* User Statistics */}
+        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <motion.div
+            className="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg"
+            whileHover={{ scale: 1.03 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                  <FontAwesomeIcon icon={faUsers} className="h-6 w-6 text-white" />
                 </div>
-                
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Users</dt>
+                    <dd className="text-3xl font-semibold text-gray-900 dark:text-white">{users.length}</dd>
+                  </dl>
+                </div>
               </div>
-            </motion.div>
-          ))}
-        </section>
+            </div>
+          </motion.div>
+          <motion.div
+            className="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg"
+            whileHover={{ scale: 1.03 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-green-500 rounded-md p-3">
+                  <FontAwesomeIcon icon={faUserTie} className="h-6 w-6 text-white" />
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Admin Users</dt>
+                    <dd className="text-3xl font-semibold text-gray-900 dark:text-white">
+                      {users.filter((user) => user.role === "Admin").length}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          <motion.div
+            className="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg"
+            whileHover={{ scale: 1.03 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+                  <FontAwesomeIcon icon={faUser} className="h-6 w-6 text-white" />
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Regular Users</dt>
+                    <dd className="text-3xl font-semibold text-gray-900 dark:text-white">
+                      {users.filter((user) => user.role === "User").length}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          <motion.div
+            className="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg"
+            whileHover={{ scale: 1.03 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-purple-500 rounded-md p-3">
+                  <FontAwesomeIcon icon={faUserClock} className="h-6 w-6 text-white" />
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                      New Users (Last 30 days)
+                    </dt>
+                    <dd className="text-3xl font-semibold text-gray-900 dark:text-white">
+                      {
+                        users.filter((user) => {
+                          const thirtyDaysAgo = new Date()
+                          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+                          return new Date(user.registrationDate) > thirtyDaysAgo
+                        }).length
+                      }
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
 
-        {/* Export Options */}
-        <section className="mt-8 flex justify-end space-x-4">
-          <button className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 flex items-center text-sm font-medium">
-            <FontAwesomeIcon icon={faDownload} className="mr-2" />
-            Export as CSV
-          </button>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300 flex items-center text-sm font-medium">
-            <FontAwesomeIcon icon={faPrint} className="mr-2" />
-            Print History
-          </button>
-        </section>
+        {/* User Management Tips */}
+        <div className="mt-8 bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">User Management Tips</h2>
+          <ul className="list-disc pl-5 space-y-2 text-gray-600 dark:text-gray-300">
+            <li>Regularly review and update user permissions to maintain security.</li>
+            <li>Encourage users to enable two-factor authentication for enhanced account security.</li>
+            <li>Implement a clear process for onboarding new users and offboarding departing users.</li>
+            <li>Periodically audit user activities to detect any unusual behavior or potential security risks.</li>
+            <li>Provide clear guidelines and support for users to manage their account settings and preferences.</li>
+          </ul>
+        </div>
 
-        {/* Booking Statistics */}
-        <section className="mt-12 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white flex items-center">
-            <FontAwesomeIcon icon={faChartBar} className="mr-3 text-blue-500" />
-            Your Booking Statistics
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold mb-2 text-blue-800 dark:text-blue-200">Total Bookings</h3>
-              <p className="text-3xl font-bold text-blue-600 dark:text-blue-300">{allBookings.length}</p>
-            </div>
-            <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold mb-2 text-green-800 dark:text-green-200">Completed Bookings</h3>
-              <p className="text-3xl font-bold text-green-600 dark:text-green-300">
-                {previousBookings.length}
-              </p>
-            </div>
-            <div className="bg-red-50 dark:bg-red-900 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold mb-2 text-red-800 dark:text-red-200">Cancelled Bookings</h3>
-              <p className="text-3xl font-bold text-red-600 dark:text-red-300">
-                {cancelBooked.length}
-              </p>
-            </div>
-            <div className="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold mb-2 text-yellow-800 dark:text-yellow-200">Rescheduled</h3>
-              <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-300">
-               {rescheduledBookings.length}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Favorite Turfs */}
-        <section className="mt-12">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white flex items-center">
-            <FontAwesomeIcon icon={faHeart} className="mr-3 text-red-500" />
-            Booked Turfs 
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...new Set(allBookings.map((b) => b.turf?.turfName))].slice(0, 3).map((turfName, index) => (
-              <div
-                key={index}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
-              >
-                <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-white">{turfName}</h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  Booked {allBookings.filter((b) => b.turf?.turfName === turfName).length} times
-                </p>
+        {/* Recent User Activities */}
+        <div className="mt-8 bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Recent User Activities</h2>
+          <div className="space-y-4">
+            {users.slice(0, 5).map((user) => (
+              <div key={user.id} className="flex items-center space-x-4">
+                <div className="flex-shrink-0">
+                  <img
+                    className="h-8 w-8 rounded-full"
+                    src={`https://ui-avatars.com/api/?name=${user.name}&background=random`}
+                    alt={user.name}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user.name}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user.recentActivity}</p>
+                </div>
+                <div className="inline-flex items-center text-sm font-semibold text-gray-900 dark:text-white">
+                  {new Date(user.lastLogin).toLocaleDateString()}
+                </div>
               </div>
             ))}
           </div>
-        </section>
-
-        {/* Booking Tips */}
-        <section className="mt-12 bg-indigo-50 dark:bg-indigo-900 rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold mb-4 text-indigo-800 dark:text-indigo-200 flex items-center">
-            <FontAwesomeIcon icon={faExclamationTriangle} className="mr-3 text-indigo-500" />
-            Booking Tips
-          </h2>
-          <ul className="list-disc list-inside text-indigo-700 dark:text-indigo-300 space-y-2">
-            <li>Book in advance for popular time slots to ensure availability.</li>
-            <li>Check the weather forecast before booking outdoor turfs.</li>
-            <li>Rescheduling can be done only under 24 hours</li>
-            <li>Always review the cancellation policy before confirming your booking.</li>
-          </ul>
-        </section>
+        </div>
       </div>
     </div>
   )
 }
 
-export default BookingHistory
+export default UserManagement
 

@@ -1,4 +1,4 @@
-const { createTurf, updateTurf, deleteTurf, getAllTurf, viewAllUsers, getAllTurfLocations,getTurfSelectedLocation,getTurfById, getTurfSlots, getAllSports, } = require("../controllers/turf-controller");
+const { createTurf, updateTurf, deleteTurf, getAllTurf, viewAllUsers, getAllTurfLocations,getTurfSelectedLocation,getTurfById, getTurfSlots, getAllSports, getTotalRevenue, getMonthlyRevenue, getMonthlyBookings,  getSportsUtilization, } = require("../controllers/turf-controller");
 const{auth,isAdmin,isUser} = require("../middlewares/auth-middleware");
 // importing the controllers for routing
 
@@ -13,5 +13,9 @@ router.get("/getAllTurfLocations",getAllTurfLocations);
 router.get("/getAllTurfLocations/:location",getTurfSelectedLocation);
 router.get("/getTurfById/:id",getTurfById);
 router.get("/:turfId/slots",getTurfSlots);
-router.get("/getAllSports",getAllSports)
+router.get("/getAllSports",getAllSports);
+router.get("/getTotalRevenue",auth,getTotalRevenue);
+router.get("/getMonthlyRevenue",auth,getMonthlyRevenue);
+router.get("/getMonthlyBookings",auth,getMonthlyBookings);
+router.get("/getSportsUtilization",auth,getSportsUtilization)
 module.exports = router;

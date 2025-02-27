@@ -1,7 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
+import { setLoader } from "../../slices/authSlice"
+import axios from "axios"
+import toast from "react-hot-toast"
+import { useDispatch } from "react-redux"
 import {
   Users,
   CalendarDays,
@@ -31,65 +35,141 @@ import {
   Pie,
   Cell,
 } from "recharts"
-
-// Sample data for charts
-const monthlyBookings = [
-  { name: "Jan", bookings: 65 },
-  { name: "Feb", bookings: 59 },
-  { name: "Mar", bookings: 80 },
-  { name: "Apr", bookings: 81 },
-  { name: "May", bookings: 56 },
-  { name: "Jun", bookings: 55 },
-  { name: "Jul", bookings: 40 },
-]
-
-const revenueData = [
-  { name: "Jan", revenue: 4000 },
-  { name: "Feb", revenue: 3000 },
-  { name: "Mar", revenue: 5000 },
-  { name: "Apr", revenue: 4800 },
-  { name: "May", revenue: 6000 },
-  { name: "Jun", revenue: 4500 },
-  { name: "Jul", revenue: 5200 },
-]
-
-const turfUtilization = [
-  { name: "Football", value: 400 },
-  { name: "Cricket", value: 300 },
-  { name: "Basketball", value: 200 },
-  { name: "Tennis", value: 100 },
-]
+import { useSelector } from "react-redux"
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"]
 
-const recentActivities = [
-  {
-    id: 1,
-    user: "John Doe",
-    action: "Booked Football Turf",
-    time: "2 minutes ago",
-    avatar: "/placeholder.svg?height=32&width=32",
-  },
-  {
-    id: 2,
-    user: "Jane Smith",
-    action: "Cancelled Cricket Booking",
-    time: "1 hour ago",
-    avatar: "/placeholder.svg?height=32&width=32",
-  },
-  {
-    id: 3,
-    user: "Mike Johnson",
-    action: "Modified Booking Time",
-    time: "3 hours ago",
-    avatar: "/placeholder.svg?height=32&width=32",
-  },
-]
 
 export default function AdminDashboard() {
+  const dispatch = useDispatch()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [monthlyBookings,setMonthlyBookings] = useState(false)
+  const [monthlyRevenue,setMonthlyRevenue] = useState(false)
+  const [totalRevenue,setTotalRevenue] = useState("")
+  const allUsers = useSelector((state)=>state.admin.allUsers);
+  const totalUsers = allUsers.length;
+  const allBookings = useSelector((state)=>state.booking.allBookings);
+  const totalBookings = allBookings.length;
+  const turfs = useSelector((state)=>state.turf.turfs);
+  const totalTurfs = turfs.length;
+  const token = useSelector((state)=>state.auth.token);
+  const [recentActivities,setRecentActivities] = useState([]);
+  const [turfUtilization, setTurfUtilization] = useState([]);
 
+  useEffect(() => {
+    if (allUsers && allUsers.length > 0) {
+      const activities = allUsers.flatMap((user) =>
+        user.recentActivity.map((activity) => ({
+          ...activity,
+          user: `${user.firstName} ${user.lastName}`,
+          avatar: user.image,
+        }))
+      )
+
+      activities.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      const latestActivities = activities.slice(0, 6)
+      setRecentActivities(latestActivities)
+    }
+  }, [allUsers])
+  const fetchMontlyBookings = async ()=>{
+    try {
+      dispatch(setLoader(true));
+
+      const response = await axios.get(
+        `http://localhost:4000/api/v1/turf/getMonthlyBookings`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("Response from backend monthly bookings", response.data);
+      setMonthlyBookings(response.data)
+    } catch (error) {
+      console.log("Error", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Unable to fetch montly bookings");
+    } finally {
+      dispatch(setLoader(false));
+    }
+  }
+  const fetchMontlyRevenue = async ()=>{
+    try {
+      dispatch(setLoader(true));
+
+      const response = await axios.get(
+        `http://localhost:4000/api/v1/turf/getMonthlyRevenue`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("Response from backend monthly revenue", response.data);
+      setMonthlyRevenue(response.data)
+    } catch (error) {
+      console.log("Error", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Unable to fetch montly revenue");
+    } finally {
+      dispatch(setLoader(false));
+    }
+  }
+  const fetchTotalRevenue =async()=>{
+    try {
+      dispatch(setLoader(true));
+
+      const response = await axios.get(
+        `http://localhost:4000/api/v1/turf/getTotalRevenue`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("Response from backend total revenue", response.data.total);
+      setTotalRevenue(response.data.total)
+    } catch (error) {
+      console.log("Error", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Unable to fetch total revenue");
+    } finally {
+      dispatch(setLoader(false));
+    }
+  }
+  const sportsData = async()=>{
+    try {
+      dispatch(setLoader(true));
+
+      const response = await axios.get(
+        `http://localhost:4000/api/v1/turf/getSportsUtilization`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("Response from backend sports data", response.data);
+      setTurfUtilization(response.data)
+    } catch (error) {
+      console.log("Error", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Unable to fetch sports data");
+    } finally {
+      dispatch(setLoader(false));
+    }
+  }
+  useEffect(()=>{
+       fetchMontlyBookings()
+       fetchMontlyRevenue();
+       fetchTotalRevenue();
+       sportsData();
+  },[token])
   return (
     <div className="min-h-screen bg-gray-100 mt-16 dark:bg-gray-900">
       {/* Sidebar */}
@@ -190,28 +270,28 @@ export default function AdminDashboard() {
           {[
             {
               title: "Total Users",
-              value: "1,234",
+              value: totalUsers,
               icon: Users,
               trend: "+12.5%",
               color: "blue",
             },
             {
               title: "Total Bookings",
-              value: "845",
+              value: totalBookings,
               icon: CalendarDays,
               trend: "+8.2%",
               color: "green",
             },
             {
-              title: "Revenue",
-              value: "₹52,000",
+              title: " Total Revenue",
+              value: totalRevenue,
               icon: TrendingUp,
               trend: "+15.3%",
               color: "purple",
             },
             {
               title: "Active Turfs",
-              value: "12",
+              value: totalTurfs,
               icon: BarChart3,
               trend: "+2",
               color: "yellow",
@@ -257,9 +337,9 @@ export default function AdminDashboard() {
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Revenue Overview</h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={revenueData}>
+                <LineChart data={monthlyRevenue}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
+                  <XAxis dataKey="month" />
                   <YAxis />
                   <Tooltip />
                   <Line type="monotone" dataKey="revenue" stroke="#10b981" />
@@ -283,7 +363,7 @@ export default function AdminDashboard() {
                     labelLine={false}
                     outerRadius={100}
                     fill="#8884d8"
-                    dataKey="value"
+                    dataKey="count"
                   >
                     {turfUtilization.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -299,7 +379,7 @@ export default function AdminDashboard() {
                       className="w-3 h-3 rounded-full mr-2"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">{entry.name}</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">{entry.sport}</span>
                   </div>
                 ))}
               </div>
@@ -320,13 +400,13 @@ export default function AdminDashboard() {
                     <p className="text-sm font-medium text-gray-900 dark:text-white">{activity.user}</p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">{activity.action}</p>
                   </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">{activity.time}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {new Date(activity.createdAt).toLocaleString()}
+                  </span>
                 </div>
               ))}
             </div>
-            <button className="w-full mt-4 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-              View All Activities
-            </button>
+            
           </div>
         </div>
       </div>

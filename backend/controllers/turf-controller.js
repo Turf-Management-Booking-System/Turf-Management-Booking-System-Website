@@ -1,7 +1,7 @@
 
 const Turf = require("../models/turf");
 const Sport = require("../models/sports")
-
+const Booking = require("../models/booking")
 // create turf
 exports.createTurf=async(req,res)=>{
     try{
@@ -394,4 +394,142 @@ exports.getAllSports = async (req, res) => {
       
       
       
+};
+exports.getTotalRevenue = async (req, res) => {
+  try {
+  
+       const totalRevenue = await Booking.aggregate
+       ([
+     { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+        ]); 
+
+    res.status(200).json({ total: totalRevenue[0]?.total  });
+  } catch (error) {
+    console.error("Error fetching total revenue:", error);
+    res.status(500).json({ message: "Failed to fetch total revenue" });
+  }
+};
+exports.getMonthlyRevenue = async (req, res) => {
+  try {
+    const monthlyRevenue = await Booking.aggregate([
+      {
+        $group: {
+          _id: { $month: "$date" }, // Group by month
+          revenue: { $sum: "$totalPrice" } // Sum of revenue
+        }
+      },
+      { $sort: { _id: 1 } }, // Sort months by number (1 = Jan, 2 = Feb, etc.)
+      {
+        $project: {
+          _id: 0, 
+          month: {
+            $let: {
+              vars: {
+                months: [
+                  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                ]
+              },
+              in: {
+                $arrayElemAt: ["$$months", { $subtract: ["$_id", 1] }]
+              }
+            }
+          },
+          revenue: 1
+        }
+      }
+    ]);
+
+    res.status(200).json(monthlyRevenue);
+  } catch (error) {
+    console.error("Error fetching monthly revenue:", error);
+    res.status(500).json({ message: "Failed to fetch monthly revenue" });
+  }
+};
+
+
+
+exports.getMonthlyBookings = async (req, res) => {
+  try {
+    const monthlyBookings = await Booking.aggregate([
+      {
+        $group: {
+          _id: { $month: "$date" },
+          bookings: { $sum: 1 }, 
+        },
+      },
+      {
+        $project: {
+          _id: 0, 
+          name: {
+            $let: {
+              vars: {
+                monthsInString: [
+                  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+                ],
+              },
+              in: {
+                $arrayElemAt: ["$$monthsInString", { $subtract: ["$_id", 1] }],
+              },
+            },
+          },
+          bookings: 1, 
+          monthIndex: { $subtract: ["$_id", 1] },
+        },
+      },
+      { $sort: { monthIndex: 1 } }, 
+      { $project: { monthIndex: 0 } }, 
+    ]);
+
+    res.status(200).json(monthlyBookings);
+  } catch (error) {
+    console.error("Error fetching monthly bookings:", error);
+    res.status(500).json({ message: "Failed to fetch monthly bookings" });
+  }
+};
+exports.getSportsUtilization = async (req, res) => {
+  try {
+    const result = await Turf.aggregate([
+      {
+        $unwind: "$sports" // Split sports array into separate documents
+      },
+      {
+        $lookup: {
+          from: "sports", // Collection name in lowercase
+          localField: "sports",
+          foreignField: "_id",
+          as: "sportDetails"
+        }
+      },
+      {
+        $unwind: "$sportDetails" 
+      },
+      {
+        $unwind: "$sportDetails.sports" // Get sport names from sports array
+      },
+      {
+        $group: {
+          _id: "$sportDetails.sports",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          sport: "$_id",
+          count: 1,
+          _id: 0
+        }
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ]);
+
+    console.log(result);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error fetching sports utilization:", error);
+    res.status(500).json({ message: "Failed to fetch sports utilization" });
+  }
 };
