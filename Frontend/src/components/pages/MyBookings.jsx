@@ -321,7 +321,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
       style={{
         backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
       }}
-      className="mt-16 lg:mt-5 min-h-screen p-4 sm:p-6 transition-colors duration-300"
+      className="min-h-screen p-4 sm:p-6 transition-colors duration-300"
     >
       {/* Hero Section */}
       <div className="bg-cover bg-center h-64 flex items-center justify-center rounded-lg overflow-hidden mb-8">

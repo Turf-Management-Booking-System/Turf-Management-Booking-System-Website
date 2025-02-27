@@ -67,7 +67,7 @@ const BookingHistory = () => {
       style={{
         backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
       }}
-      className="mt-16 min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 transition-colors duration-300"
+      className=" min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 transition-colors duration-300"
     >
       <div className="max-w-7xl mx-auto">
         <header className="mb-5">

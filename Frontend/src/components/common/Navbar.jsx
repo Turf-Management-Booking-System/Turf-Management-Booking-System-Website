@@ -166,7 +166,7 @@ function Navbar() {
                     <i className="bx bx-chevron-right text-2xl"></i>
                   </Link>
 
-                  <Link
+                  {/* <Link
                     to="/myBookings"
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
@@ -176,15 +176,15 @@ function Navbar() {
                       Bookings
                     </div>
                     <i className="bx bx-chevron-right text-2xl"></i>
-                  </Link>
+                  </Link> */}
 
                   <Link
-                    to="/bookinghistory"
+                    to="/dashboard"
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
                   >
                     <div className="flex items-center gap-5">
-                    <BiHistory className="text-2xl" />Booking History
+                    <i className="bx bxs-calendar-check text-2xl"></i>
                     </div>
                     <i className="bx bx-chevron-right text-2xl"></i>
                   </Link>
