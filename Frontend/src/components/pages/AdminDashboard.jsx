@@ -55,11 +55,11 @@ export default function AdminDashboard() {
   const [selectedItem, setSelectedItem] = useState("Dashboard");
   const allUsers = useSelector((state) => state.admin.allUsers);
   const totalUsers = allUsers.length;
-  const allBookings = useSelector((state) => state.booking.allBookings);
-  const totalBookings = allBookings.length;
+  const  [allBookings,setAllBookings] = useState([])
   const turfs = useSelector((state) => state.turf.turfs);
   const totalTurfs = turfs.length;
   const token = useSelector((state) => state.auth.token);
+  const user = useSelector((state)=>state.auth.user)
   const [recentActivities, setRecentActivities] = useState([]);
   const [turfUtilization, setTurfUtilization] = useState([]);
 
@@ -174,12 +174,35 @@ export default function AdminDashboard() {
       dispatch(setLoader(false));
     }
   };
+  const fetchAllBookings = async()=>{
+    try {
+      dispatch(setLoader(true));
 
+      const response = await axios.get(
+        `http://localhost:4000/api/v1/booking/getAllBookings`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("Response from backend all Bookings", response.data.allBookings);
+      setAllBookings(response.data.allBookings)
+    } catch (error) {
+      console.log("Error", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Unable to fetch bookings data");
+    } finally {
+      dispatch(setLoader(false));
+    }
+  }
   useEffect(() => {
     fetchMontlyBookings();
     fetchMontlyRevenue();
     fetchTotalRevenue();
     sportsData();
+    fetchAllBookings();
   }, [token]);
 
   const renderContent = () => {
@@ -198,7 +221,7 @@ export default function AdminDashboard() {
                 },
                 {
                   title: "Total Bookings",
-                  value: totalBookings,
+                  value: allBookings.length,
                   icon: CalendarDays,
                   color: "green",
                 },
@@ -390,13 +413,13 @@ export default function AdminDashboard() {
     <header className="bg-white dark:bg-gray-800 shadow-lg p-4 rounded-lg flex justify-between items-center mb-2">
           <div className="flex items-center">
             <h1 className="text-2xl font-bold font-orbitron text-gray-800 dark:text-white">
-              Welcome, <span className="text-green-500 font-serif">Nagma Shaikh</span>
+              Welcome, <span className="text-green-500 font-serif">{user.firstName} {user.lastName}</span>
             </h1>
           </div>
           <div className="flex items-center space-x-4">
             <div className="relative">
               <img
-                src={"" || ""}
+                src={user.image}
                 alt={""}
                 className="w-10 h-10 rounded-full border-2 border-green-500 dark:border-green-400"
               />

@@ -467,7 +467,7 @@ exports.getUserFeedback =async (req,res)=>{
         });
     }
 }
-exports.getAllBookings = async(req,res)=>{
+exports.getAllBooking = async(req,res)=>{
   try{
      const allBookings = await Booking.find({} );
      return res.status(200).json({
