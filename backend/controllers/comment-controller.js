@@ -165,7 +165,7 @@ exports.createCommentWithRating = async (req, res) => {
   const turf = await Turf.findById(turfId);
    turf.comments.push(newComment._id);
    const fetchTurfById = await turf.save();
-  const user = User.findById(userId);
+  const user = await User.findById(userId);
   const activity = await UserActivity.create({
     userId:user._id,
     action:"Give Comment And Rating!"
@@ -178,6 +178,7 @@ await user.save();
       fetchTurfById,
     });
   } catch (error) {
+    console.log("error",error)
     res.status(500).json({ success: false, message: error.message });
   }
 };

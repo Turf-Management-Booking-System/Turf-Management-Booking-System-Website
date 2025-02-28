@@ -120,7 +120,11 @@ const TurfPage = () => {
     (turf) =>
       turf.turfName.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (selectedLocation === "All" || turf.turfLocation === selectedLocation) &&
-      (selectedSport === "All" || turf.sports[0].sports.includes(selectedSport)) &&
+      (selectedSport === "All" || 
+        (turf.sports && 
+         turf.sports.length > 0 && 
+         turf.sports[0].sports && 
+         turf.sports[0].sports.includes(selectedSport))) &&
       turf.turfPricePerHour >= minPrice &&
       turf.turfPricePerHour <= priceRange &&
       (!showFavorites || likedTurfs.includes(turf._id))

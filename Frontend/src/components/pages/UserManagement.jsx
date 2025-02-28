@@ -322,7 +322,7 @@ const UserManagement = () => {
           <div className="space-y-4">
             {users
               .filter((user) => user.recentActivity !== "No recent activity")
-              .slice(0, 2) 
+              .slice(0, 6) 
               .map((user) => (
                 <div key={user.id} className="flex items-center space-x-4">
                   <div className="flex-shrink-0">

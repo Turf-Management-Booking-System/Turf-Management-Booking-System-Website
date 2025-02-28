@@ -467,3 +467,20 @@ exports.getUserFeedback =async (req,res)=>{
         });
     }
 }
+exports.getAllBookings = async(req,res)=>{
+  try{
+     const allBookings = await Booking.find({} );
+     return res.status(200).json({
+      success:true,
+      message:"Fetch All Bookings",
+      allBookings,
+     })
+  }catch(error){
+    console.log("error",error);
+    return res.status(500).json({
+      success:false,
+      message:"Error while fectching all bookings",
+      error:error.message
+    })
+  }
+}
