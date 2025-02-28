@@ -1,11 +1,10 @@
-"use client"
-
 import React, { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useSelector, useDispatch } from "react-redux"
 import { DarkModeContext } from "../../context/DarkModeContext"
 import greenBg from "../../assets/Images/greenBg.png"
 import blackBg from "../../assets/Images/blackBg.png"
+import whiteBg from "../../assets/Images/whiteBg.png"
 import axios from "axios"
 import toast from "react-hot-toast"
 import {
@@ -179,10 +178,10 @@ const BookingManagement = () => {
   return (
     <div 
     style={{
-            backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
-          }} className={`min-h-screen p-4 sm:p-6 lg:p-8 ${darkMode ? "dark" : ""}`}>
+            backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+          }} className={`min-h-screen p-4 sm:p-6 lg:p-8`}>
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-white">Booking Management</h1>
+        <h1 className="text-3xl font-bold mb-6 text-green-600 dark:text-white">Booking Management</h1>
 
         {/* Search and Filter Section */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">

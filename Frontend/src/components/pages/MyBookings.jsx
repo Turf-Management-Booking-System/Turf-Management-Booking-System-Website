@@ -326,14 +326,14 @@ const BookingDetailsModal = ({ booking, onClose }) => {
       {/* Hero Section */}
       <div className="bg-cover bg-center h-64 flex items-center justify-center rounded-lg overflow-hidden">
         <div className="text-center p-6  rounded-lg">
-          <h1 className="text-3xl sm:text-4xl font-bold text-black mb-2 font-orbitron">
+          <h1 className="text-3xl sm:text-4xl font-bold text-black dark:text-white mb-2 font-orbitron">
             Welcome to Your Bookings,
             <span className="capitalize font-orbitron text-green-500">
               {" "}
               {user?.firstName} {user.lastName}
             </span>
           </h1>
-          <p className="text-black mb-4">Manage your reservations with ease.</p>
+          <p className="text-black dark:text-gray-300 mb-4">Manage your reservations with ease.</p>
           <button
           onClick={() => navigate("/turf")}
           className="bg-green-500 text-white border border-white px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300">
@@ -345,19 +345,19 @@ const BookingDetailsModal = ({ booking, onClose }) => {
       {/* Policy Section */}
       <div className="max-w-6xl mx-auto mb-8 grid gap-4 sm:grid-cols-2">
         <div className="bg-red-50 dark:bg-red-900 p-4 rounded-lg border border-red-200 dark:border-red-500">
-          <h3 className="font-semibold text-red-700 dark:text-red-300 mb-2">
+          <h3 className="font-semibold font-serif text-red-700 dark:text-red-300 text-lg mb-2">
             Cancellation & Reschedule Policy
           </h3>
-          <p className="text-red-700 dark:text-red-300 text-sm">
+          <p className="text-red-700 dark:text-red-300 font-sans text-sm">
             Cancel within 24 hours for a full refund. Reschedule subject to
             availability.
           </p>
         </div>
         <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg border border-green-200 dark:border-green-500">
-          <h3 className="font-semibold text-green-700 dark:text-green-300 mb-2">
+          <h3 className="font-semibold font-serif text-lg text-green-700 dark:text-green-300 mb-2">
             Real-Time Updates & Easy Management
           </h3>
-          <p className="text-green-700 dark:text-green-300 text-sm">
+          <p className="text-green-700 font-sans dark:text-green-300 text-sm">
             Get instant booking updates and manage your reservations
             effortlessly.
           </p>
@@ -370,7 +370,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
+              className={`px-4 py-2 font-montserrat rounded-lg transition-colors duration-300 ${
                 activeTab === tab
                   ? "bg-green-500 text-white"
                   : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
@@ -408,7 +408,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                   animate="visible"
                   className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-shadow duration-300 hover:shadow-lg"
                 >
-                  <h2 className="text-xl font-semibold mb-2 dark:text-white">
+                  <h2 className="text-xl font-semibold font-serif mb-2 dark:text-white">
                     {booking.turf.turfName}
                   </h2>
                   <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
@@ -420,9 +420,9 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                   </div>
                   <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
                     <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
-                    <span>{booking.turf.turfLocation}</span>
+                    <span className="font-sans">{booking.turf.turfLocation}</span>
                   </div>
-                  <p className="mt-4 dark:text-white">
+                  <p className="mt-4 dark:text-white font-montserrat">
                     Status:{" "}
                     <span className="font-semibold text-red-600 dark:text-red-400">
                       Cancelled
@@ -431,7 +431,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                   <div className="mt-4 space-y-2">
                     <button
                       onClick={() => deleteBooking(booking._id)}
-                      className="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-300"
+                      className="w-full bg-gray-500 font-montserrat text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-300"
                     >
                       Delete
                     </button>
@@ -446,7 +446,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                   animate="visible"
                   className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-shadow duration-300 hover:shadow-lg"
                 >
-                  <h2 className="text-xl font-semibold mb-2 dark:text-white">
+                  <h2 className="text-xl font-serif font-semibold mb-2 dark:text-white">
                     {booking.turf.turfName}
                   </h2>
                   <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
@@ -456,11 +456,11 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                       {booking.timeSlot.join(", ")}
                     </span>
                   </div>
-                  <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
+                  <div className="flex items-center  text-gray-600 dark:text-gray-300 mb-2">
                     <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
-                    <span>{booking.turf.turfLocation}</span>
+                    <span className="font-sans">{booking.turf.turfLocation}</span>
                   </div>
-                  <p className="mt-4 dark:text-white">
+                  <p className="mt-4 dark:text-white font-montserrat">
                     Status:{" "}
                     <span
                       className={`font-semibold ${
@@ -483,7 +483,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                     {booking.status === "Confirmed" && (
                       <button
                         onClick={(e) => handleCancelBooking(booking._id, e)}
-                        className="w-full bg-red-400 dark:bg-red-600 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300"
+                        className="w-full font-montserrat bg-red-400 dark:bg-red-600 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300"
                       >
                         Cancel Booking
                       </button>
@@ -492,7 +492,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                       booking.status === "Cancelled") && (
                       <button
                         onClick={() => deleteBooking(booking._id)}
-                        className="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-300"
+                        className="w-full font-montserrat bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-300"
                       >
                         Delete
                       </button>
@@ -515,8 +515,8 @@ const BookingDetailsModal = ({ booking, onClose }) => {
         <div className="bg-yellow-400 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
           <FontAwesomeIcon icon={faTag} className="text-white text-xl" />
         </div>
-        <h3 className="text-2xl font-semibold mb-4">Special Offer!</h3>
-        <p className="mb-4">
+        <h3 className="text-2xl font-orbitron font-semibold mb-4">Special Offer!</h3>
+        <p className="mb-4 font-serif">
           Get <strong>20% off</strong> on your next booking. Hurry, this
           exclusive offer ends soon!
         </p>
@@ -526,12 +526,12 @@ const BookingDetailsModal = ({ booking, onClose }) => {
             style={{ width: "60%" }}
           ></div>
         </div>
-        <p className="text-sm">60% of the offer claimed</p>
+        <p className="text-sm font-sans">60% of the offer claimed</p>
       </div>
 
       {/* FAQ Section */}
       <section className="py-16 max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold mb-8 text-center text-gray-800 dark:text-white">
+        <h2 className="text-3xl font-serif font-bold mb-8 text-center text-gray-800 dark:text-white">
           Frequently Asked Questions
         </h2>
         <div className="grid gap-6">
@@ -545,7 +545,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
               onClick={() => toggleFAQ(index)}
             >
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                <h3 className="text-lg font-montserrat font-semibold text-gray-800 dark:text-white">
                   {faq.question}
                 </h3>
                 <motion.div
@@ -565,7 +565,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="text-gray-600 dark:text-gray-300 mt-2 overflow-hidden"
+                    className="text-gray-600 font-montserrat dark:text-gray-300 mt-2 overflow-hidden"
                   >
                     {faq.answer}
                   </motion.p>
@@ -579,7 +579,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
       {/* CTA Buttons Section */}
       <div className="py-12 ">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-8 text-center text-gray-800 dark:text-white">
+          <h2 className="text-2xl font-bold mb-8 text-center font-serif text-gray-800 dark:text-white">
             What Would You Like to Do Next?
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -625,10 +625,10 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                     className="text-white text-xl"
                   />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">
+                <h3 className="text-xl font-serif font-semibold mb-2 text-gray-800 dark:text-white">
                   {item.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                <p className="text-gray-600 font-montserrat dark:text-gray-300 mb-4">
                   {item.desc}
                 </p>
                 <Link
@@ -645,10 +645,10 @@ const BookingDetailsModal = ({ booking, onClose }) => {
 
       {/* Feedback Form */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md my-8 max-w-4xl mx-auto">
-        <h3 className="text-2xl font-semibold mb-4 text-center text-gray-800 dark:text-white">
+        <h3 className="text-2xl font-serif font-semibold mb-4 text-center text-gray-800 dark:text-white">
           We Value Your Feedback
         </h3>
-        <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
+        <p className="text-gray-600 font-montserrat dark:text-gray-300 text-center mb-6">
           Your feedback helps us improve. Share your thoughts, suggestions, or
           any issues you faced.
         </p>
@@ -662,7 +662,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
         ></textarea>
         <button 
         onClick={shareFeedBack}
-        className="bg-green-500 text-white px-6 py-2 rounded-lg mt-4 hover:bg-green-600 transition duration-300 w-full sm:w-auto">
+        className="bg-green-500 font-montserrat text-white px-6 py-2 rounded-lg mt-4 hover:bg-green-600 transition duration-300 w-full sm:w-auto">
           Submit Feedback
         </button>
       </div>

@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useContext, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { DarkModeContext } from "../../context/DarkModeContext"
@@ -8,6 +6,8 @@ import { setTurfs } from "../../slices/turfSlice"
 import { setLoader } from "../../slices/authSlice"
 import toast from "react-hot-toast"
 import axios from "axios"
+import blackBg from "../../assets/Images/blackBg.png"
+import whiteBg from "../../assets/Images/whiteBg.png"
 import {
   Plus,
   Search,
@@ -301,13 +301,15 @@ const AdminPanel = () => {
 
   return (
     <div
-      className={`min-h-screen bg-gray-50 dark:bg-gray-900 pt-6 pb-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300`}
+      style={{
+              backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+            }} className={`min-h-screen pt-6 pb-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300`}
     >
       {/* Header Section */}
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div className="mb-4 sm:mb-0">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Turf Management</h1>
+            <h1 className="text-3xl font-bold text-green-600 dark:text-white">Turf Management</h1>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage your turf listings and bookings</p>
           </div>
           <motion.button
