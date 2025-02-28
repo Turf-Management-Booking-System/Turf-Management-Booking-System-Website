@@ -321,10 +321,10 @@ const BookingDetailsModal = ({ booking, onClose }) => {
       style={{
         backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
       }}
-      className="min-h-screen p-4 sm:p-6 transition-colors duration-300"
+      className="min-h-screen p-2 sm:p-6 transition-colors duration-300"
     >
       {/* Hero Section */}
-      <div className="bg-cover bg-center h-64 flex items-center justify-center rounded-lg overflow-hidden mb-8">
+      <div className="bg-cover bg-center h-64 flex items-center justify-center rounded-lg overflow-hidden">
         <div className="text-center p-6  rounded-lg">
           <h1 className="text-3xl sm:text-4xl font-bold text-black mb-2 font-orbitron">
             Welcome to Your Bookings,

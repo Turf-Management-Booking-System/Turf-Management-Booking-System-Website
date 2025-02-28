@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { setLoader } from "../../slices/authSlice";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
+import { DarkModeContext } from "../../context/DarkModeContext";
+import whiteBg from "../../assets/Images/whiteBg.png"
+import blackBg from "../../assets/Images/blackBg.png"
+import greenBg from "../../assets/Images/greenBg.png"
 import {
   Users,
   CalendarDays,
@@ -42,6 +46,7 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 export default function AdminDashboard() {
   const dispatch = useDispatch();
+  const {darkMode} = useContext(DarkModeContext)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [monthlyBookings, setMonthlyBookings] = useState(false);
@@ -189,28 +194,24 @@ export default function AdminDashboard() {
                   title: "Total Users",
                   value: totalUsers,
                   icon: Users,
-                  trend: "+12.5%",
                   color: "blue",
                 },
                 {
                   title: "Total Bookings",
                   value: totalBookings,
                   icon: CalendarDays,
-                  trend: "+8.2%",
                   color: "green",
                 },
                 {
                   title: " Total Revenue",
                   value: totalRevenue,
                   icon: TrendingUp,
-                  trend: "+15.3%",
                   color: "purple",
                 },
                 {
                   title: "Active Turfs",
                   value: totalTurfs,
                   icon: BarChart3,
-                  trend: "+2",
                   color: "yellow",
                 },
               ].map((stat, index) => (
@@ -225,7 +226,6 @@ export default function AdminDashboard() {
                     <div className={`p-2 rounded-lg bg-${stat.color}-100 dark:bg-${stat.color}-900`}>
                       <stat.icon className={`h-6 w-6 text-${stat.color}-500`} />
                     </div>
-                    <span className="text-green-500 text-sm font-medium">{stat.trend}</span>
                   </div>
                   <h3 className="text-gray-600 dark:text-gray-400 text-sm font-medium">{stat.title}</h3>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
@@ -236,7 +236,7 @@ export default function AdminDashboard() {
             {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Monthly Bookings</h3>
+                <h3 className="text-2xl font-serif font-semibold mb-4 text-gray-900 dark:text-white">Monthly Bookings</h3>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={monthlyBookings}>
@@ -251,7 +251,7 @@ export default function AdminDashboard() {
               </div>
 
               <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Revenue Overview</h3>
+                <h3 className="text-2xl font-serif font-semibold mb-4 text-gray-900 dark:text-white">Revenue Overview</h3>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={monthlyRevenue}>
@@ -269,7 +269,7 @@ export default function AdminDashboard() {
             {/* Bottom Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Turf Utilization</h3>
+                <h3 className="text-2xl font-serif font-semibold mb-4 text-gray-900 dark:text-white">Turf Utilization</h3>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <RePieChart>
@@ -304,7 +304,7 @@ export default function AdminDashboard() {
               </div>
 
               <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Recent Activities</h3>
+                <h3 className="text-2xl font-semibold font-serif mb-4 text-gray-900 dark:text-white">Recent Activities</h3>
                 <div className="space-y-4">
                   {recentActivities.map((activity) => (
                     <div key={activity.id} className="flex items-center space-x-4">
@@ -331,6 +331,8 @@ export default function AdminDashboard() {
         return <UserManagement />;
       case "Booking Management":
         return <BookingManagement />;
+      case "Turf management":
+          return <AdminPanel/>
       default:
         return null;
     }
@@ -339,13 +341,16 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-100 mt-16 dark:bg-gray-900 flex">
   {/* Sidebar */}
-  <aside
+  <aside 
+  style={{
+        backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
+      }}
     className={`w-72 h-screen transition-transform ${
       isSidebarOpen ? "translate-x-0" : "-translate-x-full"
     } bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0`}
   >
     <div className="flex items-center justify-between p-4">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-white">TurfAdmin</h2>
+      <h2 className="text-2xl pt-3 pl-3 font-serif font-bold text-green-500">TurfAdmin</h2>
       <button
         onClick={() => setIsSidebarOpen(false)}
         className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -364,7 +369,7 @@ export default function AdminDashboard() {
         <button
           key={item.label}
           onClick={() => setSelectedItem(item.label)}
-          className={`flex items-center w-full p-3 rounded-lg text-left space-x-3 ${
+          className={`flex items-center w-full p-3 rounded-lg text-left  space-x-3 ${
             selectedItem === item.label
               ? "bg-gray-100 dark:bg-gray-700 text-green-600 dark:text-green-400"
               : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -379,61 +384,29 @@ export default function AdminDashboard() {
   </aside>
 
   {/* Main Content */}
-  <div className={` p-4 ${isSidebarOpen ? "" : ""}`}>
-    {/* Top Navigation */}
-    <header className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm mb-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-            <Menu className="h-6 w-6 text-gray-500 dark:text-gray-400" />
-          </button>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-            <input
-              type="search"
-              placeholder="Search..."
-              className="pl-10 pr-4 py-2 w-[300px] rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+  <div style={{
+        backgroundImage: `url(${darkMode ? blackBg : greenBg})`
+      }} className="flex-1 p-4">
+    <header className="bg-white dark:bg-gray-800 shadow-lg p-4 rounded-lg flex justify-between items-center mb-2">
+          <div className="flex items-center">
+            <h1 className="text-2xl font-bold font-orbitron text-gray-800 dark:text-white">
+              Welcome, <span className="text-green-500 font-serif">Nagma Shaikh</span>
+            </h1>
           </div>
-        </div>
-        <div className="flex items-center space-x-4">
-          <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-            <Bell className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-          </button>
-          <div className="relative">
-            <button
-              onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-              className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              <img src="/placeholder.svg" alt="Admin" className="h-8 w-8 rounded-full" />
-              <span className="text-gray-700 dark:text-gray-300">Admin User</span>
-              <ChevronDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-            </button>
-            {isProfileDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 border border-gray-200 dark:border-gray-700">
-                <button className="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                  Profile
-                </button>
-                <button className="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                  Settings
-                </button>
-                <hr className="my-1 border-gray-200 dark:border-gray-700" />
-                <button className="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                  Logout
-                </button>
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <img
+                src={"" || ""}
+                alt={""}
+                className="w-10 h-10 rounded-full border-2 border-green-500 dark:border-green-400"
+              />
               </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </header>
+            </div>
+          </header>
 
     {/* Render Content Based on Selected Item */}
     {renderContent()}
   </div>
 </div>
-  );
+  )
 }
