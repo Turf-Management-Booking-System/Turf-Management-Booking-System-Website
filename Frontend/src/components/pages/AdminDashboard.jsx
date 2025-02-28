@@ -250,8 +250,8 @@ export default function AdminDashboard() {
                       <stat.icon className={`h-6 w-6 text-${stat.color}-500`} />
                     </div>
                   </div>
-                  <h3 className="text-gray-600 dark:text-gray-400 text-sm font-medium">{stat.title}</h3>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+                  <h3 className="text-gray-600 dark:text-gray-400 text-sm font-serif font-medium">{stat.title}</h3>
+                  <p className="text-2xl font-sans font-bold text-gray-900 dark:text-white">{stat.value}</p>
                 </motion.div>
               ))}
             </div>
@@ -337,7 +337,7 @@ export default function AdminDashboard() {
                         className="h-10 w-10 rounded-full"
                       />
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{activity.user}</p>
+                        <p className="text-sm font-sans font-medium text-gray-900 dark:text-white">{activity.user?.charAt(0).toUpperCase() + activity.user?.slice(1)}</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">{activity.action}</p>
                       </div>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -362,13 +362,13 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 mt-16 dark:bg-gray-900 flex">
+    <div className="min-h-screen mt-16 dark:bg-gray-900 flex">
   {/* Sidebar */}
   <aside 
   style={{
         backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
       }}
-    className={`w-72 h-screen transition-transform ${
+    className={`w-72 h-50 transition-transform ${
       isSidebarOpen ? "translate-x-0" : "-translate-x-full"
     } bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0`}
   >

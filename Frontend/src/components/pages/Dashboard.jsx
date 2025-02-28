@@ -163,7 +163,7 @@ const Dashboard = () => {
         <aside
           className={`${
             isSidebarOpen ? "w-64" : "w-20"
-          } bg-white dark:bg-gray-800 min-h-screen transition-all duration-300 ease-in-out`}
+          } bg-white border-r-2 dark:border-gray-500 dark:bg-gray-800 min-h-screen transition-all duration-300 ease-in-out`}
         >
           <div
             style={{
@@ -303,9 +303,6 @@ const BookingStatusChart = ({ data, colors ,darkMode }) => (
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.2 }}
-    style={{
-      backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
-    }}
     className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
   >
     <h2 className="text-2xl font-semibold font-serif mb-4 text-gray-800 dark:text-white">
@@ -355,9 +352,6 @@ const BookingTrendChart = ({ data ,darkMode }) => (
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.3 }}
-    style={{
-      backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
-    }}
     className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
   >
     <h2 className="text-2xl font-serif font-semibold mb-4 text-gray-800 dark:text-white">
