@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { loadNotification } from "../../slices/notificationSlice"
 import { useSelector, useDispatch } from "react-redux"
-import { useLocation } from "react-router-dom"
+import greenBg from "../../assets/Images/greenBg.png"
+import blackBg from "../../assets/Images/blackBg.png"
 import { useNavigate } from "react-router-dom"
 import {
   faTachometerAlt,
@@ -125,7 +126,9 @@ const Dashboard = () => {
   }
 
   return (
-    <div className={`min-h-screen mt-12 bg-gray-100 dark:bg-gray-900 ${darkMode ? "dark" : ""}`}>
+    <div style={{
+            backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
+          }} className={`min-h-screen mt-12 bg-gray-100 dark:bg-gray-900 ${darkMode ? "dark" : ""}`}>
       <div className="flex">
         {/* Sidebar */}
         <aside

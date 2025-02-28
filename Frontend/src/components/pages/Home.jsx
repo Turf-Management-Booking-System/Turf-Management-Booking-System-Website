@@ -2,6 +2,7 @@ import React, { useContext, useState,useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { HiStar, HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import blackBg from "../../assets/Images/blackBg.png";
+import greenBg from "../../assets/Images/greenBg.png";
 import {
   faFutbol,
   faSearch,
@@ -295,7 +296,7 @@ function Home() {
       <section
         ref={ref}
         style={{
-          backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+          backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
         }}
         className="py-16 flex flex-col items-center relative"
       >

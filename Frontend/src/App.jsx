@@ -36,6 +36,7 @@ import AutoLogout from "./utils/AutoLogout";
 import BookingHistory from "./components/pages/BookingHistory";
 import UserManagement from "./components/pages/UserManagement";
 import AdminDashboard from "./components/pages/AdminDashboard";
+import BookingManagement from "./components/pages/BookingManagement";
 const App = () => {
   const dispatch = useDispatch(); 
   const location = useLocation();
@@ -101,6 +102,7 @@ const App = () => {
         <Route path="/bookinghistory" element={<BookingHistory/>}/>
         <Route path="/usermanagement" element={<UserManagement/>}/>
         <Route path="/admindashboard" element={<AdminDashboard/>}/>
+        <Route path="/bookingmanagement" element={<BookingManagement/>}/>
 
          {/* work is pending for private routing */}
 

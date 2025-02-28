@@ -184,7 +184,7 @@ function Navbar() {
                     className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
                   >
                     <div className="flex items-center gap-5">
-                    <i className="bx bxs-calendar-check text-2xl"></i>
+                    <i className="bx bxs-calendar-check text-2xl"></i>Dashboard
                     </div>
                     <i className="bx bx-chevron-right text-2xl"></i>
                   </Link>
