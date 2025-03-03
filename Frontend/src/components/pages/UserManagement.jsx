@@ -5,6 +5,8 @@ import { setLoader } from "../../slices/authSlice";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
+import { deleteAccountUser } from "../../slices/authSlice";
+import { deleteAccountNotification } from "../../slices/notificationSlice";
 import {
   faSearch,
   faUserPlus,
@@ -52,7 +54,6 @@ const UserManagement = () => {
         );
 
         if (response.data.success) {
-          toast.success("Fetched All Users Details");
           dispatch(setAllUsers(response.data.allUsers));
           const mappedUsers = response.data.allUsers.map((user) => ({
             id: user._id,
@@ -130,7 +131,39 @@ const UserManagement = () => {
       </div>
     );
   }
+  const handleDeleteProfile =async (id)=>{
+    console.log(id)
+    try{
+        dispatch(setLoader(true));
+        const response = await axios.delete(`http://localhost:4000/api/v1/auth/deleteProfile/${id}`,
+        {  
+          headers:{
+            "Content-Type":"application/json",
+            Authorization:`Bearer ${token}`,
+            withCredentials:true
+          }
+        });
+        console.log("response Data",response.data);
+        if(response.data.success){
+            dispatch(deleteAccountUser());
+            dispatch(deleteAccountNotification());
+            if(isForgetPassword && email){
+              localStorage.removeItem("isForgetPassword");
+              localStorage.removeItem("email");
+            }
+            toast.success("Profile Deleted Successfullly!");
+          
+        }
+      }catch(error){
+        toast.error(error.response?.data?.message || "Something Went Wrong!");
+        console.error("Error:", error.response?.data || error.message);
 
+  
+      }finally{
+        dispatch(setLoader(false))
+  
+      }
+  }
   return (
     <div
       style={{
@@ -251,7 +284,7 @@ const UserManagement = () => {
                     {/* <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
                       <FontAwesomeIcon icon={faEdit} />
                     </button> */}
-                    <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 mr-3">
+                    <button onClick={()=>handleDeleteProfile(user.id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 mr-3">
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
                   </td>

@@ -7,6 +7,9 @@ import greenBg from "../../assets/Images/greenBg.png";
 import whiteBg from "../../assets/Images/whiteBg.png";
 import blackBg from "../../assets/Images/blackBg.png";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { setLoader } from "../../slices/authSlice";
 import {
   faTachometerAlt,
   faCalendarAlt,
@@ -45,9 +48,11 @@ const Dashboard = () => {
   const [filterStatus, setFilterStatus] = useState("All");
   const [sortBy, setSortBy] = useState("date");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-
+  const [allBookingsCount, setAllBookingsCount] = useState([]);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleFilter = () => setIsFilterOpen(!isFilterOpen);
+  const token = useSelector((state) => state.auth.token);
+  const [trendChart,setTrendChart] = useState([])
 
   const notifications = useSelector(
     (state) => state.notification.notifications
@@ -88,12 +93,6 @@ const Dashboard = () => {
     },
   ];
 
-  const bookingStatusData = [
-    { name: "Confirmed", value: currentBookings.length },
-    { name: "Completed", value: previousBookings.length },
-    { name: "Cancelled", value: cancelBooked.length },
-  ];
-
   const bookingTrendData = getBookingTrendData();
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
@@ -131,8 +130,12 @@ const Dashboard = () => {
           <>
             <QuickStats stats={quickStats} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <BookingStatusChart data={bookingStatusData} colors={COLORS} />
-              <BookingTrendChart data={bookingTrendData} />
+              <BookingStatusChart
+                data={allBookingsCount} // Use allBookingsCount
+                colors={COLORS}
+                darkMode={darkMode}
+              />
+              <BookingTrendChart data={bookingTrendData} darkMode={darkMode} />
             </div>
             <RecentBookings
               bookings={currentBookings.slice(0, 5)}
@@ -151,6 +154,58 @@ const Dashboard = () => {
     }
   };
 
+  const userId = user._id;
+  const fetchMontlyBookings = async () => {
+    try {
+      dispatch(setLoader(true));
+
+      const response = await axios.get(
+        `http://localhost:4000/api/v1/turf/getMonthlyBookingForUser/${userId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("Response from backend monthly bookings", response.data);
+      setAllBookingsCount(response.data);
+    } catch (error) {
+      console.log("Error", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Unable to fetch monthly bookings");
+    } finally {
+      dispatch(setLoader(false));
+    }
+  };
+  const fetchMontlyBookingsTrend = async () => {
+    try {
+      dispatch(setLoader(true));
+
+      const response = await axios.get(
+        `http://localhost:4000/api/v1/turf/getMonthlyBookingsTrend/${userId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("Response from backend monthly bookings", response.data);
+      setTrendChart(response.data)
+    } catch (error) {
+      console.log("Error", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Unable to fetch monthly bookings");
+    } finally {
+      dispatch(setLoader(false));
+    }
+  };
+  useEffect(() => {
+    fetchMontlyBookings();
+    fetchMontlyBookingsTrend();
+  }, [token]);
+
   return (
     <div
       style={{
@@ -167,7 +222,7 @@ const Dashboard = () => {
         >
           <div
             style={{
-              backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
+              backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
             }}
             className="flex flex-col h-full"
           >
@@ -223,7 +278,6 @@ const Dashboard = () => {
           {/* Header */}
           {isOverviewPage && (
             <header
-            
               className="bg-white dark:bg-gray-800 shadow-lg p-4 rounded-lg flex justify-between items-center mb-2"
             >
               <div className="flex items-center">
@@ -240,7 +294,7 @@ const Dashboard = () => {
               <div className="flex items-center space-x-4">
                 <div className="relative">
                   <img
-                    src={user?.avatar || ""}
+                    src={user?.image || ""}
                     alt={""}
                     className="w-10 h-10 rounded-full border-2 border-green-500 dark:border-green-400"
                   />
@@ -268,7 +322,7 @@ const Dashboard = () => {
 };
 
 const QuickStats = ({ stats }) => (
-  <section  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+  <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
     {stats.map((stat, index) => (
       <motion.div
         key={index}
@@ -298,7 +352,7 @@ const QuickStats = ({ stats }) => (
   </section>
 );
 
-const BookingStatusChart = ({ data, colors ,darkMode }) => (
+const BookingStatusChart = ({ data, colors, darkMode }) => (
   <motion.section
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -312,13 +366,13 @@ const BookingStatusChart = ({ data, colors ,darkMode }) => (
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
-            data={data}
+            data={data} // Use the data prop
             cx="50%"
             cy="50%"
             labelLine={false}
             outerRadius={80}
             fill="#8884d8"
-            dataKey="value"
+            dataKey="bookings" // Ensure this matches the key in your data
           >
             {data.map((entry, index) => (
               <Cell
@@ -347,7 +401,7 @@ const BookingStatusChart = ({ data, colors ,darkMode }) => (
   </motion.section>
 );
 
-const BookingTrendChart = ({ data ,darkMode }) => (
+const BookingTrendChart = ({ data, darkMode }) => (
   <motion.section
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -418,7 +472,6 @@ const RecentBookings = ({ bookings, title }) => (
   </motion.section>
 );
 
-
 const SettingsSection = ({ user }) => {
   const navigate = useNavigate(); // Hook for navigation
 
@@ -467,7 +520,7 @@ const SettingsSection = ({ user }) => {
             </label>
             <input
               type="text"
-              value={user?.gender || "Not specified"}
+              value={user?.additionalFields?.gender || "Not specified"}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50"
               readOnly
             />
@@ -480,7 +533,7 @@ const SettingsSection = ({ user }) => {
             </label>
             <input
               type="text"
-              value={user?.mobileNumber || "Not specified"}
+              value={user?.additionalFields?.phoneNumber || "Not specified"}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50"
               readOnly
             />
@@ -493,7 +546,7 @@ const SettingsSection = ({ user }) => {
             </label>
             <input
               type="text"
-              value={user?.dateOfBirth || "Not specified"}
+              value={user?.additionalFields?.dateOfBirth || "Not specified"}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50"
               readOnly
             />
@@ -506,7 +559,7 @@ const SettingsSection = ({ user }) => {
             </label>
             <input
               type="text"
-              value={user?.location || "Not specified"}
+              value={user?.additionalFields?.location || "Not specified"}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50"
               readOnly
             />
@@ -553,7 +606,6 @@ const SettingsSection = ({ user }) => {
     </div>
   );
 };
-
 
 const getStatusColor = (status) => {
   switch (status) {
