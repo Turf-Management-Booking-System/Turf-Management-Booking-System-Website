@@ -17,7 +17,7 @@ function Navbar() {
   const { darkMode, setDarkMode } = useContext(DarkModeContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showChatbot, setShowChatbot] = useState(false);
-  const [openModal,closeModal] = useState(false);
+  const [openModal, closeModal] = useState(false);
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const notifications = useSelector(
@@ -29,7 +29,7 @@ function Navbar() {
   const location = useLocation();
 
   const handleChatbotToggle = () => {
-    setShowChatbot((prev) => !prev); 
+    setShowChatbot((prev) => !prev);
   };
 
   const handleMenu = () => setMenuOpen((prev) => !prev);
@@ -41,10 +41,10 @@ function Navbar() {
     dispatch(logout());
     navigate("/login");
   };
-  
-   useEffect(()=>{
-    const fetchNotification =async ()=>{
-      if(user && user._id){
+
+  useEffect(() => {
+    const fetchNotification = async () => {
+      if (user && user._id) {
         try {
           const response = await axios.get(
             `http://localhost:4000/api/v1/notify/getNotifications/${user._id}`,
@@ -53,22 +53,20 @@ function Navbar() {
             }
           );
           if (response.data.success) {
-            console.log("fetch notification",response.data.currentMessage);
-            dispatch(setNotification(response.data.currentMessage ||[]));
-            console.log("notifications state",notifications);
+            console.log("fetch notification", response.data.currentMessage);
+            dispatch(setNotification(response.data.currentMessage || []));
+            console.log("notifications state", notifications);
           }
         } catch (error) {
           toast.error(error.response?.data?.message || "Something Went Wrong!");
         }
       }
-      
-    }
-    
-      fetchNotification()
-   },[dispatch,user]);
+    };
+    fetchNotification();
+  }, [dispatch, user]);
 
-   const unreadCount = notifications.filter((notify)=> !notify.isRead).length;
-   console.log("unreadCount",unreadCount);
+  const unreadCount = notifications.filter((notify) => !notify.isRead).length;
+  console.log("unreadCount", unreadCount);
 
   return (
     <nav className="p-3 flex bg-[#5886a7] dark:bg-gray-900 text-white justify-between items-center fixed top-0 left-0 right-0 z-50 shadow-md">
@@ -77,13 +75,26 @@ function Navbar() {
         <span className="text-xl font-orbitron font-bold">KickOnTurf</span>
       </Link>
 
-      {/* Navbar Links (Desktop) */}
-      <div id="nav-menu" className="hidden lg:flex gap-12">
+      {/* Mobile Menu Toggle */}
+      <button className="p-2 lg:hidden" onClick={handleMenu}>
+        {menuOpen ? (
+          <i className="bx bx-x text-3xl"></i>
+        ) : (
+          <i className="bx bx-menu text-3xl"></i>
+        )}
+      </button>
+
+      {/* Navbar Links (Mobile and Desktop) */}
+      <div
+        className={`${
+          menuOpen ? "block" : "hidden"
+        } lg:flex lg:items-center lg:gap-12 absolute lg:static top-16 left-0 right-0 bg-[#5886a7] dark:bg-gray-900 lg:bg-transparent lg:dark:bg-transparent p-4 lg:p-0`}
+      >
         {["/", "/turf", "/about", "/contact"].map((path, index) => (
           <Link
             key={index}
             to={path}
-            className={`text-[20px] font-medium font-serif pb-2 relative ${
+            className={`block lg:inline text-[20px] font-medium font-serif pb-2 relative ${
               location.pathname === path ? "after:w-full" : "after:w-0"
             } after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-white after:transition-all after:duration-300`}
           >
@@ -94,8 +105,9 @@ function Navbar() {
         ))}
       </div>
 
+      {/* Desktop-only elements (Chatbot, Dark Mode, Profile, etc.) */}
       <div className="hidden lg:flex flex-1 items-center justify-end gap-4 mr-5">
-      <div className="text-4xl">
+        <div className="text-4xl">
           <button onClick={handleChatbotToggle}>
             <TbMessageChatbot />
           </button>
@@ -113,7 +125,7 @@ function Navbar() {
           )}
         </button>
 
-        {/*when Auth then  Notification */}
+        {/* When Auth then Notification */}
         {isAuthenticated ? (
           <div className="relative flex items-center gap-4">
             <button
@@ -121,7 +133,6 @@ function Navbar() {
               className="relative p-2 hover:bg-[#8bb0ca] dark:hover:bg-gray-700 rounded-full"
             >
               <i className="bx bx-bell text-2xl"></i>
-              {/*temporary dot hehehe*/}
               {unreadCount > 0 && (
                 <span className="absolute top-0 right-1.5 w-1 h-1 rounded-full ">
                   {unreadCount}
@@ -166,25 +177,13 @@ function Navbar() {
                     <i className="bx bx-chevron-right text-2xl"></i>
                   </Link>
 
-                  {/* <Link
-                    to="/myBookings"
-                    onClick={() => setDropdownOpen(false)}
-                    className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
-                  >
-                    <div className="flex items-center gap-5">
-                      <i className="bx bxs-calendar-check text-2xl"></i> My
-                      Bookings
-                    </div>
-                    <i className="bx bx-chevron-right text-2xl"></i>
-                  </Link> */}
-
                   <Link
                     to="/dashboard"
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
                   >
                     <div className="flex items-center gap-5">
-                    <i className="bx bxs-calendar-check text-2xl"></i>Dashboard
+                      <i className="bx bxs-calendar-check text-2xl"></i>Dashboard
                     </div>
                     <i className="bx bx-chevron-right text-2xl"></i>
                   </Link>
@@ -194,8 +193,8 @@ function Navbar() {
                     className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
                   >
                     <div className="flex items-center gap-5">
-                    <FaKey size={20} />
-                    Change Password
+                      <FaKey size={20} />
+                      Change Password
                     </div>
                     <i className="bx bx-chevron-right text-2xl"></i>
                   </Link>
@@ -224,15 +223,6 @@ function Navbar() {
           </button>
         )}
       </div>
-
-      {/* Mobile Menu Toggle */}
-      <button className="p-2 lg:hidden" onClick={handleMenu}>
-        {menuOpen ? (
-          <i className="bx bx-x text-3xl"></i>
-        ) : (
-          <i className="bx bx-menu text-3xl"></i>
-        )}
-      </button>
     </nav>
   );
 }

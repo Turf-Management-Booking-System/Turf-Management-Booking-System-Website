@@ -1,4 +1,4 @@
-import React, { useContext, useState,useEffect } from "react";
+import React, { useContext, useState,useEffect ,useCallback} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { HiStar, HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import blackBg from "../../assets/Images/blackBg.png";
@@ -305,7 +305,7 @@ function Home() {
         {timelineItems.map((item, index) => (
           <motion.div
             key={index}
-            initial={{ opacity: 0, x: item.position === "left" ? -300 : 300 }}
+            initial={{ opacity: 0, x: item.position === "left" ? -150 : 150 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 2.5, delay: index * 0.5 }}
             className={`relative flex items-center w-full max-w-6xl my-8 ${

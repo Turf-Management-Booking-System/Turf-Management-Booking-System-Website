@@ -413,7 +413,7 @@ export default function AdminDashboard() {
     <header className="bg-white dark:bg-gray-800 shadow-lg p-4 rounded-lg flex justify-between items-center mb-2">
           <div className="flex items-center">
             <h1 className="text-2xl font-bold font-orbitron text-gray-800 dark:text-white">
-              Welcome, <span className="text-green-500 font-serif">{user.firstName} {user.lastName}</span>
+              Welcome, <span className="capitalize text-green-500 font-serif">{user.firstName} {user.lastName}</span>
             </h1>
           </div>
           <div className="flex items-center space-x-4">
