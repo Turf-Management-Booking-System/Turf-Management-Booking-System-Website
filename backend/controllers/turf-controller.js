@@ -1,7 +1,9 @@
 
 const Turf = require("../models/turf");
 const Sport = require("../models/sports")
-const Booking = require("../models/booking")
+const Booking = require("../models/booking");
+const mongoose = require("mongoose");
+const { ObjectId } = require('mongodb'); 
 // create turf
 exports.createTurf=async(req,res)=>{
     try{
@@ -531,5 +533,83 @@ exports.getSportsUtilization = async (req, res) => {
   } catch (error) {
     console.error("Error fetching sports utilization:", error);
     res.status(500).json({ message: "Failed to fetch sports utilization" });
+  }
+};
+exports.getMonthlyBookingsForUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Convert userId to ObjectId
+    const objectUserId = new mongoose.Types.ObjectId(userId);
+
+    // Aggregate bookings by status
+    const statusBookings = await Booking.aggregate([
+      {
+        $match: { user: objectUserId }, // Filter by user
+      },
+      {
+        $group: {
+          _id: "$status", // Group by status
+          bookings: { $sum: 1 }, // Count bookings per status
+        },
+      },
+      {
+        $project: {
+          _id: 0, // Exclude the default _id field
+          name: "$_id", // Use status as the name
+          bookings: 1, // Include the bookings count
+        },
+      },
+    ]);
+
+    // Send the response
+    res.status(200).json(statusBookings);
+  } catch (error) {
+    console.error("Error fetching monthly bookings for user:", error);
+    res.status(500).json({ message: "Failed to fetch monthly bookings for user" });
+  }
+};
+
+exports.getMonthlyBookingsTrend = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const objectUserId = new mongoose.Types.ObjectId(userId);
+
+    const monthlyBookings = await Booking.aggregate([
+      {
+        $match: { user: objectUserId }, // Ensure ObjectId matching
+      },
+      {
+        $group: {
+          _id: { month: { $month: "$date" }, year: { $year: "$date" } },
+          bookings: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          name: {
+            $let: {
+              vars: {
+                monthsInString: [
+                  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+                ],
+              },
+              in: {
+                $arrayElemAt: ["$$monthsInString", { $subtract: ["$_id.month", 1] }],
+              },
+            },
+          },
+          bookings: 1,
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
+    ]);
+
+    res.status(200).json(monthlyBookings);
+  } catch (error) {
+    console.error("Error fetching monthly bookings for user:", error);
+    res.status(500).json({ message: "Failed to fetch monthly bookings for user" });
   }
 };
