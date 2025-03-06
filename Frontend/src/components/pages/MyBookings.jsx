@@ -82,7 +82,7 @@ const MyBookings = () => {
 
 const BookingDetailsModal = ({ booking, onClose }) => {
   if (!booking) return null
-
+  const duration = booking.timeSlot.length; 
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -133,7 +133,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
             <div className="flex items-center text-gray-700 dark:text-gray-300">
               <FontAwesomeIcon icon={faClock} className="mr-3 text-black dark:text-white" />
               <span className="font-semibold">Duration:</span>
-              <span className="ml-2">1 hours</span>
+              <span className="ml-2">{duration} hour{duration > 1 ? "s" : ""}</span>
             </div>
             <div className="flex items-center text-gray-700 dark:text-gray-300">
               <FontAwesomeIcon icon={faTag} className="mr-3 text-black dark:text-white" />

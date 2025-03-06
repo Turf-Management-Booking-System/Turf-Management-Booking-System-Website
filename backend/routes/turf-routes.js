@@ -1,4 +1,4 @@
-const { createTurf, updateTurf, deleteTurf, getAllTurf, viewAllUsers, getAllTurfLocations,getTurfSelectedLocation,getTurfById, getTurfSlots, getAllSports, getTotalRevenue, getMonthlyRevenue, getMonthlyBookings,  getSportsUtilization, getMonthlyBookingsForUser,getMonthlyBookingsTrend } = require("../controllers/turf-controller");
+const { createTurf, updateTurf, deleteTurf, getAllTurf, viewAllUsers, getAllTurfLocations,getTurfSelectedLocation,getTurfById, getTurfSlots, getAllSports, getTotalRevenue, getMonthlyRevenue, getMonthlyBookings,  getSportsUtilization, getMonthlyBookingsForUser,getMonthlyBookingsTrend, getTurfSlotsByDate } = require("../controllers/turf-controller");
 const{auth,isAdmin,isUser} = require("../middlewares/auth-middleware");
 // importing the controllers for routing
 
@@ -19,5 +19,6 @@ router.get("/getMonthlyRevenue",auth,getMonthlyRevenue);
 router.get("/getMonthlyBookings",auth,getMonthlyBookings);
 router.get("/getSportsUtilization",auth,getSportsUtilization);
 router.get("/getMonthlyBookingForUser/:userId",auth,getMonthlyBookingsForUser);
-router.get("/getMonthlyBookingsTrend/:userId",auth,getMonthlyBookingsTrend)
+router.get("/getMonthlyBookingsTrend/:userId",auth,getMonthlyBookingsTrend);
+router.get("/getTurfSlotByDate/:turfId/:date",getTurfSlotsByDate)
 module.exports = router;

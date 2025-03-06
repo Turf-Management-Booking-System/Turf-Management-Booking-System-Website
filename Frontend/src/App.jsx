@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { DarkModeProvider } from "./context/DarkModeContext";
 import Navbar from "./components/common/Navbar";
@@ -13,7 +13,7 @@ import UpdatePassword from "./components/pages/UpdatePassword";
 import ChangePassword from "./components/pages/ChangePassword";
 import Spinner from "./components/common/Spinner";
 import { useSelector, useDispatch } from "react-redux";
-import { login } from "./slices/authSlice";
+import { login, setLoader } from "./slices/authSlice";
 import Dashboard from "./components/pages/Dashboard";
 import "../src/App.css";
 import PrivateRoute from "./routes/PrivateRoute";
@@ -24,8 +24,7 @@ import TurfPage from "./components/pages/TurfPage";
 import Profile from "./components/pages/Profile";
 import Notification from "./components/pages/Notification";
 import Chatbot from "./components/pages/Chatbot";
-import { loadNotification } from "./slices/notificationSlice";
-import { setNotification } from "./slices/notificationSlice";
+import { loadNotification, setNotification } from "./slices/notificationSlice";
 import AdminPanel from "./components/pages/AdminPanel";
 import TurfDetailPage from "./components/pages/TurfDetailPage";
 import BookingPage from "./components/pages/BookingPage";
@@ -37,80 +36,78 @@ import BookingHistory from "./components/pages/BookingHistory";
 import UserManagement from "./components/pages/UserManagement";
 import AdminDashboard from "./components/pages/AdminDashboard";
 import BookingManagement from "./components/pages/BookingManagement";
+
 const App = () => {
-  const dispatch = useDispatch(); 
+  const dispatch = useDispatch();
   const location = useLocation();
   const loader = useSelector((state) => state.auth.loader);
-  const notifications = useSelector((state)=>state.notification.notifications)
-  // Check if current page is authentication-related
-  
   const isAuthPage = ["/otp", "/forgetpassword", "/updatepassword", "/changepassword"].includes(location.pathname);
 
- 
+  // Initialize authentication state
   useEffect(() => {
     const token = localStorage.getItem("token");
     const storedUser = localStorage.getItem("userData");
     const user = storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null;
 
-     if (token && user) {
+    if (token && user) {
       dispatch(login({ user, token }));
+    } else {
+      dispatch(setLoader(false)); // Set loader to false if no token/user
     }
   }, [dispatch]);
-   useEffect( ()=>{
-     dispatch(fetchTurfLocations()); 
-   },[dispatch]);
-    useEffect( ()=>{
-            dispatch(loadNotification());
-          },[dispatch])
-   useEffect(() => {
+
+  // Fetch turf locations
+  useEffect(() => {
+    dispatch(fetchTurfLocations());
+  }, [dispatch]);
+
+  // Load notifications
+  useEffect(() => {
+    dispatch(loadNotification());
+  }, [dispatch]);
+
+  // Set notifications from localStorage
+  useEffect(() => {
     const storedNotifications = localStorage.getItem("userNotifications");
     if (storedNotifications) {
       dispatch(setNotification(JSON.parse(storedNotifications)));
     }
   }, [dispatch]);
-  
+
   return (
-    <>
     <DarkModeProvider>
-       <LocationPopup/>
+      <LocationPopup />
       {loader && <Spinner />}
       {!isAuthPage && <Navbar />}
-      <AutoLogout/>
+      <AutoLogout />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/otp" element={<Otp />} />
         <Route path="/forgetpassword" element={<ForgetPassword />} />
-        <Route element={<PrivateRoute />}>
-        </Route>
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/changepassword" element={<ChangePassword />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/myBookings" element={<MyBookings />} />
+          <Route path="/bookinghistory" element={<BookingHistory />} />
+          <Route path="/admindashboard" element={<AdminDashboard />} />
+          <Route path="/confirmBooking/:turfId/:userId" element={<BookedConfirmPage />} />
+          <Route path="/booking-confirmation/:bookingId" element={<BookingConfirmedPage />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/updatepassword" element={<UpdatePassword/>}/>
+        <Route path="/updatepassword" element={<UpdatePassword />} />
         <Route path="/about" element={<About />} />
         <Route path="*" element={<PageNotFound />} />
-        <Route path="/turf" element={<TurfPage/>}/>
-        <Route path="/profile" element={<Profile/>}/>
-        <Route path="/notification" element={<Notification/>}/>
-        <Route path="/chatbot" element={<Chatbot/>}/>
-        <Route path="/changepassword" element={<ChangePassword />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="turf/turfDetails/:id" element={<TurfDetailPage/>}/>
-        <Route path="/booking/:turfId/slots" element={<BookingPage/>}/>
-        <Route path="/adminpanel" element={<AdminPanel/>}/>
-        <Route path="/confirmBooking/:turfId/:userId" element={<BookedConfirmPage/>}/>
-        <Route path="/booking-confirmation/:bookingId" element={<BookingConfirmedPage />} />
-        <Route path="/myBookings" element={<MyBookings/>}/>
-        <Route path="/bookinghistory" element={<BookingHistory/>}/>
-        <Route path="/usermanagement" element={<UserManagement/>}/>
-        <Route path="/admindashboard" element={<AdminDashboard/>}/>
-        <Route path="/bookingmanagement" element={<BookingManagement/>}/>
-
-         {/* work is pending for private routing */}
-
+        <Route path="/turf" element={<TurfPage />} />
+        <Route path="/notification" element={<Notification />} />
+        <Route path="/chatbot" element={<Chatbot />} />
+        <Route path="/turf/turfDetails/:id" element={<TurfDetailPage />} />
+        <Route path="/booking/:turfId/slots" element={<BookingPage />} />
+        <Route path="/usermanagement" element={<UserManagement />} />
+        <Route path="/bookingmanagement" element={<BookingManagement />} />
+        <Route path="/adminpanel" element={<AdminPanel />} />
       </Routes>
-        
       {!isAuthPage && <Footer />}
     </DarkModeProvider>
-    </>
   );
 };
 

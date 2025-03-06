@@ -1,346 +1,296 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useContext, useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { DarkModeContext } from "../../context/DarkModeContext";
+import whiteBg from "../../assets/Images/whiteBg.png";
+import { UNSAFE_RouteContext, useLocation, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import blackBg from "../../assets/Images/blackBg.png";
 import {
-  faSearch,
-  faUserPlus,
-  faFileExport,
-  faUsers,
-  faUserClock,
-  faSortUp,
-  faSortDown,
-  faEdit,
-  faTrash,
-  faEllipsisV,
-  faUserTie,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons"
+  faCalendarAlt,
+  faClock,
+  faCloud,
+  faExclamationCircle,
+  faInfoCircle,
+} from "@fortawesome/free-solid-svg-icons";
+import { useSelector } from "react-redux";
 
-// Mock user data
-const mockUsers = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john@example.com",
-    role: "User",
-    status: "Active",
-    lastLogin: "2023-05-15",
-    registrationDate: "2023-01-10",
-    recentActivity: "Updated profile",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "Admin",
-    status: "Active",
-    lastLogin: "2023-05-14",
-    registrationDate: "2022-11-05",
-    recentActivity: "Changed password",
-  },
-  {
-    id: 3,
-    name: "Bob Johnson",
-    email: "bob@example.com",
-    role: "User",
-    status: "Pending",
-    lastLogin: "Never",
-    registrationDate: "2023-05-01",
-    recentActivity: "Registered",
-  },
-  {
-    id: 4,
-    name: "Alice Brown",
-    email: "alice@example.com",
-    role: "User",
-    status: "Active",
-    lastLogin: "2023-05-12",
-    registrationDate: "2023-03-20",
-    recentActivity: "Booked a turf",
-  },
-  {
-    id: 5,
-    name: "Charlie Davis",
-    email: "charlie@example.com",
-    role: "Admin",
-    status: "Active",
-    lastLogin: "2023-05-13",
-    registrationDate: "2022-09-15",
-    recentActivity: "Added new turf",
-  },
-]
+const BookingPage = () => {
+  const {turfId} = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { darkMode } = useContext(DarkModeContext);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedSlots, setSelectedSlots] = useState([]);
+  const { bookingIdRescheduled, turf } = location.state || {};
+  const [slots, setSlots] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
+   const selectedTurfName = location.state?.turfName || location.state?.turf?.turfName  ;
+  const token = useSelector((state)=>state.auth.token);
+  const [priceTurf,setPriceTurf] = useState(0);
+  const [userId,setUserId]= useState(0);
+  const user = useSelector((state)=>state.auth.user);
+  const [isRescheduled, setIsRescheduled] = useState(false);
+  const weatherInfo = {
+    temperature: 28,
+    condition: "Partly Cloudy",
+    icon: faCloud,
+  };
+  // api call for turf slots details
+  const fetchTurfSlots = async ()=>{
+    try {
+      const response = await axios.get(
+        `http://localhost:4000/api/v1/turf/${turfId}/slots`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.data.success) {
+        console.log("resposne from slots data", response.data.turf);
+        setSlots(response.data.turf.slots);
+        setPriceTurf(response.data.turf.turfPricePerHour);
+        if (user && user._id) {
+          setUserId(user._id);
+        }
+        
 
-const UserManagement = () => {
-  const [users, setUsers] = useState(mockUsers)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [sortColumn, setSortColumn] = useState("")
-  const [sortDirection, setSortDirection] = useState("asc")
-
-  useEffect(() => {
-    // In a real application, you would fetch users from an API here
-  }, [])
-
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value)
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while fetching the slots details"
+      );
+      console.log("error",error)
   }
+}
+  useEffect(()=>{
+   fetchTurfSlots();
+  },[turfId])
 
-  const filteredUsers = users.filter((user) =>
-    Object.values(user).some((value) => value.toString().toLowerCase().includes(searchTerm.toLowerCase())),
-  )
+  const toggleSlot = (slot) => {
+    if (slot.status === "booked") return;
+  
+    setSelectedSlots((prevSlots) => {
+      let newSlots;
+  
+      if (prevSlots.includes(slot.time)) {
+        newSlots = prevSlots.filter((s) => s !== slot.time);
+      } else {
+        newSlots = [...prevSlots, slot.time];
+      }
+  
 
-  const handleSort = (column) => {
-    if (column === sortColumn) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
-    } else {
-      setSortColumn(column)
-      setSortDirection("asc")
+      const newTotalPrice = newSlots.length * priceTurf;
+      setTotalPrice(newTotalPrice);
+  
+      return newSlots;
+    });
+  }
+  const handleProceedToPayment =async  () => {
+    if (!selectedDate || selectedSlots.length === 0) {
+      toast.error("Please select a date and at least one slot.");
+      return;
     }
-  }
+    console.log("rescheduleId",bookingIdRescheduled)
+    navigate(`/confirmBooking/${turfId}/${userId}` , {
+      state: {
+        bookingIdRescheduled,
+        selectedTurfName,
+        selectedDate,
+        selectedSlots,
+        totalPrice,
+        isRescheduled: !!bookingIdRescheduled,
 
-  const sortedUsers = [...filteredUsers].sort((a, b) => {
-    if (a[sortColumn] < b[sortColumn]) return sortDirection === "asc" ? -1 : 1
-    if (a[sortColumn] > b[sortColumn]) return sortDirection === "asc" ? 1 : -1
-    return 0
-  })
-
-  const statusColors = {
-    Active: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-    Inactive: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-    Pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-  }
+      },
+    });
+  };
+  
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">User Management</h1>
+    <div
+  style={{
+            backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
+          }}
+  className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 mt-12"
+>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white  dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-7xl mx-auto"
+      >
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-2">
+          Book Your Turf Slot
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
+          Reserve your perfect playing time and enjoy a game with friends and
+          family.
+        </p>
 
-        {/* Search and Actions */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <div className="relative flex-grow max-w-md">
-            <input
-              type="text"
-              placeholder="Search users..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              value={searchTerm}
-              onChange={handleSearch}
-            />
-            <FontAwesomeIcon
-              icon={faSearch}
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            />
+        {/* Instructions */}
+        <div className="mb-6 bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+          <h2 className="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-2">
+            How to Book
+          </h2>
+          <ol className="list-decimal list-inside text-blue-700 dark:text-blue-300">
+            <li>Select your preferred date</li>
+            <li>Choose available time slots</li>
+            <li>Review your selection and total price</li>
+            <li>Click "Proceed to Payment" to complete your booking</li>
+          </ol>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-2">
+            {/* Date Selection */}
+            <div className="mb-6">
+              <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                <FontAwesomeIcon icon={faCalendarAlt} className="mr-2" />
+                Select Date:
+              </label>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                min={new Date().toISOString().split("T")[0]} 
+                className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+            </div>
+
+            {/* Slot Selection */}
+            <div className="mb-6">
+              <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                <FontAwesomeIcon icon={faClock} className="mr-2" />
+                Select Time Slot:
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                {slots.map((slot, index) => (
+                  <motion.button
+                    key={index}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`p-3 rounded-lg transition-colors ${
+                      selectedSlots.includes(slot.time)
+                        ? "bg-green-500 text-white"
+                        : slot.status === "available"
+                        ? "bg-green-100 dark:bg-green-800 text-gray-900 dark:text-white"
+                        : "bg-yellow-100 dark:bg-yellow-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                    }`}
+                    onClick={() => toggleSlot(slot)}
+                    disabled={slot.status === "booked"}
+                  >
+                    <div>{slot.time}</div>
+                    <div className="text-sm">₹{priceTurf}</div>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
+            {/* Slot Availability*/}
+            <div className="mb-6 flex justify-center space-x-4">
+              <div className="flex items-center">
+                <div className="w-4 h-4 bg-green-100 dark:bg-green-800 rounded-full mr-2"></div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Available
+                </span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-4 h-4 bg-yellow-100 dark:bg-yellow-800 rounded-full mr-2"></div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Booked
+                </span>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 text-center">
+              <FontAwesomeIcon icon={faInfoCircle} className="mr-1" />
+              Note: You can book multiple slots for longer playtime.
+            </p>
           </div>
-          <div className="flex gap-4">
-            <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 flex items-center">
-              <FontAwesomeIcon icon={faUserPlus} className="mr-2" />
-              Add User
-            </button>
-            <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 flex items-center">
-              <FontAwesomeIcon icon={faFileExport} className="mr-2" />
-              Export
-            </button>
-          </div>
-        </div>
 
-        {/* User Table */}
-        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                {["Name", "Email", "Role", "Registration Date", "Recent Activity", "Actions"].map(
-                  (header) => (
-                    <th
-                      key={header}
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
-                      onClick={() => handleSort(header.toLowerCase())}
-                    >
-                      <div className="flex items-center">
-                        {header}
-                        {sortColumn === header.toLowerCase() && (
-                          <FontAwesomeIcon icon={sortDirection === "asc" ? faSortUp : faSortDown} className="ml-1" />
-                        )}
-                      </div>
-                    </th>
-                  ),
-                )}
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {sortedUsers.map((user) => (
-                <motion.tr
-                  key={user.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.role}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.registrationDate}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500 dark:text-gray-300">{user.recentActivity}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
-                      <FontAwesomeIcon icon={faEdit} />
-                    </button>
-                    <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 mr-3">
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                    <button className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300">
-                      <FontAwesomeIcon icon={faEllipsisV} />
-                    </button>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* User Statistics */}
-        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <motion.div
-            className="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg"
-            whileHover={{ scale: 1.03 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0 bg-blue-500 rounded-md p-3">
-                  <FontAwesomeIcon icon={faUsers} className="h-6 w-6 text-white" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Users</dt>
-                    <dd className="text-3xl font-semibold text-gray-900 dark:text-white">{users.length}</dd>
-                  </dl>
+          <div>
+            {/* Weather*/}
+            <div className="mb-6 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
+                Today's Weather
+              </h3>
+              <div className="flex items-center justify-center">
+                <FontAwesomeIcon
+                  icon={weatherInfo.icon}
+                  className="text-4xl text-yellow-500 mr-3"
+                />
+                <div>
+                  <p className="text-gray-700 dark:text-gray-300">
+                    {weatherInfo.temperature}°C
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {weatherInfo.condition}
+                  </p>
                 </div>
               </div>
             </div>
-          </motion.div>
-          <motion.div
-            className="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg"
-            whileHover={{ scale: 1.03 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0 bg-green-500 rounded-md p-3">
-                  <FontAwesomeIcon icon={faUserTie} className="h-6 w-6 text-white" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Admin Users</dt>
-                    <dd className="text-3xl font-semibold text-gray-900 dark:text-white">
-                      {users.filter((user) => user.role === "Admin").length}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-          <motion.div
-            className="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg"
-            whileHover={{ scale: 1.03 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0 bg-yellow-500 rounded-md p-3">
-                  <FontAwesomeIcon icon={faUser} className="h-6 w-6 text-white" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Regular Users</dt>
-                    <dd className="text-3xl font-semibold text-gray-900 dark:text-white">
-                      {users.filter((user) => user.role === "User").length}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-          <motion.div
-            className="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg"
-            whileHover={{ scale: 1.03 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0 bg-purple-500 rounded-md p-3">
-                  <FontAwesomeIcon icon={faUserClock} className="h-6 w-6 text-white" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                      New Users (Last 30 days)
-                    </dt>
-                    <dd className="text-3xl font-semibold text-gray-900 dark:text-white">
-                      {
-                        users.filter((user) => {
-                          const thirtyDaysAgo = new Date()
-                          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-                          return new Date(user.registrationDate) > thirtyDaysAgo
-                        }).length
-                      }
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
 
-        {/* User Management Tips */}
-        <div className="mt-8 bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">User Management Tips</h2>
-          <ul className="list-disc pl-5 space-y-2 text-gray-600 dark:text-gray-300">
-            <li>Regularly review and update user permissions to maintain security.</li>
-            <li>Encourage users to enable two-factor authentication for enhanced account security.</li>
-            <li>Implement a clear process for onboarding new users and offboarding departing users.</li>
-            <li>Periodically audit user activities to detect any unusual behavior or potential security risks.</li>
-            <li>Provide clear guidelines and support for users to manage their account settings and preferences.</li>
-          </ul>
-        </div>
+            {/* Cancellation and Reschedule Info */}
+            <div className="mb-6 bg-red-50 dark:bg-red-900 p-4 rounded-lg">
+              <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
+                <FontAwesomeIcon icon={faExclamationCircle} className="mr-2" />
+                Cancellation & Reschedule Policy
+              </h3>
+              <ul className="list-disc list-inside text-red-700 dark:text-red-300">
+                <li>Free cancellation up to 24 hours before the booked slot</li>
+                <li>Rescheduling is allowed once, subject to availability</li>
+                <li>For any queries, please contact our support team</li>
+              </ul>
+            </div>
 
-        {/* Recent User Activities */}
-        <div className="mt-8 bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Recent User Activities</h2>
-          <div className="space-y-4">
-            {users.slice(0, 5).map((user) => (
-              <div key={user.id} className="flex items-center space-x-4">
-                <div className="flex-shrink-0">
-                  <img
-                    className="h-8 w-8 rounded-full"
-                    src={`https://ui-avatars.com/api/?name=${user.name}&background=random`}
-                    alt={user.name}
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user.name}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user.recentActivity}</p>
-                </div>
-                <div className="inline-flex items-center text-sm font-semibold text-gray-900 dark:text-white">
-                  {new Date(user.lastLogin).toLocaleDateString()}
-                </div>
-              </div>
-            ))}
+            {/* Total price*/}
+            <div className="text-center bg-green-50 dark:bg-green-900 p-4 rounded-lg">
+              <p className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                Total Price:{" "}
+                <span className="text-green-500 dark:text-green-400">
+                  ₹{totalPrice}
+                </span>
+              </p>
+              {/* Selected Date, Time Slot, and Turf Name */}
+              <p className="text-lg font-poppins font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <span className="font-semibold text-gray-900 dark:text-white">
+                  Date:
+                </span>{" "}
+                {selectedDate || "Not selected"}
+              </p>
+              <p className="text-lg font-poppins font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <span className="font-semibold text-gray-900 dark:text-white">
+                  Slot:
+                </span>{" "}
+                {selectedSlots.length > 0
+                  ? selectedSlots.join(", ")
+                  : "No slots selected"}
+              </p>
+              <p className="text-lg font-medium font-poppins text-gray-700 dark:text-gray-300 mb-4">
+                <span className="font-semibold text-gray-900 dark:text-white">
+                  Turf:
+                </span>{" "}
+                {selectedTurfName || "not selected"}
+              </p>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full p-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition"
+                onClick={handleProceedToPayment}
+                disabled={!selectedDate || selectedSlots.length === 0}
+              >
+                Proceed to Payment
+              </motion.button>
+            </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
-  )
-}
+  );
+};
 
-export default UserManagement
-
+export default BookingPage;
