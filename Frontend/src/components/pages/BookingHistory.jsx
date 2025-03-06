@@ -74,7 +74,7 @@ const BookingHistory = () => {
           <h1 className="text-4xl font-orbitron font-bold text-gray-800 dark:text-white mb-3 mt-5 lg:mt-0">
             Booking History
           </h1>
-          <p className="text-gray-600 font-serif text-xl dark:text-gray-400">View and manage your past turf bookings</p>
+          <p className="text-gray-600 font-serif text-xl dark:text-gray-400">View your past turf bookings</p>
         </header>
 
         {/* Search and Filter Section */}

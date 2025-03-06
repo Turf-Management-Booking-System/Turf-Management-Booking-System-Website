@@ -181,11 +181,11 @@ const BookedConfirmPage = () => {
       >
         <div className="md:flex relative z-20">
           <div className="md:w-1/2 p-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Confirm Your Booking</h1>
+            <h1 className="text-3xl font-bold font-serif text-gray-900 dark:text-white mb-6">Confirm Your Booking</h1>
 
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Booking Summary</h2>
+                <h2 className="text-xl font-montserrat font-semibold text-gray-800 dark:text-gray-200 mb-4">Booking Summary</h2>
                 <div className="space-y-3">
                   <p className="flex items-center text-gray-600 dark:text-gray-300">
                     <FaCalendarAlt className="mr-2 text-green-500" />
@@ -207,7 +207,7 @@ const BookedConfirmPage = () => {
               </div>
 
               <div>
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Select Payment Mode</h2>
+                <h2 className="text-xl font-montserrat font-semibold text-gray-800 dark:text-gray-200 mb-4">Select Payment Mode</h2>
                 <div className="space-y-3">
                   <label className="flex items-center space-x-3 p-3 rounded-lg bg-gray-100 dark:bg-gray-700 cursor-pointer transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-600">
                     <input
@@ -240,8 +240,8 @@ const BookedConfirmPage = () => {
 
           <div className="md:w-1/2 bg-green-500 p-8 flex items-center justify-center">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-white mb-4">Ready to Play?</h2>
-              <p className="text-white text-lg mb-6">Confirm your booking and get ready for an amazing time!</p>
+              <h2 className="text-3xl font-orbitron font-bold text-white mb-4">Ready to Play?</h2>
+              <p className="text-white font-montserrat text-lg mb-6">Confirm your booking and get ready for an amazing time!</p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
