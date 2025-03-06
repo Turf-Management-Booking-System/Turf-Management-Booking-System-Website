@@ -380,6 +380,41 @@ exports.getTurfSlots = async(req,res)=>{
         })
     }
 }
+exports.getTurfSlotsByDate = async (req, res) => {
+  try {
+    const { turfId, date } = req.params;
+    const selectedDate = new Date(date);
+
+    if (isNaN(selectedDate.getTime())) {
+      return res.status(400).json({ message: "Invalid Date" });
+    }
+
+    const turf = await Turf.findById(turfId);
+    if (!turf) {
+      return res.status(404).json({ message: "Turf not found" });
+    }
+
+    // Poore slots return karo
+    const slots = turf.slots.map((slot) => {
+      if (slot.bookingEndTime) {
+        const slotDate = new Date(slot.bookingEndTime);
+        if (
+          !isNaN(slotDate.getTime()) &&
+          slotDate.toISOString().split("T")[0] === selectedDate.toISOString().split("T")[0]
+        ) {
+          return { ...slot, status: "booked" }; // Agar date match kare toh status booked rakho
+        }
+      }
+      return slot; // Baaki slots waise hi return karo
+    });
+
+    res.status(200).json(slots);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 
 exports.getAllSports = async (req, res) => {
         try {

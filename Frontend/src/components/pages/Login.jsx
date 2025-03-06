@@ -23,7 +23,8 @@ const Login = () => {
 
   const [registerPasswordVisible,setRegisterPasswordVisible] = useState(false)
   const loader = useSelector(state=>state.auth.loader);
-  
+  const user = useSelector((state)=>state.auth.user);
+  const isAuthenticated = useSelector((state)=>state.auth.isAuthenticated)
   const [email,setEmail] = useState("");
   const [password,setPassword]=useState("")
   const navigate = useNavigate();
@@ -33,7 +34,15 @@ const Login = () => {
     email:"",
     password:"",
   });
-
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.role === "Admin") {
+        navigate("/admindashboard");
+      } else {
+        navigate("/dashboard");
+      }
+    }
+  }, [isAuthenticated, user, navigate]);
   const togglePasswordVisibility = (field) => {
     if(field === "login"){
       setLoginPasswordVisible(!loginPasswordVisible);
@@ -99,7 +108,6 @@ const LoginHandler = async (event) => {
         toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!");
         console.log(error.response?.data?.message)
       }
-      navigate("/dashboard")
     } else {
       toast.error(response.data.message || "Something went wrong please check");
       console.log(error.response?.data?.message)

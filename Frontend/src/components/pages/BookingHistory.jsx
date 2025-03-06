@@ -151,6 +151,7 @@ const BookingHistory = () => {
 
         {/* Booking History List */}
         <section className="space-y-6">
+          <div className="overflow-y-auto" style={{maxHeight:"60vh"}}>
           {filteredBookings.map((booking) => (
             <motion.div
               key={booking._id}
@@ -219,6 +220,7 @@ const BookingHistory = () => {
               </div>
             </motion.div>
           ))}
+          </div>
         </section>
 
         {/* Export Options */}

@@ -25,7 +25,7 @@ app.use(fileupload({
     tempFileDir: '/tmp/'}      // Directory for temp files
 ));
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
-
+require("./cron/updateSlotsStatus")
 const {cloudinaryConnect} =require("./config/cloudinary");
 cloudinaryConnect();
 require("dotenv").config();

@@ -24,9 +24,7 @@ function Navbar() {
   const [openModal, closeModal] = useState(false);
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  const notifications = useSelector(
-    (state) => state.notification.notifications
-  );
+  const notifications = useSelector((state) => state.notification.notifications);
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -119,7 +117,39 @@ function Navbar() {
           menuOpen ? "block" : "hidden"
         } lg:flex lg:items-center lg:gap-12 absolute lg:static top-16 left-0 right-0 bg-[#5886a7] dark:bg-gray-900 lg:bg-transparent lg:dark:bg-transparent p-4 lg:p-0`}
       >
-        {["/", "/turf", "/about", "/contact"].map((path, index) => (
+        {/* Home Link */}
+        <Link
+          to="/"
+          className={`block lg:inline text-[20px] font-medium font-serif pb-2 relative ${
+            location.pathname === "/" ? "after:w-full" : "after:w-0"
+          } after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-white after:transition-all after:duration-300`}
+        >
+          Home
+        </Link>
+
+        {/* Turf Panel Link (for Admin) */}
+        {isAuthenticated && user.role === "Admin" && (
+          <Link
+            to="/adminpanel"
+            className={`block lg:inline text-[20px] font-medium font-serif pb-2 relative ${
+              location.pathname === "/adminpanel" ? "after:w-full" : "after:w-0"
+            } after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-white after:transition-all after:duration-300`}
+          >
+            Turf Panel
+          </Link>
+        )}
+         {isAuthenticated && user.role === "Player" && (
+          <Link
+            to="/turf"
+            className={`block lg:inline text-[20px] font-medium font-serif pb-2 relative ${
+              location.pathname === "/turf" ? "after:w-full" : "after:w-0"
+            } after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-white after:transition-all after:duration-300`}
+          >
+            Turf
+          </Link>
+        )}
+        {/* Other Links */}
+        {["/about", "/contact"].map((path, index) => (
           <Link
             key={index}
             to={path}
@@ -127,9 +157,7 @@ function Navbar() {
               location.pathname === path ? "after:w-full" : "after:w-0"
             } after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-white after:transition-all after:duration-300`}
           >
-            {path === "/"
-              ? "Home"
-              : path.replace("/", "").charAt(0).toUpperCase() + path.slice(2)}
+            {path.replace("/", "").charAt(0).toUpperCase() + path.slice(2)}
           </Link>
         ))}
       </div>
@@ -206,8 +234,9 @@ function Navbar() {
                     <i className="bx bx-chevron-right text-2xl"></i>
                   </Link>
 
+                  {/* Redirect to /admindashboard if user is admin, else /dashboard */}
                   <Link
-                    to="/dashboard"
+                    to={user.role === "Admin" ? "/admindashboard" : "/dashboard"}
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
                   >

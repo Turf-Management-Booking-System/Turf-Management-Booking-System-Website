@@ -6,6 +6,10 @@ const SlotSchema = new mongoose.Schema({
         },
         time: { type: String, required: true }, 
         status: { type: String, enum: ["available", "booked"], default: "available" },
+        bookingEndTime: {
+                type: Date, 
+                default:null,
+            },
       });
 // create the schema
 const turfSchema = mongoose.Schema({
