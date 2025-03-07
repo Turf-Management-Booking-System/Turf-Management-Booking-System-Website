@@ -11,6 +11,18 @@ import {
   faChevronDown,
   faStar,
   faEnvelope,
+  faMapMarkerAlt,
+  faUsers,
+  faCheckCircle,
+  faLightbulb,
+  faShieldAlt,
+  faBasketballBall,
+  faTableTennis,
+  faVolleyballBall,
+  faHockeyPuck,
+  faQuoteLeft,
+  faQuoteRight,
+  faInfoCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import TurfImageDay from "../../assets/images/TurfImageDay.jpg";
 import TurfImageNight from "../../assets/images/TurfImageNight.jpg";
@@ -129,6 +141,40 @@ function Home() {
       image: "",
     },
   ];
+  const sportsCategories = [
+    { name: "Football", icon: faFutbol, color: "bg-green-500" },
+    { name: "Cricket", icon: faFutbol, color: "bg-blue-500" },
+    { name: "Basketball", icon: faBasketballBall, color: "bg-orange-500" },
+    { name: "Tennis", icon: faTableTennis, color: "bg-yellow-500" },
+    { name: "Volleyball", icon: faVolleyballBall, color: "bg-purple-500" },
+    { name: "Hockey", icon: faHockeyPuck, color: "bg-red-500" },
+  ]
+  const benefits = [
+    {
+      icon: faCheckCircle,
+      title: "Easy Booking",
+      description: "Book your preferred turf in just a few clicks",
+      color: "bg-blue-500",
+    },
+    {
+      icon: faShieldAlt,
+      title: "Secure Payments",
+      description: "Multiple secure payment options available",
+      color: "bg-green-500",
+    },
+    {
+      icon: faLightbulb,
+      title: "Smart Recommendations",
+      description: "Get personalized turf suggestions based on your preferences",
+      color: "bg-yellow-500",
+    },
+    {
+      icon: faUsers,
+      title: "Team Management",
+      description: "Organize your team and invite players easily",
+      color: "bg-purple-500",
+    },
+  ]
   const fetchAllTestimonals = async()=>{
     try {
       dispatch(setLoader(true));
@@ -292,11 +338,13 @@ function Home() {
         </motion.div>
       </motion.div>
 
+      
+
       {/* Search, Book, Play Timeline */}
       <section
         ref={ref}
         style={{
-          backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
+          backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
         }}
         className="py-16 flex flex-col items-center relative"
       >
@@ -333,10 +381,122 @@ function Home() {
           </motion.div>
         ))}
       </section>
+{/* Sports*/}
+<section
+        style={{
+          backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
+        }}
+        className="py-16"
+      >
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <span className="inline-block px-4 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-medium text-sm mb-4">
+              EXPLORE BY SPORT
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
+              Find Turfs For Your Favorite Sport
+            </h2>
+            <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+              Our facilities are designed to accommodate a wide range of sports activities
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {sportsCategories.map((sport, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                }}
+                viewport={{ once: true }}
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden text-center group cursor-pointer"
+              >
+                <div
+                  className={`${sport.color} h-24 flex items-center justify-center group-hover:h-28 transition-all duration-300`}
+                >
+                  <FontAwesomeIcon icon={sport.icon} className="text-4xl text-white" />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-gray-900 dark:text-white">{sport.name}</h3>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+       {/* Benefits Section */}
+       <section
+        style={{
+          backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+        }}
+        className="py-16"
+      >
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <span className="inline-block px-4 py-1 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 font-medium text-sm mb-4">
+              WHY CHOOSE US
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
+              Benefits of Using TurfBook
+            </h2>
+            <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+              We make booking sports facilities easier than ever before
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {benefits.map((benefit, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                whileHover={{
+                  y: -10,
+                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                }}
+                viewport={{ once: true }}
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden group"
+              >
+                <div className={`${benefit.color} h-2 group-hover:h-4 transition-all duration-300`}></div>
+                <div className="p-8">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-6">
+                    <FontAwesomeIcon
+                      icon={benefit.icon}
+                      className={`text-2xl ${benefit.color.replace("bg-", "text-")}`}
+                    />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">{benefit.title}</h3>
+                  <p className="text-gray-700 dark:text-gray-300">{benefit.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
       {/* Featured Turfs */}
       <section 
       style={{
-        backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+        backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
       }}
       className="py-16 ">
         <div className="container mx-auto px-4">

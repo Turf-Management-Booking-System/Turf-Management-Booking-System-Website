@@ -170,7 +170,7 @@ const LoginHandler = async (event) => {
     <>
       <div  style={{
                 backgroundImage: `url(${darkMode ? TurfLogin : TurfLoginPage})`,
-              }} className="flex justify-center items-center min-h-screen bg-cover bg-center mt-12">
+              }} className="flex justify-center items-center min-h-screen bg-cover  mt-12">
         <div
           className={`relative ${
             isActive ? "active" : ""

@@ -122,20 +122,20 @@ const BookingPage = () => {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white  dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-7xl mx-auto"
       >
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-2">
+        <h1 className="font-orbitron text-3xl font-bold text-gray-900 dark:text-white text-center mb-2">
           Book Your Turf Slot
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
+        <p className=" font-serif text-xl text-gray-600 dark:text-gray-400 text-center mb-6">
           Reserve your perfect playing time and enjoy a game with friends and
           family.
         </p>
 
         {/* Instructions */}
         <div className="mb-6 bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
-          <h2 className="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-2">
+          <h2 className="font-serif text-xl font-semibold text-blue-800 dark:text-blue-200 mb-2">
             How to Book
           </h2>
-          <ol className="list-decimal list-inside text-blue-700 dark:text-blue-300">
+          <ol className="font-montserrat list-decimal list-inside text-blue-700 dark:text-blue-300">
             <li>Select your preferred date</li>
             <li>Choose available time slots</li>
             <li>Review your selection and total price</li>
@@ -147,7 +147,7 @@ const BookingPage = () => {
           <div className="md:col-span-2">
             {/* Date Selection */}
             <div className="mb-6">
-              <label className="block text-gray-700 dark:text-gray-300 mb-2">
+              <label className="font-serif  block text-gray-700 dark:text-gray-300 mb-2">
                 <FontAwesomeIcon icon={faCalendarAlt} className="mr-2" />
                 Select Date:
               </label>
@@ -214,7 +214,7 @@ const BookingPage = () => {
           <div>
             {/* Weather*/}
             <div className="mb-6 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
+              <h3 className="font-serif text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
                 Today's Weather
               </h3>
               <div className="flex items-center justify-center">
@@ -235,7 +235,7 @@ const BookingPage = () => {
 
             {/* Cancellation and Reschedule Info */}
             <div className="mb-6 bg-red-50 dark:bg-red-900 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
+              <h3 className="text-lg font-serif font-semibold text-red-800 dark:text-red-200 mb-2">
                 <FontAwesomeIcon icon={faExclamationCircle} className="mr-2" />
                 Cancellation & Reschedule Policy
               </h3>
@@ -248,7 +248,7 @@ const BookingPage = () => {
 
             {/* Total price*/}
             <div className="text-center bg-green-50 dark:bg-green-900 p-4 rounded-lg">
-              <p className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              <p className="font-serif text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 Total Price:{" "}
                 <span className="text-green-500 dark:text-green-400">
                   ₹{totalPrice}
@@ -256,13 +256,13 @@ const BookingPage = () => {
               </p>
               {/* Selected Date, Time Slot, and Turf Name */}
               <p className="text-lg font-poppins font-medium text-gray-700 dark:text-gray-300 mb-2">
-                <span className="font-semibold text-gray-900 dark:text-white">
+                <span className="font-serif font-semibold text-gray-900 dark:text-white">
                   Date:
                 </span>{" "}
                 {selectedDate || "Not selected"}
               </p>
               <p className="text-lg font-poppins font-medium text-gray-700 dark:text-gray-300 mb-2">
-                <span className="font-semibold text-gray-900 dark:text-white">
+                <span className="font-serif font-semibold text-gray-900 dark:text-white">
                   Slot:
                 </span>{" "}
                 {selectedSlots.length > 0
@@ -270,7 +270,7 @@ const BookingPage = () => {
                   : "No slots selected"}
               </p>
               <p className="text-lg font-medium font-poppins text-gray-700 dark:text-gray-300 mb-4">
-                <span className="font-semibold text-gray-900 dark:text-white">
+                <span className="font-serif font-semibold text-gray-900 dark:text-white">
                   Turf:
                 </span>{" "}
                 {selectedTurfName || "not selected"}
@@ -279,7 +279,7 @@ const BookingPage = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-full p-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition"
+                className="w-full font-montserrat p-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition"
                 onClick={handleProceedToPayment}
                 disabled={!selectedDate || selectedSlots.length === 0}
               >
