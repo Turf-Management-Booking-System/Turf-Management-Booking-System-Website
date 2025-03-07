@@ -149,7 +149,7 @@ function Navbar() {
           </Link>
         )}
         {/* Other Links */}
-        {["/about", "/contact"].map((path, index) => (
+        {["/about","/contact"].map((path, index) => (
           <Link
             key={index}
             to={path}
