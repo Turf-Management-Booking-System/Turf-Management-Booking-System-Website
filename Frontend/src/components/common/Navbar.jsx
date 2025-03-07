@@ -140,17 +140,19 @@ function Navbar() {
         )}
 
         {/* Turf Link (Visible to All Users) */}
-        { !user.role == "Admin" && 
-        <Link
-        to="/turf"
-        className={`block lg:inline text-[20px] font-medium font-serif pb-2 relative ${
-          location.pathname === "/turf" ? "after:w-full" : "after:w-0"
-        } after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-white after:transition-all after:duration-300`}
-      >
-        Turf
-      </Link>
+  
+     {/* Turf Link (Visible to All Users except Admin) */}
+     {(!isAuthenticated || (isAuthenticated && user.role !== "Admin")) && (
+  <Link
+    to="/turf"
+    className={`block lg:inline text-[20px] font-medium font-serif pb-2 relative ${
+      location.pathname === "/turf" ? "after:w-full" : "after:w-0"
+    } after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-white after:transition-all after:duration-300`}
+  >
+    Turf
+  </Link>
+)}
 
-        }
 
         {/* Other Links */}
         {["/about", "/contact"].map((path, index) => (
