@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useSelector, useDispatch } from "react-redux"
-import { DarkModeContext } from "../../context/DarkModeContext"
-import greenBg from "../../assets/Images/greenBg.png"
-import blackBg from "../../assets/Images/blackBg.png"
-import whiteBg from "../../assets/Images/whiteBg.png"
-import axios from "axios"
-import toast from "react-hot-toast"
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useSelector, useDispatch } from "react-redux";
+import { DarkModeContext } from "../../context/DarkModeContext";
+import greenBg from "../../assets/Images/greenBg.png";
+import blackBg from "../../assets/Images/blackBg.png";
+import whiteBg from "../../assets/Images/whiteBg.png";
+import axios from "axios";
+import toast from "react-hot-toast";
 import {
   Calendar,
   ChevronDown,
@@ -24,162 +24,171 @@ import {
   DollarSign,
   BarChart2,
   Download,
-} from "lucide-react"
+} from "lucide-react";
 
 // Assuming you have these actions in your Redux store
 // import { setBookings, updateBooking, deleteBooking } from "../../slices/bookingSlice"
-import { setLoader } from "../../slices/authSlice"
+import { setLoader } from "../../slices/authSlice";
 
 const BookingManagement = () => {
-  const dispatch = useDispatch()
-  const { darkMode } = React.useContext(DarkModeContext)
-  const token = useSelector((state) => state.auth.token)
-  const bookings = useSelector((state) => state.booking.allBookings)
+  const dispatch = useDispatch();
+  const { darkMode } = React.useContext(DarkModeContext);
+  const token = useSelector((state) => state.auth.token);
 
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("All")
-  const [sortBy, setSortBy] = useState("date")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [bookingsPerPage] = useState(10)
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
-  const [selectedBooking, setSelectedBooking] = useState(null)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("All");
+  const [sortBy, setSortBy] = useState("date");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [bookingsPerPage] = useState(10);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [allBookings, setAllBookings] = useState([]);
   const [editFormData, setEditFormData] = useState({
     status: "",
     date: "",
     timeSlot: [],
-  })
+  });
 
   useEffect(() => {
-    fetchBookings()
-  }, [])
+    fetchBookings();
+  }, []);
 
   const fetchBookings = async () => {
     try {
-      dispatch(setLoader(true))
+      dispatch(setLoader(true));
       const response = await axios.get("http://localhost:4000/api/v1/booking/getAllBookings", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
+      });
       if (response.data.success) {
-        dispatch(setBookings(response.data.bookings))
+        // Limit the bookings to only 4
+        const limitedBookings = response.data.allBookings.slice(0, 4);
+        setAllBookings(limitedBookings);
       }
     } catch (error) {
-      toast.error("Failed to fetch bookings")
+      toast.error("Failed to fetch bookings");
     } finally {
-      dispatch(setLoader(false))
+      dispatch(setLoader(false));
     }
-  }
+  };
 
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value)
-    setCurrentPage(1)
-  }
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
 
   const handleFilterChange = (e) => {
-    setFilterStatus(e.target.value)
-    setCurrentPage(1)
-  }
+    setFilterStatus(e.target.value);
+    setCurrentPage(1);
+  };
 
   const handleSortChange = (e) => {
-    setSortBy(e.target.value)
-    setCurrentPage(1)
-  }
+    setSortBy(e.target.value);
+    setCurrentPage(1);
+  };
 
-  const toggleFilter = () => setIsFilterOpen(!isFilterOpen)
+  const toggleFilter = () => setIsFilterOpen(!isFilterOpen);
 
-  const filteredBookings = bookings.filter((booking) => {
+  const filteredBookings = allBookings.filter((booking) => {
     const matchesSearch =
       booking.turf.turfName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.user.lastName.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesFilter = filterStatus === "All" || booking.status === filterStatus
-    return matchesSearch && matchesFilter
-  })
+      booking.user.lastName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterStatus === "All" || booking.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
 
   const sortedBookings = filteredBookings.sort((a, b) => {
     if (sortBy === "date") {
-      return new Date(b.date) - new Date(a.date)
+      return new Date(b.date) - new Date(a.date);
     } else if (sortBy === "status") {
-      return a.status.localeCompare(b.status)
+      return a.status.localeCompare(b.status);
     }
-    return 0
-  })
+    return 0;
+  });
 
-  const indexOfLastBooking = currentPage * bookingsPerPage
-  const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage
-  const currentBookings = sortedBookings.slice(indexOfFirstBooking, indexOfLastBooking)
+  const indexOfLastBooking = currentPage * bookingsPerPage;
+  const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
+  const currentBookings = sortedBookings.slice(indexOfFirstBooking, indexOfLastBooking);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber)
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const openEditModal = (booking) => {
-    setSelectedBooking(booking)
+    setSelectedBooking(booking);
     setEditFormData({
       status: booking.status,
-      date: booking.date,
+      date: booking.date.split("T")[0], // Ensure the date is in the correct format
       timeSlot: booking.timeSlot,
-    })
-    setIsEditModalOpen(true)
-  }
+    });
+    setIsEditModalOpen(true);
+  };
 
   const closeEditModal = () => {
-    setIsEditModalOpen(false)
-    setSelectedBooking(null)
-    setEditFormData({ status: "", date: "", timeSlot: [] })
-  }
+    setIsEditModalOpen(false);
+    setSelectedBooking(null);
+    setEditFormData({ status: "", date: "", timeSlot: [] });
+  };
 
   const handleEditSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      dispatch(setLoader(true))
+      dispatch(setLoader(true));
+      const formattedDate = new Date(editFormData.date).toISOString(); // Format the date
       const response = await axios.put(
         `http://localhost:4000/api/v1/booking/updateBooking/${selectedBooking._id}`,
-        editFormData,
+        { ...editFormData, date: formattedDate },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
-      )
+        }
+      );
       if (response.data.success) {
-        dispatch(updateBooking({ id: selectedBooking._id, updates: editFormData }))
-        toast.success("Booking updated successfully")
-        closeEditModal()
+        const updatedBookings = allBookings.map((booking) =>
+          booking._id === selectedBooking._id ? { ...booking, ...editFormData, date: formattedDate } : booking
+        );
+        setAllBookings(updatedBookings);
+        toast.success("Booking updated successfully");
+        closeEditModal();
       }
     } catch (error) {
-      toast.error("Failed to update booking")
+      toast.error("Failed to update booking");
     } finally {
-      dispatch(setLoader(false))
+      dispatch(setLoader(false));
     }
-  }
+  };
 
   const handleDeleteBooking = async (id) => {
     if (window.confirm("Are you sure you want to delete this booking?")) {
       try {
-        dispatch(setLoader(true))
+        dispatch(setLoader(true));
         const response = await axios.delete(`http://localhost:4000/api/v1/booking/deleteBooking/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        })
+        });
         if (response.data.success) {
-          dispatch(deleteBooking(id))
-          toast.success("Booking deleted successfully")
+          const updatedBookings = allBookings.filter((booking) => booking._id !== id);
+          setAllBookings(updatedBookings);
+          toast.success("Booking deleted successfully");
         }
       } catch (error) {
-        toast.error("Failed to delete booking")
+        toast.error("Failed to delete booking");
       } finally {
-        dispatch(setLoader(false))
+        dispatch(setLoader(false));
       }
     }
-  }
+  };
 
   return (
-    <div 
-    style={{
-            backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
-          }} className={`min-h-screen p-4 sm:p-6 lg:p-8`}>
+    <div
+      style={{
+        backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+      }}
+      className={`min-h-screen p-4 sm:p-6 lg:p-8`}
+    >
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-green-600 dark:text-white">Booking Management</h1>
 
@@ -341,7 +350,7 @@ const BookingManagement = () => {
         </div>
 
         {/* Pagination */}
-        {/* <div className="mt-4 flex justify-between items-center">
+        <div className="mt-4 flex justify-between items-center">
           <div className="text-sm text-gray-700 dark:text-gray-300">
             Showing <span className="font-medium">{indexOfFirstBooking + 1}</span> to{" "}
             <span className="font-medium">{Math.min(indexOfLastBooking, sortedBookings.length)}</span> of{" "}
@@ -363,7 +372,7 @@ const BookingManagement = () => {
               <ChevronRight size={20} />
             </button>
           </div>
-        </div> */}
+        </div>
 
         {/* Edit Booking Modal */}
         <AnimatePresence>
@@ -404,7 +413,7 @@ const BookingManagement = () => {
                     <input
                       type="date"
                       id="date"
-                      value={editFormData.date.split("T")[0]}
+                      value={editFormData.date}
                       onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
                       className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
                     />
@@ -452,7 +461,7 @@ const BookingManagement = () => {
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Total Bookings</h3>
               <Calendar className="text-green-500" size={24} />
             </div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">{bookings.length}</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">{allBookings.length}</p>
           </div>
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
             <div className="flex items-center justify-between mb-4">
@@ -460,7 +469,7 @@ const BookingManagement = () => {
               <CheckCircle className="text-blue-500" size={24} />
             </div>
             <p className="text-3xl font-bold text-gray-900 dark:text-white">
-              {bookings.filter((booking) => booking.status === "Confirmed").length}
+              {allBookings.filter((booking) => booking.status === "Confirmed").length}
             </p>
           </div>
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
@@ -469,7 +478,7 @@ const BookingManagement = () => {
               <CheckCircle className="text-green-500" size={24} />
             </div>
             <p className="text-3xl font-bold text-gray-900 dark:text-white">
-              {bookings.filter((booking) => booking.status === "Completed").length}
+              {allBookings.filter((booking) => booking.status === "Completed").length}
             </p>
           </div>
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
@@ -478,7 +487,7 @@ const BookingManagement = () => {
               <XCircle className="text-red-500" size={24} />
             </div>
             <p className="text-3xl font-bold text-gray-900 dark:text-white">
-              {bookings.filter((booking) => booking.status === "Cancelled").length}
+              {allBookings.filter((booking) => booking.status === "Cancelled").length}
             </p>
           </div>
         </div>
@@ -488,7 +497,7 @@ const BookingManagement = () => {
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Recent Activity</h3>
             <ul className="space-y-4">
-              {bookings.slice(0, 5).map((booking) => (
+              {allBookings.slice(0, 5).map((booking) => (
                 <li key={booking._id} className="flex items-start space-x-3">
                   <div className="flex-shrink-0">
                     {booking.status === "Confirmed" && <Clock className="text-blue-500" size={20} />}
@@ -546,8 +555,7 @@ const BookingManagement = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default BookingManagement
-
+export default BookingManagement;

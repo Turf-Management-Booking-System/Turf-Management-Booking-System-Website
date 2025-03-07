@@ -485,7 +485,8 @@ exports.getUserFeedback =async (req,res)=>{
 }
 exports.getAllBooking = async(req,res)=>{
   try{
-     const allBookings = await Booking.find({} );
+     const allBookings = await Booking.find({}).populate("user").populate("turf")
+
      return res.status(200).json({
       success:true,
       message:"Fetch All Bookings",
