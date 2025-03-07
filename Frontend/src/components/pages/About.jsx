@@ -35,39 +35,6 @@ const About = () => {
   const scale = useTransform(scrollYProgress, [0, 0.2], [0.8, 1])
   const [currentAdIndex, setCurrentAdIndex] = useState(0)
 
-  // Side advertisement data
-  const advertisements = [
-    {
-      title: "Premium Turf Gear",
-      description: "20% OFF on all sports equipment!",
-      image: "https://source.unsplash.com/300x600/?sports,equipment",
-      link: "#",
-      color: "from-blue-500 to-purple-600",
-    },
-    {
-      title: "Join Our League",
-      description: "Register your team today!",
-      image: "https://source.unsplash.com/300x600/?football,team",
-      link: "#",
-      color: "from-green-500 to-teal-600",
-    },
-    {
-      title: "Sports Nutrition",
-      description: "Fuel your game with the best supplements",
-      image: "https://source.unsplash.com/300x600/?fitness,nutrition",
-      link: "#",
-      color: "from-orange-500 to-red-600",
-    },
-  ]
-
-  // Auto-rotate ads
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentAdIndex((prevIndex) => (prevIndex === advertisements.length - 1 ? 0 : prevIndex + 1))
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [advertisements.length])
 
   // Team members data
   const teamMembers = [
@@ -242,34 +209,6 @@ const About = () => {
     { name: "Volleyball", icon: faFutbol, color: "bg-purple-500" },
   ]
 
-  // Side Advertisement Component
-  const SideAdvertisement = ({ ad, position }) => (
-    <motion.div
-      initial={{ opacity: 0, x: position === "left" ? -100 : 100 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: position === "left" ? -100 : 100 }}
-      transition={{ duration: 0.5 }}
-      className={`hidden lg:block fixed ${position === "left" ? "left-0" : "right-0"} top-1/2 transform -translate-y-1/2 w-64 h-[600px] z-10 overflow-hidden rounded-lg shadow-xl`}
-    >
-      <div className={`absolute inset-0 bg-gradient-to-b ${ad.color} opacity-90`}></div>
-      <img
-        src={ad.image || "/placeholder.svg"}
-        alt={ad.title}
-        className="absolute inset-0 w-full h-full object-cover mix-blend-overlay"
-      />
-      <div className="absolute inset-0 flex flex-col justify-end p-6 text-white">
-        <h3 className="text-2xl font-bold mb-2">{ad.title}</h3>
-        <p className="mb-4">{ad.description}</p>
-        <Link
-          to={ad.link}
-          className="px-4 py-2 bg-white text-gray-900 rounded-full font-bold hover:bg-opacity-90 transition-all text-center"
-        >
-          Learn More
-        </Link>
-      </div>
-    </motion.div>
-  )
-
   return (
     <div
       style={{
@@ -277,15 +216,6 @@ const About = () => {
       }}
       className="min-h-screen pt-16 transition-colors duration-300"
     >
-      {/* Side Advertisements */}
-      <AnimatePresence mode="wait">
-        <SideAdvertisement key={`left-${currentAdIndex}`} ad={advertisements[currentAdIndex]} position="left" />
-        <SideAdvertisement
-          key={`right-${currentAdIndex}`}
-          ad={advertisements[(currentAdIndex + 1) % advertisements.length]}
-          position="right"
-        />
-      </AnimatePresence>
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">

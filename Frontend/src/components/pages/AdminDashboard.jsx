@@ -12,16 +12,11 @@ import {
   Users,
   CalendarDays,
   TrendingUp,
-  Menu,
   X,
   ChevronRight,
   BarChart3,
   PieChart,
-  Activity,
   Settings,
-  Search,
-  Bell,
-  ChevronDown,
 } from "lucide-react";
 import {
   BarChart,
@@ -48,7 +43,6 @@ export default function AdminDashboard() {
   const dispatch = useDispatch();
   const {darkMode} = useContext(DarkModeContext)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [monthlyBookings, setMonthlyBookings] = useState(false);
   const [monthlyRevenue, setMonthlyRevenue] = useState(false);
   const [totalRevenue, setTotalRevenue] = useState("");
