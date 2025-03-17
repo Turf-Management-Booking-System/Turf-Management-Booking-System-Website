@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelector, useDispatch } from "react-redux";
 import { DarkModeContext } from "../../context/DarkModeContext";
-import greenBg from "../../assets/Images/greenBg.png";
 import blackBg from "../../assets/Images/blackBg.png";
 import whiteBg from "../../assets/Images/whiteBg.png";
 import axios from "axios";
@@ -25,9 +24,6 @@ import {
   BarChart2,
   Download,
 } from "lucide-react";
-
-// Assuming you have these actions in your Redux store
-// import { setBookings, updateBooking, deleteBooking } from "../../slices/bookingSlice"
 import { setLoader } from "../../slices/authSlice";
 
 const BookingManagement = () => {
@@ -63,7 +59,6 @@ const BookingManagement = () => {
         },
       });
       if (response.data.success) {
-        // Limit the bookings to only 4
         const limitedBookings = response.data.allBookings.slice(0, 4);
         setAllBookings(limitedBookings);
       }
@@ -217,7 +212,6 @@ const BookingManagement = () => {
               />
             </button>
           </div>
-
           <AnimatePresence>
             {isFilterOpen && (
               <motion.div
@@ -264,7 +258,6 @@ const BookingManagement = () => {
             )}
           </AnimatePresence>
         </div>
-
         {/* Bookings Table */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
           <div className="overflow-x-auto">

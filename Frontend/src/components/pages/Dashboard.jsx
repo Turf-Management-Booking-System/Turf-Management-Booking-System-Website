@@ -1,12 +1,12 @@
-import { useState, useContext, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { loadNotification } from "../../slices/notificationSlice"
-import { useSelector, useDispatch } from "react-redux"
-import greenBg from "../../assets/Images/greenBg.png"
-import whiteBg from "../../assets/Images/whiteBg.png"
-import blackBg from "../../assets/Images/blackBg.png"
-import { useNavigate } from "react-router-dom"
+import { useState, useContext, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { loadNotification } from "../../slices/notificationSlice";
+import { useSelector, useDispatch } from "react-redux";
+import greenBg from "../../assets/Images/greenBg.png";
+import whiteBg from "../../assets/Images/whiteBg.png";
+import blackBg from "../../assets/Images/blackBg.png";
+import { useNavigate } from "react-router-dom";
 import {
   faTachometerAlt,
   faCalendarAlt,
@@ -17,8 +17,8 @@ import {
   faTicketAlt,
   faChartLine,
   faSignOutAlt,
-} from "@fortawesome/free-solid-svg-icons"
-import { DarkModeContext } from "../../context/DarkModeContext"
+} from "@fortawesome/free-solid-svg-icons";
+import { DarkModeContext } from "../../context/DarkModeContext";
 import {
   PieChart,
   Pie,
@@ -30,77 +30,98 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-} from "recharts"
-import MyBookings from "./MyBookings"
-import BookingHistory from "./BookingHistory"
+} from "recharts";
+import MyBookings from "./MyBookings";
+import BookingHistory from "./BookingHistory";
 
 const Dashboard = () => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const { darkMode } = useContext(DarkModeContext)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [activeSection, setActiveSection] = useState("overview")
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("All")
-  const [sortBy, setSortBy] = useState("date")
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { darkMode } = useContext(DarkModeContext);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [activeSection, setActiveSection] = useState("overview");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("All");
+  const [sortBy, setSortBy] = useState("date");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen)
-  const toggleFilter = () => setIsFilterOpen(!isFilterOpen)
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const toggleFilter = () => setIsFilterOpen(!isFilterOpen);
 
-  const notifications = useSelector((state) => state.notification.notifications)
-  const user = useSelector((state) => state.auth.user)
-  const allBookings = useSelector((state) => state.booking.allBookings)
-  const currentBookings = useSelector((state) => state.booking.currentBookings)
-  const cancelBooked = useSelector((state) => state.booking.cancelBooked)
-  const rescheduledBookings = useSelector((state) => state.booking.rescheduledBookings)
-  const previousBookings = useSelector((state) => state.booking.previousBookings)
+  const notifications = useSelector(
+    (state) => state.notification.notifications
+  );
+  const user = useSelector((state) => state.auth.user);
+  const allBookings = useSelector((state) => state.booking.allBookings);
+  const currentBookings = useSelector((state) => state.booking.currentBookings);
+  const cancelBooked = useSelector((state) => state.booking.cancelBooked);
+  const rescheduledBookings = useSelector(
+    (state) => state.booking.rescheduledBookings
+  );
+  const previousBookings = useSelector(
+    (state) => state.booking.previousBookings
+  );
 
   useEffect(() => {
-    dispatch(loadNotification())
-  }, [dispatch])
+    dispatch(loadNotification());
+  }, [dispatch]);
 
-  const isOverviewPage = activeSection === "overview"
+  const isOverviewPage = activeSection === "overview";
 
   const quickStats = [
     { icon: faFutbol, title: "Total Bookings", value: allBookings.length },
-    { icon: faMapMarkerAlt, title: "Favorite Turf", value: getMostBookedTurf() },
-    { icon: faTicketAlt, title: "Upcoming Bookings", value: currentBookings.length },
-    { icon: faChartLine, title: "Completed Bookings", value: previousBookings.length },
-  ]
+    {
+      icon: faMapMarkerAlt,
+      title: "Favorite Turf",
+      value: getMostBookedTurf(),
+    },
+    {
+      icon: faTicketAlt,
+      title: "Upcoming Bookings",
+      value: currentBookings.length,
+    },
+    {
+      icon: faChartLine,
+      title: "Completed Bookings",
+      value: previousBookings.length,
+    },
+  ];
 
   const bookingStatusData = [
     { name: "Confirmed", value: currentBookings.length },
     { name: "Completed", value: previousBookings.length },
     { name: "Cancelled", value: cancelBooked.length },
-  ]
+  ];
 
-  const bookingTrendData = getBookingTrendData()
+  const bookingTrendData = getBookingTrendData();
 
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"]
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
   const sidebarItems = [
     { icon: faTachometerAlt, label: "Overview", section: "overview" },
     { icon: faCalendarAlt, label: "My Bookings", section: "mybookings" },
     { icon: faHistory, label: "Booking History", section: "history" },
     { icon: faCog, label: "Settings", section: "settings" },
-  ]
+  ];
 
   const filteredBookings = allBookings
     .filter((booking) => {
-      const matchesTurfName = booking.turf?.turfName?.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesTurfName = booking.turf?.turfName
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase());
       const matchesSport = booking.turf?.sports?.some((sport) =>
-        sport.name?.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
-      const matchesStatus = filterStatus === "All" || booking.status === filterStatus
-      return (matchesTurfName || matchesSport) && matchesStatus
+        sport.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      const matchesStatus =
+        filterStatus === "All" || booking.status === filterStatus;
+      return (matchesTurfName || matchesSport) && matchesStatus;
     })
     .sort((a, b) => {
-      if (sortBy === "date") return new Date(b.date) - new Date(a.date)
-      if (sortBy === "price") return b.turf?.turfPricePerHour - a.turf?.turfPricePerHour
-      return 0
-    })
-
+      if (sortBy === "date") return new Date(b.date) - new Date(a.date);
+      if (sortBy === "price")
+        return b.turf?.turfPricePerHour - a.turf?.turfPricePerHour;
+      return 0;
+    });
   const renderSection = () => {
     switch (activeSection) {
       case "overview":
@@ -111,21 +132,23 @@ const Dashboard = () => {
               <BookingStatusChart data={bookingStatusData} colors={COLORS} />
               <BookingTrendChart data={bookingTrendData} />
             </div>
-            <RecentBookings bookings={currentBookings.slice(0, 5)} title="Recent Bookings" />
+            <RecentBookings
+              bookings={currentBookings.slice(0, 5)}
+              title="Recent Bookings"
+            />
           </>
-        )
+        );
       case "mybookings":
-        return <MyBookings />
+        return <MyBookings />;
       case "history":
-        return <BookingHistory />
+        return <BookingHistory />;
       case "settings":
-        return <SettingsSection user={user} />
+        return <SettingsSection user={user} />;
       default:
-        return null
+        return null;
     }
-  }
-
-  return (
+  };
+ return (
     <div
       style={{
         backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
@@ -166,8 +189,13 @@ const Dashboard = () => {
                           : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       }`}
                     >
-                      <FontAwesomeIcon icon={item.icon} className="w-5 h-5 mr-3" />
-                      <span className={isSidebarOpen ? "" : "hidden"}>{item.label}</span>
+                      <FontAwesomeIcon
+                        icon={item.icon}
+                        className="w-5 h-5 mr-3"
+                      />
+                      <span className={isSidebarOpen ? "" : "hidden"}>
+                        {item.label}
+                      </span>
                     </button>
                   </li>
                 ))}
@@ -175,9 +203,7 @@ const Dashboard = () => {
             </nav>
             <div className="p-4 border-t dark:border-gray-700">
               <button
-                onClick={() => {
-                  /* Add logout logic */
-                }}
+                onClick={() => {}}
                 className="flex items-center w-full p-2 rounded-lg text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900 transition-colors duration-200"
               >
                 <FontAwesomeIcon icon={faSignOutAlt} className="w-5 h-5 mr-3" />
@@ -188,8 +214,13 @@ const Dashboard = () => {
         </aside>
 
         {/* Main Content */}
-        <main className={`flex-1 p-4 md:p-8 ${isSidebarOpen ? "ml-64" : "ml-20"} `}>
-          <div className="overflow-y-auto" style={{ height: "calc(100vh - 48px)" }}>
+        <main
+          className={`flex-1 p-4 md:p-8 ${isSidebarOpen ? "ml-64" : "ml-20"} `}
+        >
+          <div
+            className="overflow-y-auto"
+            style={{ height: "calc(100vh - 48px)" }}
+          >
             {/* Header */}
             {isOverviewPage && (
               <header className="bg-white dark:bg-gray-800 shadow-lg p-4 rounded-lg flex justify-between items-center mb-2">
@@ -197,8 +228,10 @@ const Dashboard = () => {
                   <h1 className="text-2xl font-bold text-gray-800 dark:text-white font-orbitron">
                     Welcome,{" "}
                     <span className="text-green-500 font-serif">
-                      {user?.firstName?.charAt(0).toUpperCase() + user?.firstName?.slice(1)}{" "}
-                      {user?.lastName?.charAt(0).toUpperCase() + user?.lastName?.slice(1)}
+                      {user?.firstName?.charAt(0).toUpperCase() +
+                        user?.firstName?.slice(1)}{" "}
+                      {user?.lastName?.charAt(0).toUpperCase() +
+                        user?.lastName?.slice(1)}
                     </span>
                   </h1>
                 </div>
@@ -230,8 +263,8 @@ const Dashboard = () => {
         </main>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const QuickStats = ({ stats }) => (
   <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -245,17 +278,24 @@ const QuickStats = ({ stats }) => (
       >
         <div className="flex items-center space-x-4">
           <div className="p-3 rounded-full bg-green-100 dark:bg-green-900">
-            <FontAwesomeIcon icon={stat.icon} className="text-2xl text-green-500 dark:text-green-400" />
+            <FontAwesomeIcon
+              icon={stat.icon}
+              className="text-2xl text-green-500 dark:text-green-400"
+            />
           </div>
           <div>
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{stat.title}</h3>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              {stat.title}
+            </h3>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {stat.value}
+            </p>
           </div>
         </div>
       </motion.div>
     ))}
   </section>
-)
+);
 
 const BookingStatusChart = ({ data, colors }) => (
   <motion.section
@@ -264,13 +304,26 @@ const BookingStatusChart = ({ data, colors }) => (
     transition={{ delay: 0.2 }}
     className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
   >
-    <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Booking Status</h2>
+    <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+      Booking Status
+    </h2>
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
-          <Pie data={data} cx="50%" cy="50%" labelLine={false} outerRadius={80} fill="#8884d8" dataKey="value">
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            outerRadius={80}
+            fill="#8884d8"
+            dataKey="value"
+          >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+              <Cell
+                key={`cell-${index}`}
+                fill={colors[index % colors.length]}
+              />
             ))}
           </Pie>
           <Tooltip />
@@ -280,13 +333,18 @@ const BookingStatusChart = ({ data, colors }) => (
     <div className="flex justify-center mt-4">
       {data.map((entry, index) => (
         <div key={`legend-${index}`} className="flex items-center mx-2">
-          <div className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: colors[index % colors.length] }}></div>
-          <span className="text-sm text-gray-600 dark:text-gray-400">{entry.name}</span>
+          <div
+            className="w-3 h-3 rounded-full mr-1"
+            style={{ backgroundColor: colors[index % colors.length] }}
+          ></div>
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            {entry.name}
+          </span>
         </div>
       ))}
     </div>
   </motion.section>
-)
+);
 
 const BookingTrendChart = ({ data }) => (
   <motion.section
@@ -295,7 +353,9 @@ const BookingTrendChart = ({ data }) => (
     transition={{ delay: 0.3 }}
     className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
   >
-    <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Booking Trend</h2>
+    <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+      Booking Trend
+    </h2>
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
@@ -303,12 +363,17 @@ const BookingTrendChart = ({ data }) => (
           <XAxis dataKey="name" />
           <YAxis />
           <Tooltip />
-          <Line type="monotone" dataKey="bookings" stroke="#8884d8" activeDot={{ r: 8 }} />
+          <Line
+            type="monotone"
+            dataKey="bookings"
+            stroke="#8884d8"
+            activeDot={{ r: 8 }}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>
   </motion.section>
-)
+);
 
 const RecentBookings = ({ bookings, title }) => (
   <motion.section
@@ -317,14 +382,22 @@ const RecentBookings = ({ bookings, title }) => (
     transition={{ delay: 0.4 }}
     className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
   >
-    <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">{title}</h2>
+    <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+      {title}
+    </h2>
     <ul className="space-y-3">
       {bookings.map((booking) => (
-        <li key={booking._id} className="flex justify-between items-center border-b dark:border-gray-700 pb-2">
+        <li
+          key={booking._id}
+          className="flex justify-between items-center border-b dark:border-gray-700 pb-2"
+        >
           <div>
-            <p className="font-semibold text-gray-800 dark:text-white">{booking.turf?.turfName}</p>
+            <p className="font-semibold text-gray-800 dark:text-white">
+              {booking.turf?.turfName}
+            </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {new Date(booking.date).toLocaleDateString()} | {booking.timeSlot.join(", ")}
+              {new Date(booking.date).toLocaleDateString()} |{" "}
+              {booking.timeSlot.join(", ")}
             </p>
           </div>
           <span
@@ -332,8 +405,8 @@ const RecentBookings = ({ bookings, title }) => (
               booking.status === "Confirmed"
                 ? "bg-green-200 text-green-800 dark:bg-green-900 dark:text-green-200"
                 : booking.status === "Completed"
-                  ? "bg-blue-200 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                  : "bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-200"
+                ? "bg-blue-200 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                : "bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-200"
             }`}
           >
             {booking.status}
@@ -342,16 +415,21 @@ const RecentBookings = ({ bookings, title }) => (
       ))}
     </ul>
   </motion.section>
-)
-
+);
 const SettingsSection = ({ user }) => (
   <div className="space-y-6">
-    <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Settings</h2>
+    <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+      Settings
+    </h2>
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-      <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Profile Information</h3>
+      <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+        Profile Information
+      </h3>
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Name
+          </label>
           <input
             type="text"
             value={`${user?.firstName} ${user?.lastName}`}
@@ -360,7 +438,9 @@ const SettingsSection = ({ user }) => (
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Email
+          </label>
           <input
             type="email"
             value={user?.email}
@@ -371,49 +451,58 @@ const SettingsSection = ({ user }) => (
       </div>
     </div>
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-      <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Preferences</h3>
+      <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+        Preferences
+      </h3>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <span className="text-gray-700 dark:text-gray-300">Enable Notifications</span>
-          <input type="checkbox" className="form-checkbox h-5 w-5 text-green-600" checked />
+          <span className="text-gray-700 dark:text-gray-300">
+            Enable Notifications
+          </span>
+          <input
+            type="checkbox"
+            className="form-checkbox h-5 w-5 text-green-600"
+            checked
+          />
         </div>
         <div className="flex items-center justify-between">
           <span className="text-gray-700 dark:text-gray-300">Dark Mode</span>
-          <input type="checkbox" className="form-checkbox h-5 w-5 text-green-600" checked />
+          <input
+            type="checkbox"
+            className="form-checkbox h-5 w-5 text-green-600"
+            checked
+          />
         </div>
       </div>
     </div>
   </div>
-)
+);
 
 const getStatusColor = (status) => {
   switch (status) {
     case "Confirmed":
-      return "text-green-600 dark:text-green-400"
+      return "text-green-600 dark:text-green-400";
     case "Completed":
-      return "text-blue-600 dark:text-blue-400"
+      return "text-blue-600 dark:text-blue-400";
     case "Cancelled":
-      return "text-red-600 dark:text-red-400"
+      return "text-red-600 dark:text-red-400";
     default:
-      return "text-gray-600 dark:text-gray-400"
+      return "text-gray-600 dark:text-gray-400";
   }
-}
+};
 
 const getMostBookedTurf = () => {
-  // Implement logic to get the most booked turf
-  return "Green Valley"
-}
+  return "Green Valley";
+};
 
 const getBookingTrendData = () => {
-  // Implement logic to get booking trend data
   return [
     { name: "Jan", bookings: 4 },
     { name: "Feb", bookings: 3 },
     { name: "Mar", bookings: 5 },
     { name: "Apr", bookings: 7 },
     { name: "May", bookings: 6 },
-  ]
-}
+  ];
+};
 
-export default Dashboard
-
+export default Dashboard;

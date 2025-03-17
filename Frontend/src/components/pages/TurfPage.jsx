@@ -56,7 +56,6 @@ const TurfPage = () => {
     fetchSports();
   }, [token]);
 
-  // Fetch turf data based on user-selected location or all turfs
   const fetchTurfByLocationsOrAll = async () => {
     try {
       dispatch(setLoader(true));

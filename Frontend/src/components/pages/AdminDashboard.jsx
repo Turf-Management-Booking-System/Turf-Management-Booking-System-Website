@@ -5,9 +5,9 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { DarkModeContext } from "../../context/DarkModeContext";
-import whiteBg from "../../assets/Images/whiteBg.png"
-import blackBg from "../../assets/Images/blackBg.png"
-import greenBg from "../../assets/Images/greenBg.png"
+import whiteBg from "../../assets/Images/whiteBg.png";
+import blackBg from "../../assets/Images/blackBg.png";
+import greenBg from "../../assets/Images/greenBg.png";
 import {
   Users,
   CalendarDays,
@@ -41,7 +41,7 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 export default function AdminDashboard() {
   const dispatch = useDispatch();
-  const {darkMode} = useContext(DarkModeContext)
+  const { darkMode } = useContext(DarkModeContext);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [monthlyBookings, setMonthlyBookings] = useState(false);
   const [monthlyRevenue, setMonthlyRevenue] = useState(false);
@@ -49,11 +49,11 @@ export default function AdminDashboard() {
   const [selectedItem, setSelectedItem] = useState("Dashboard");
   const allUsers = useSelector((state) => state.admin.allUsers);
   const totalUsers = allUsers.length;
-  const  [allBookings,setAllBookings] = useState([])
+  const [allBookings, setAllBookings] = useState([]);
   const turfs = useSelector((state) => state.turf.turfs);
   const totalTurfs = turfs.length;
   const token = useSelector((state) => state.auth.token);
-  const user = useSelector((state)=>state.auth.user)
+  const user = useSelector((state) => state.auth.user);
   const [recentActivities, setRecentActivities] = useState([]);
   const [turfUtilization, setTurfUtilization] = useState([]);
 
@@ -91,7 +91,9 @@ export default function AdminDashboard() {
       setMonthlyBookings(response.data);
     } catch (error) {
       console.log("Error", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Unable to fetch monthly bookings");
+      toast.error(
+        error.response?.data?.message || "Unable to fetch monthly bookings"
+      );
     } finally {
       dispatch(setLoader(false));
     }
@@ -115,12 +117,13 @@ export default function AdminDashboard() {
       setMonthlyRevenue(response.data);
     } catch (error) {
       console.log("Error", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Unable to fetch monthly revenue");
+      toast.error(
+        error.response?.data?.message || "Unable to fetch monthly revenue"
+      );
     } finally {
       dispatch(setLoader(false));
     }
   };
-
   const fetchTotalRevenue = async () => {
     try {
       dispatch(setLoader(true));
@@ -139,12 +142,13 @@ export default function AdminDashboard() {
       setTotalRevenue(response.data.total);
     } catch (error) {
       console.log("Error", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Unable to fetch total revenue");
+      toast.error(
+        error.response?.data?.message || "Unable to fetch total revenue"
+      );
     } finally {
       dispatch(setLoader(false));
     }
   };
-
   const sportsData = async () => {
     try {
       dispatch(setLoader(true));
@@ -163,12 +167,14 @@ export default function AdminDashboard() {
       setTurfUtilization(response.data);
     } catch (error) {
       console.log("Error", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Unable to fetch sports data");
+      toast.error(
+        error.response?.data?.message || "Unable to fetch sports data"
+      );
     } finally {
       dispatch(setLoader(false));
     }
   };
-  const fetchAllBookings = async()=>{
+  const fetchAllBookings = async () => {
     try {
       dispatch(setLoader(true));
 
@@ -182,15 +188,20 @@ export default function AdminDashboard() {
           withCredentials: true,
         }
       );
-      console.log("Response from backend all Bookings", response.data.allBookings);
-      setAllBookings(response.data.allBookings)
+      console.log(
+        "Response from backend all Bookings",
+        response.data.allBookings
+      );
+      setAllBookings(response.data.allBookings);
     } catch (error) {
       console.log("Error", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Unable to fetch bookings data");
+      toast.error(
+        error.response?.data?.message || "Unable to fetch bookings data"
+      );
     } finally {
       dispatch(setLoader(false));
     }
-  }
+  };
   useEffect(() => {
     fetchMontlyBookings();
     fetchMontlyRevenue();
@@ -240,12 +251,18 @@ export default function AdminDashboard() {
                   className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`p-2 rounded-lg bg-${stat.color}-100 dark:bg-${stat.color}-900`}>
+                    <div
+                      className={`p-2 rounded-lg bg-${stat.color}-100 dark:bg-${stat.color}-900`}
+                    >
                       <stat.icon className={`h-6 w-6 text-${stat.color}-500`} />
                     </div>
                   </div>
-                  <h3 className="text-gray-600 dark:text-gray-400 text-sm font-serif font-medium">{stat.title}</h3>
-                  <p className="text-2xl font-sans font-bold text-gray-900 dark:text-white">{stat.value}</p>
+                  <h3 className="text-gray-600 dark:text-gray-400 text-sm font-serif font-medium">
+                    {stat.title}
+                  </h3>
+                  <p className="text-2xl font-sans font-bold text-gray-900 dark:text-white">
+                    {stat.value}
+                  </p>
                 </motion.div>
               ))}
             </div>
@@ -253,7 +270,9 @@ export default function AdminDashboard() {
             {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-                <h3 className="text-2xl font-serif font-semibold mb-4 text-gray-900 dark:text-white">Monthly Bookings</h3>
+                <h3 className="text-2xl font-serif font-semibold mb-4 text-gray-900 dark:text-white">
+                  Monthly Bookings
+                </h3>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={monthlyBookings}>
@@ -268,7 +287,9 @@ export default function AdminDashboard() {
               </div>
 
               <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-                <h3 className="text-2xl font-serif font-semibold mb-4 text-gray-900 dark:text-white">Revenue Overview</h3>
+                <h3 className="text-2xl font-serif font-semibold mb-4 text-gray-900 dark:text-white">
+                  Revenue Overview
+                </h3>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={monthlyRevenue}>
@@ -276,17 +297,22 @@ export default function AdminDashboard() {
                       <XAxis dataKey="month" />
                       <YAxis />
                       <Tooltip />
-                      <Line type="monotone" dataKey="revenue" stroke="#10b981" />
+                      <Line
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke="#10b981"
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
               </div>
             </div>
-
             {/* Bottom Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-                <h3 className="text-2xl font-serif font-semibold mb-4 text-gray-900 dark:text-white">Turf Utilization</h3>
+                <h3 className="text-2xl font-serif font-semibold mb-4 text-gray-900 dark:text-white">
+                  Turf Utilization
+                </h3>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <RePieChart>
@@ -300,7 +326,10 @@ export default function AdminDashboard() {
                         dataKey="count"
                       >
                         {turfUtilization.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
                         ))}
                       </Pie>
                       <Tooltip />
@@ -308,12 +337,19 @@ export default function AdminDashboard() {
                   </ResponsiveContainer>
                   <div className="flex justify-center space-x-4 mt-4">
                     {turfUtilization.map((entry, index) => (
-                      <div key={`legend-${index}`} className="flex items-center">
+                      <div
+                        key={`legend-${index}`}
+                        className="flex items-center"
+                      >
                         <div
                           className="w-3 h-3 rounded-full mr-2"
-                          style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                          style={{
+                            backgroundColor: COLORS[index % COLORS.length],
+                          }}
                         />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">{entry.sport}</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {entry.sport}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -321,18 +357,28 @@ export default function AdminDashboard() {
               </div>
 
               <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-                <h3 className="text-2xl font-semibold font-serif mb-4 text-gray-900 dark:text-white">Recent Activities</h3>
+                <h3 className="text-2xl font-semibold font-serif mb-4 text-gray-900 dark:text-white">
+                  Recent Activities
+                </h3>
                 <div className="space-y-4">
                   {recentActivities.map((activity) => (
-                    <div key={activity.id} className="flex items-center space-x-4">
+                    <div
+                      key={activity.id}
+                      className="flex items-center space-x-4"
+                    >
                       <img
                         src={activity.avatar || "/placeholder.svg"}
                         alt={activity.user}
                         className="h-10 w-10 rounded-full"
                       />
                       <div className="flex-1">
-                        <p className="text-sm font-sans font-medium text-gray-900 dark:text-white">{activity.user?.charAt(0).toUpperCase() + activity.user?.slice(1)}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{activity.action}</p>
+                        <p className="text-sm font-sans font-medium text-gray-900 dark:text-white">
+                          {activity.user?.charAt(0).toUpperCase() +
+                            activity.user?.slice(1)}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {activity.action}
+                        </p>
                       </div>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
                         {new Date(activity.createdAt).toLocaleString()}
@@ -349,7 +395,7 @@ export default function AdminDashboard() {
       case "Booking Management":
         return <BookingManagement />;
       case "Turf management":
-          return <AdminPanel/>
+        return <AdminPanel />;
       default:
         return null;
     }
@@ -357,57 +403,67 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen mt-16 dark:bg-gray-900 flex">
-  {/* Sidebar */}
-  <aside 
-  style={{
-        backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
-      }}
-    className={`w-72 h-50 transition-transform ${
-      isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-    } bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0`}
-  >
-    <div className="flex items-center justify-between p-4">
-      <h2 className="text-2xl pt-3 pl-3 font-serif font-bold text-green-500">TurfAdmin</h2>
-      <button
-        onClick={() => setIsSidebarOpen(false)}
-        className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+      {/* Sidebar */}
+      <aside
+        style={{
+          backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+        }}
+        className={`w-72 h-50 transition-transform ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0`}
       >
-        <X className="h-6 w-6 text-gray-500 dark:text-gray-400" />
-      </button>
-    </div>
-    <nav className="space-y-2 p-4">
-      {[
-        { icon: BarChart3, label: "Dashboard" },
-        { icon: Users, label: "User Management" },
-        { icon: CalendarDays, label: "Booking Management" },
-        { icon: PieChart, label: "Turf management" },
-        { icon: Settings, label: "Settings" },
-      ].map((item) => (
-        <button
-          key={item.label}
-          onClick={() => setSelectedItem(item.label)}
-          className={`flex items-center w-full p-3 rounded-lg text-left  space-x-3 ${
-            selectedItem === item.label
-              ? "bg-gray-100 dark:bg-gray-700 text-green-600 dark:text-green-400"
-              : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-          }`}
-        >
-          <item.icon className="h-5 w-5" />
-          <span>{item.label}</span>
-          {selectedItem === item.label && <ChevronRight className="h-5 w-5 ml-auto" />}
-        </button>
-      ))}
-    </nav>
-  </aside>
+        <div className="flex items-center justify-between p-4">
+          <h2 className="text-2xl pt-3 pl-3 font-serif font-bold text-green-500">
+            TurfAdmin
+          </h2>
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <X className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+          </button>
+        </div>
+        <nav className="space-y-2 p-4">
+          {[
+            { icon: BarChart3, label: "Dashboard" },
+            { icon: Users, label: "User Management" },
+            { icon: CalendarDays, label: "Booking Management" },
+            { icon: PieChart, label: "Turf management" },
+            { icon: Settings, label: "Settings" },
+          ].map((item) => (
+            <button
+              key={item.label}
+              onClick={() => setSelectedItem(item.label)}
+              className={`flex items-center w-full p-3 rounded-lg text-left  space-x-3 ${
+                selectedItem === item.label
+                  ? "bg-gray-100 dark:bg-gray-700 text-green-600 dark:text-green-400"
+                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              }`}
+            >
+              <item.icon className="h-5 w-5" />
+              <span>{item.label}</span>
+              {selectedItem === item.label && (
+                <ChevronRight className="h-5 w-5 ml-auto" />
+              )}
+            </button>
+          ))}
+        </nav>
+      </aside>
 
-  {/* Main Content */}
-  <div style={{
-        backgroundImage: `url(${darkMode ? blackBg : greenBg})`
-      }} className="flex-1 p-4">
-    <header className="bg-white dark:bg-gray-800 shadow-lg p-4 rounded-lg flex justify-between items-center mb-2">
+      {/* Main Content */}
+      <div
+        style={{
+          backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
+        }}
+        className="flex-1 p-4"
+      >
+        <header className="bg-white dark:bg-gray-800 shadow-lg p-4 rounded-lg flex justify-between items-center mb-2">
           <div className="flex items-center">
             <h1 className="text-2xl font-bold font-orbitron text-gray-800 dark:text-white">
-              Welcome, <span className="capitalize text-green-500 font-serif">{user.firstName} {user.lastName}</span>
+              Welcome,{" "}
+              <span className="capitalize text-green-500 font-serif">
+                {user.firstName} {user.lastName}
+              </span>
             </h1>
           </div>
           <div className="flex items-center space-x-4">
@@ -417,13 +473,11 @@ export default function AdminDashboard() {
                 alt={""}
                 className="w-10 h-10 rounded-full border-2 border-green-500 dark:border-green-400"
               />
-              </div>
             </div>
-          </header>
-
-    {/* Render Content Based on Selected Item */}
-    {renderContent()}
-  </div>
-</div>
-  )
+          </div>
+        </header>
+        {renderContent()}
+      </div>
+    </div>
+  );
 }

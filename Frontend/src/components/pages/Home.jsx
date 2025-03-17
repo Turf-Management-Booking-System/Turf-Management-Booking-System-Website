@@ -1,4 +1,4 @@
-import React, { useContext, useState,useEffect ,useCallback} from "react";
+import React, { useContext, useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { HiStar, HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import blackBg from "../../assets/Images/blackBg.png";
@@ -27,25 +27,30 @@ import {
 import TurfImageDay from "../../assets/images/TurfImageDay.jpg";
 import TurfImageNight from "../../assets/images/TurfImageNight.jpg";
 import { DarkModeContext } from "../../context/DarkModeContext";
-import { motion ,AnimatePresence} from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Link } from "react-router-dom";
-import whiteBg from "../../assets/Images/whiteBg.png"
+import whiteBg from "../../assets/Images/whiteBg.png";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { setLoader } from "../../slices/authSlice";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { loadNotification,setNotification } from "../../slices/notificationSlice";
+import {
+  loadNotification,
+  setNotification,
+} from "../../slices/notificationSlice";
 function Home() {
   const dispatch = useDispatch();
   const { darkMode } = useContext(DarkModeContext);
   const [ref, inView] = useInView({ triggerOnce: false, threshold: 0.2 });
   const [openIndex, setOpenIndex] = useState(null);
-  const [email,setEmail] = useState("");
-  const [testimonials,setTestimonials] = useState([]);
-  const notifications = useSelector((state)=>state.notification.notifications);
-  const user = useSelector((state)=>state.auth.user)
+  const [email, setEmail] = useState("");
+  const [testimonials, setTestimonials] = useState([]);
+  const notifications = useSelector(
+    (state) => state.notification.notifications
+  );
+  const user = useSelector((state) => state.auth.user);
 
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -148,7 +153,7 @@ function Home() {
     { name: "Tennis", icon: faTableTennis, color: "bg-yellow-500" },
     { name: "Volleyball", icon: faVolleyballBall, color: "bg-purple-500" },
     { name: "Hockey", icon: faHockeyPuck, color: "bg-red-500" },
-  ]
+  ];
   const benefits = [
     {
       icon: faCheckCircle,
@@ -165,7 +170,8 @@ function Home() {
     {
       icon: faLightbulb,
       title: "Smart Recommendations",
-      description: "Get personalized turf suggestions based on your preferences",
+      description:
+        "Get personalized turf suggestions based on your preferences",
       color: "bg-yellow-500",
     },
     {
@@ -174,11 +180,12 @@ function Home() {
       description: "Organize your team and invite players easily",
       color: "bg-purple-500",
     },
-  ]
-  const fetchAllTestimonals = async()=>{
+  ];
+  const fetchAllTestimonals = async () => {
     try {
       dispatch(setLoader(true));
-      const url = "http://localhost:4000/api/v1/comment/getCommentWithTestimonals";
+      const url =
+        "http://localhost:4000/api/v1/comment/getCommentWithTestimonals";
 
       const response = await axios.get(url, {
         headers: {
@@ -188,8 +195,7 @@ function Home() {
       });
       console.log("fetch the testimonals", response.data.testimonals);
       if (response.data.success) {
-         setTestimonials(response.data.testimonals)
-  
+        setTestimonials(response.data.testimonals);
       }
     } catch (error) {
       toast.error(
@@ -200,36 +206,42 @@ function Home() {
     } finally {
       dispatch(setLoader(false));
     }
-  }
-  useEffect(()=>{
-    fetchAllTestimonals()
-  },[])
-  
-  const [index, setIndex] = useState(0)
+  };
+  useEffect(() => {
+    fetchAllTestimonals();
+  }, []);
+
+  const [index, setIndex] = useState(0);
   useEffect(() => {
     const interval = setInterval(() => {
-      setIndex((prevIndex) => (prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1));
-    }, 1000); 
+      setIndex((prevIndex) =>
+        prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 1000);
 
-    return () => clearInterval(interval); 
+    return () => clearInterval(interval);
   }, [testimonials.length]);
 
   const prevTestimonials = () => {
-    setIndex((prevIndex) => (prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1));
+    setIndex((prevIndex) =>
+      prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
+    );
   };
 
   const nextTestimonials = () => {
-    setIndex((prevIndex) => (prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1));
+    setIndex((prevIndex) =>
+      prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1
+    );
   };
 
-  const handleSubmit = async(e) => {
-    e.preventDefault()
-    // Handle newsletter subscription
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       dispatch(setLoader(true));
       const response = await axios.post(
-        `http://localhost:4000/api/v1/auth/subscription`,{
-          email:email
+        `http://localhost:4000/api/v1/auth/subscription`,
+        {
+          email: email,
         },
         {
           headers: {
@@ -238,54 +250,62 @@ function Home() {
           withCredentials: true,
         }
       );
-      console.log("response",response.data.success)
+      console.log("response", response.data.success);
 
       if (response.data.success) {
         toast.success(response?.data?.message);
-        if(user?._id){
-          dispatch(loadNotification())
+        if (user?._id) {
+          dispatch(loadNotification());
           try {
             const notificationResponse = await axios.get(
               `http://localhost:4000/api/v1/notify/getNotifications/${user._id}`,
               {
-                headers: { "Content-Type": "application/json", withCredentials: true },
+                headers: {
+                  "Content-Type": "application/json",
+                  withCredentials: true,
+                },
               }
             );
             if (notificationResponse.data.success) {
-              console.log("fetch notification",notificationResponse.data.currentMessage);
-              dispatch(setNotification(notificationResponse.data.currentMessage || []));
+              console.log(
+                "fetch notification",
+                notificationResponse.data.currentMessage
+              );
+              dispatch(
+                setNotification(notificationResponse.data.currentMessage || [])
+              );
               localStorage.setItem(
                 "userNotification",
                 JSON.stringify(notificationResponse.data.currentMessage || [])
               );
-              console.log("notifications state",notifications);
-          
+              console.log("notifications state", notifications);
             }
           } catch (error) {
-            toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!");
-            console.log(error.response?.data?.message)
+            toast.error(
+              error.response?.data?.message ||
+                "Something Went Wrong in fetching notifications!"
+            );
+            console.log(error.response?.data?.message);
           }
         }
-       
-        setEmail("")
+
+        setEmail("");
       }
     } catch (error) {
-      toast.error(
-        error.response?.data?.message  || "Error While Subscribing!"
-      );
+      toast.error(error.response?.data?.message || "Error While Subscribing!");
       console.error("Error:", error.response?.data?.message);
     } finally {
       dispatch(setLoader(false));
     }
-    setEmail("")
-  }
+    setEmail("");
+  };
 
   return (
     <>
       {/* Hero Section */}
       <motion.div
         style={{
-          backgroundImage: `url(${darkMode ? TurfImageNight : TurfImageDay})`
+          backgroundImage: `url(${darkMode ? TurfImageNight : TurfImageDay})`,
         }}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -313,7 +333,7 @@ function Home() {
             </p>
           </motion.div>
           <h1 className="font-orbitron text-3xl sm:text-4xl font-semibold leading-snug">
-          Find & Book the Best Turfs Near You!
+            Find & Book the Best Turfs Near You!
           </h1>
           <p className="font-montserrat text-lg mt-4 sm:text-xl sm:mt-6">
             Book, manage, and track turf bookings with ease. Perfect for sports
@@ -338,8 +358,6 @@ function Home() {
         </motion.div>
       </motion.div>
 
-      
-
       {/* Search, Book, Play Timeline */}
       <section
         ref={ref}
@@ -348,8 +366,10 @@ function Home() {
         }}
         className="py-16 flex flex-col items-center relative"
       >
-        <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">How It Works</h2>
-        <div className="w-1 mt-10 h-[61rem] absolute left-1/2 transform -translate-x-1/2 bg-gray-300 dark:bg-gray-600"></div>
+        <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">
+          How It Works
+        </h2>
+        <div className="w-1 mt-10 h-[88rem] md:h-[61rem] absolute left-1/2 transform -translate-x-1/2 bg-gray-300 dark:bg-gray-600"></div>
         {timelineItems.map((item, index) => (
           <motion.div
             key={index}
@@ -377,12 +397,14 @@ function Home() {
                 <p className="text-gray-600 dark:text-gray-300">{item.desc}</p>
               </div>
             </div>
-            <div className="w-14 h-14 bg-[#5886a7] dark:bg-[#9fbfd8] rounded-full absolute left-1/2  text-white text-xl font-bold transform -translate-x-1/2 flex items-center justify-center">{index + 1}</div>
+            <div className="w-14 h-14 bg-[#5886a7] dark:bg-[#9fbfd8] rounded-full absolute left-1/2  text-white text-xl font-bold transform -translate-x-1/2 flex items-center justify-center">
+              {index + 1}
+            </div>
           </motion.div>
         ))}
       </section>
-{/* Sports*/}
-<section
+      {/* Sports*/}
+      <section
         style={{
           backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
         }}
@@ -403,7 +425,8 @@ function Home() {
               Find Turfs For Your Favorite Sport
             </h2>
             <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
-              Our facilities are designed to accommodate a wide range of sports activities
+              Our facilities are designed to accommodate a wide range of sports
+              activities
             </p>
           </motion.div>
 
@@ -416,7 +439,8 @@ function Home() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 whileHover={{
                   scale: 1.05,
-                  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                  boxShadow:
+                    "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
                 }}
                 viewport={{ once: true }}
                 className="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden text-center group cursor-pointer"
@@ -424,10 +448,15 @@ function Home() {
                 <div
                   className={`${sport.color} h-24 flex items-center justify-center group-hover:h-28 transition-all duration-300`}
                 >
-                  <FontAwesomeIcon icon={sport.icon} className="text-4xl text-white" />
+                  <FontAwesomeIcon
+                    icon={sport.icon}
+                    className="text-4xl text-white"
+                  />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-bold text-gray-900 dark:text-white">{sport.name}</h3>
+                  <h3 className="font-bold text-gray-900 dark:text-white">
+                    {sport.name}
+                  </h3>
                 </div>
               </motion.div>
             ))}
@@ -435,8 +464,8 @@ function Home() {
         </div>
       </section>
 
-       {/* Benefits Section */}
-       <section
+      {/* Benefits Section */}
+      <section
         style={{
           backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
         }}
@@ -470,21 +499,31 @@ function Home() {
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 whileHover={{
                   y: -10,
-                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                  boxShadow:
+                    "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
                 }}
                 viewport={{ once: true }}
                 className="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden group"
               >
-                <div className={`${benefit.color} h-2 group-hover:h-4 transition-all duration-300`}></div>
+                <div
+                  className={`${benefit.color} h-2 group-hover:h-4 transition-all duration-300`}
+                ></div>
                 <div className="p-8">
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-6">
                     <FontAwesomeIcon
                       icon={benefit.icon}
-                      className={`text-2xl ${benefit.color.replace("bg-", "text-")}`}
+                      className={`text-2xl ${benefit.color.replace(
+                        "bg-",
+                        "text-"
+                      )}`}
                     />
                   </div>
-                  <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">{benefit.title}</h3>
-                  <p className="text-gray-700 dark:text-gray-300">{benefit.description}</p>
+                  <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">
+                    {benefit.title}
+                  </h3>
+                  <p className="text-gray-700 dark:text-gray-300">
+                    {benefit.description}
+                  </p>
                 </div>
               </motion.div>
             ))}
@@ -492,13 +531,13 @@ function Home() {
         </div>
       </section>
 
-
       {/* Featured Turfs */}
-      <section 
-      style={{
-        backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
-      }}
-      className="py-16 ">
+      <section
+        style={{
+          backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
+        }}
+        className="py-16 "
+      >
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center dark:text-white">
             Featured Turfs
@@ -506,34 +545,40 @@ function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ml-7 mr-7">
             {featuredTurfs.map((turf, index) => (
               <motion.div
-              key={turf.id}
-              initial={{ x: -200, opacity: 0 }} 
-              whileInView={{ x: 0, opacity: 1 }} 
-              transition={{ duration: 1.2, delay: index * 0.2 }} 
-              whileHover={{ scale: 1.05 }} 
-              viewport={{ once: false, amount: 0.2 }}
-              className="bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg"
-            >                  
+                key={turf.id}
+                initial={{ x: -200, opacity: 0 }}
+                whileInView={{ x: 0, opacity: 1 }}
+                transition={{ duration: 1.2, delay: index * 0.2 }}
+                whileHover={{ scale: 1.05 }}
+                viewport={{ once: false, amount: 0.2 }}
+                className="bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg"
+              >
                 <img
                   src={turf.image || ""}
                   alt={""}
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-4">
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{turf.name}</h2>
-                <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                  <i className="bx bx-map text-red-500"></i> {turf.location}
-                </p>
-                <div className="flex justify-between">
-                <p className="text-green-600 dark:text-green-400 font-bold mt-2">₹{turf.pricePerHour}/hr</p>
-                <div className="flex items-center mt-4">
-                <span className="text-yellow-400 mr-1">
-                      <FontAwesomeIcon icon={faStar} />
-                    </span>
-                    <span className="font-bold dark:text-white">{turf.rating}</span>
+                  <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                    {turf.name}
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                    <i className="bx bx-map text-red-500"></i> {turf.location}
+                  </p>
+                  <div className="flex justify-between">
+                    <p className="text-green-600 dark:text-green-400 font-bold mt-2">
+                      ₹{turf.pricePerHour}/hr
+                    </p>
+                    <div className="flex items-center mt-4">
+                      <span className="text-yellow-400 mr-1">
+                        <FontAwesomeIcon icon={faStar} />
+                      </span>
+                      <span className="font-bold dark:text-white">
+                        {turf.rating}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                </div>
-              </div>
               </motion.div>
             ))}
           </div>
@@ -550,91 +595,110 @@ function Home() {
       </section>
 
       {/* Testimonials */}
-      <section style={{
+      <section
+        style={{
           backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
-        }} className="py-16">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">What Our Users Say</h2>
-        <div className="relative w-full max-w-5xl mx-auto">
-          {/* Left Arrow */}
-          <button
-            onClick={prevTestimonials}
-            className="absolute -left-20 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10"
-          >
-            <HiChevronLeft className="text-white text-2xl" />
-          </button>
+        }}
+        className="py-16"
+      >
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">
+            What Our Users Say
+          </h2>
+          <div className="relative w-full max-w-5xl mx-auto">
+            {/* Left Arrow */}
+            <button
+              onClick={prevTestimonials}
+              className="absolute -left-20 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10"
+            >
+              <HiChevronLeft className="text-white text-2xl" />
+            </button>
 
-          {/* Testimonials Grid */}
-          <div className="overflow-hidden  w-[70vw]">
-            <div className="flex transition-transform duration-300" style={{ transform: `translateX(-${index * 33.33}%)` }}>
-              {testimonials.map((testimonial, i) => (
-                <div
-                  key={testimonial._id}
-                  className={`w-[30vw] flex-shrink-0 p-4 transition-all duration-300 pt-20  // Middle testimonial is larger
+            {/* Testimonials Grid */}
+            <div className="overflow-hidden  w-[70vw]">
+              <div
+                className="flex transition-transform duration-300"
+                style={{ transform: `translateX(-${index * 33.33}%)` }}
+              >
+                {testimonials.map((testimonial, i) => (
+                  <div
+                    key={testimonial._id}
+                    className={`w-[30vw] flex-shrink-0 p-4 transition-all duration-300 pt-20  // Middle testimonial is larger
                   }`}
-                >
-                  <div className="relative bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg flex flex-col items-center text-center">
-      
-                    <div className="absolute -top-7">
-                      <img
-                        src={testimonial?.userId?.image}
-                        alt={testimonial.firstName}
-                        className="w-16 h-16 rounded-full border-4 border-gray-300 dark:border-gray-500 "
-                        style={{ zIndex: 1 }}>
-                      </img>
-                    </div>
-
-                    <div className="pt-12">
-                      {/* Comment */}
-                      <p className="text-gray-600 dark:text-gray-300 mb-4">{testimonial.commentText}</p>
-
-                      {/* User Info */}
-                      <div>
-                        <span className="block font-semibold capitalize  dark:text-white">{`${testimonial?.userId?.firstName} ${testimonial?.userId?.lastName}`}</span>
-                        <span className="block text-sm text-gray-500 dark:text-gray-400">{testimonial?.turfId?.turfName}</span>
+                  >
+                    <div className="relative bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg flex flex-col items-center text-center">
+                      <div className="absolute -top-7">
+                        <img
+                          src={testimonial?.userId?.image}
+                          alt={testimonial.firstName}
+                          className="w-16 h-16 rounded-full border-4 border-gray-300 dark:border-gray-500 "
+                          style={{ zIndex: 1 }}
+                        ></img>
                       </div>
 
-                      {/* Star Rating */}
-                      <div className="flex justify-center mt-2">
-                        {[...Array(testimonial?.rating?.rating)].map((_, i) => (
-                          <HiStar key={i} className="text-yellow-500 text-lg" />
-                        ))}
+                      <div className="pt-12">
+                        {/* Comment */}
+                        <p className="text-gray-600 dark:text-gray-300 mb-4">
+                          {testimonial.commentText}
+                        </p>
+
+                        {/* User Info */}
+                        <div>
+                          <span className="block font-semibold capitalize  dark:text-white">{`${testimonial?.userId?.firstName} ${testimonial?.userId?.lastName}`}</span>
+                          <span className="block text-sm text-gray-500 dark:text-gray-400">
+                            {testimonial?.turfId?.turfName}
+                          </span>
+                        </div>
+
+                        {/* Star Rating */}
+                        <div className="flex justify-center mt-2">
+                          {[...Array(testimonial?.rating?.rating)].map(
+                            (_, i) => (
+                              <HiStar
+                                key={i}
+                                className="text-yellow-500 text-lg"
+                              />
+                            )
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+
+            {/* Right Arrow */}
+            <button
+              onClick={nextTestimonials}
+              className="absolute -right-24 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10"
+            >
+              <HiChevronRight className="text-white text-2xl" />
+            </button>
           </div>
 
-          {/* Right Arrow */}
-          <button
-            onClick={nextTestimonials}
-            className="absolute -right-24 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10"
-          >
-            <HiChevronRight className="text-white text-2xl" />
-          </button>
+          {/* Dots (Indicators) */}
+          <div className="flex justify-center mt-8 space-x-2">
+            {testimonials.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setIndex(i)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  i === index + 1 ? "bg-blue-600 scale-125" : "bg-gray-400"
+                }`}
+              />
+            ))}
+          </div>
         </div>
-
-        {/* Dots (Indicators) */}
-        <div className="flex justify-center mt-8 space-x-2">
-          {testimonials.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setIndex(i)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                i === index + 1 ? "bg-blue-600 scale-125" : "bg-gray-400"
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-    </section>    
+      </section>
 
       {/*Faqs*/}
-      <section style={{
+      <section
+        style={{
           backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
-        }} className="py-16 bg-gray-100 dark:bg-gray-800">
+        }}
+        className="py-16 bg-gray-100 dark:bg-gray-800"
+      >
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center dark:text-white">
             Frequently Asked Questions
@@ -707,7 +771,8 @@ function Home() {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4 text-white">Stay Updated</h2>
           <p className="text-xl mb-8 text-blue-100">
-            Subscribe to our newsletter for the latest turf news and exclusive offers!
+            Subscribe to our newsletter for the latest turf news and exclusive
+            offers!
           </p>
           <form onSubmit={handleSubmit} className="max-w-md mx-auto">
             <div className="flex">

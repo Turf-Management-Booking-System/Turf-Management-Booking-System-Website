@@ -1,9 +1,8 @@
-"use client"
-
-import { useContext, useEffect, useState } from "react"
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
+import { useContext, useState } from "react"
+import { motion, useScroll, useTransform, } from "framer-motion"
 import { DarkModeContext } from "../../context/DarkModeContext"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import logo from "../../assets/Images/Logo.png";
 import {
   faUsers,
   faTrophy,
@@ -14,8 +13,7 @@ import {
   faChartLine,
   faQuoteLeft,
   faArrowRight,
-  faFutbol,
-  faRunning,
+  faFutbol, faBaseballBatBall, faTableTennisPaddleBall, faFootball, faHockeyPuck, faVolleyball,
   faMedal,
   faBullhorn,
   faLightbulb,
@@ -33,13 +31,12 @@ const About = () => {
   const { scrollYProgress } = useScroll()
   const opacity = useTransform(scrollYProgress, [0, 0.2], [0, 1])
   const scale = useTransform(scrollYProgress, [0, 0.2], [0.8, 1])
-  const [currentAdIndex, setCurrentAdIndex] = useState(0)
 
 
   // Team members data
   const teamMembers = [
     {
-      name: "Alex Johnson",
+      name: "Sabina Shaikh",
       role: "Founder & CEO",
       image: "https://source.unsplash.com/300x300/?portrait,man,1",
       bio: "Former professional footballer with a passion for making sports accessible to everyone.",
@@ -61,7 +58,7 @@ const About = () => {
       },
     },
     {
-      name: "Raj Patel",
+      name: "Nagma Shaikh",
       role: "Tech Lead",
       image: "https://source.unsplash.com/300x300/?portrait,man,2",
       bio: "Software engineer who loves building innovative solutions for sports enthusiasts.",
@@ -202,11 +199,11 @@ const About = () => {
   // Sports we support
   const sports = [
     { name: "Football", icon: faFutbol, color: "bg-green-500" },
-    { name: "Cricket", icon: faMedal, color: "bg-blue-500" },
-    { name: "Basketball", icon: faFutbol, color: "bg-orange-500" },
-    { name: "Tennis", icon: faRunning, color: "bg-yellow-500" },
-    { name: "Hockey", icon: faRunning, color: "bg-red-500" },
-    { name: "Volleyball", icon: faFutbol, color: "bg-purple-500" },
+    { name: "Cricket", icon: faBaseballBatBall, color: "bg-blue-500" },
+    { name: "Badminton", icon: faTableTennisPaddleBall, color: "bg-orange-500" },
+    { name: "Rugby", icon: faFootball, color: "bg-yellow-500" },
+    { name: "Hockey", icon: faHockeyPuck, color: "bg-red-500" },
+    { name: "Volleyball", icon: faVolleyball, color: "bg-purple-500" },
   ]
 
   return (
@@ -221,11 +218,11 @@ const About = () => {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
-            src="https://source.unsplash.com/1600x900/?football,turf"
+            src="https://media.istockphoto.com/id/2013078894/photo/soccer-field-sideline-at-sunny-day-summer-day-at-sports-field-sunlight-in-the-background.webp?a=1&b=1&s=612x612&w=0&k=20&c=tnph3eIMZEpcxbNHqrpbnLcFzsacTtc4DlgYK_-HsCs="
             alt="Turf"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-900 to-blue-900 opacity-80 mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-green-200 dark:bg-black opacity-30 dark:opacity-70 mix-blend-multiply"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 text-center">
@@ -240,12 +237,13 @@ const About = () => {
             className="inline-block mb-6"
           >
             <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full blur-lg opacity-75 animate-pulse"></div>
-              <div className="relative bg-white dark:bg-gray-800 rounded-full p-5">
-                <FontAwesomeIcon
-                  icon={faFutbol}
-                  className="text-5xl text-gradient bg-gradient-to-r from-purple-600 to-blue-600"
-                />
+              <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-blue-600 rounded-full blur-lg opacity-75 animate-pulse"></div>
+              <div className="relative bg-white dark:bg-gray-800 rounded-full p-2">
+                <img
+                        src={logo}
+                        alt="Logo"
+                        className="w-16 h-16 md:block hidden rounded-full object-cover text-5xl text-gradient bg-gradient-to-r from-green-600 to-blue-500"
+                      />
               </div>
             </div>
           </motion.div>
@@ -254,18 +252,18 @@ const About = () => {
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-5xl md:text-7xl font-bold text-white mb-6 font-orbitron"
+            className="text-5xl md:text-7xl font-bold text-green-600 dark:text-white mb-6 font-orbitron"
           >
-            Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">Story</span>
+            Our <span className="text-transparent bg-clip-text bg-white dark:bg-green-400">Story</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto font-montserrat"
+            className="text-xl md:text-2xl text-black dark:text-white max-w-3xl mx-auto font-montserrat"
           >
-            Transforming how sports enthusiasts find and book the perfect playing field
+            We simplify the way players find and book turfs. Whether you're a casual player or a pro, we make booking easy, fast, and hassle-free.
           </motion.p>
 
           <motion.div
@@ -276,7 +274,7 @@ const About = () => {
           >
             <Link
               to="/turf"
-              className="inline-block px-8 py-4 rounded-full bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold text-lg hover:from-green-500 hover:to-blue-600 transform hover:scale-105 transition-all duration-300 shadow-lg"
+              className="inline-block px-8 py-4 rounded-full bg-[#5886a7] bg-opacity-90 border border-black dark:bg-green-600 dark:border-white  text-white font-bold text-lg hover:from-green-500 hover:to-blue-600 transform hover:scale-105 transition-all duration-300 shadow-lg"
             >
               Explore Our Turfs
             </Link>
@@ -346,7 +344,7 @@ const About = () => {
 
               <div className="flex items-center bg-gray-100 dark:bg-gray-700 px-6 py-3 rounded-full">
                 <FontAwesomeIcon icon={faMapMarkedAlt} className="text-green-500 mr-2" />
-                <span className="text-gray-800 dark:text-gray-200">Nationwide</span>
+                <span className="text-gray-800 dark:text-gray-200">Play from anywhere</span>
               </div>
 
               <div className="flex items-center bg-gray-100 dark:bg-gray-700 px-6 py-3 rounded-full">
@@ -618,7 +616,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* Meet Our Team - Redesigned */}
+      {/* Meet Our Team section */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -633,7 +631,7 @@ const About = () => {
             </span>
             <h2 className="text-3xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">Meet Our Team</h2>
             <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
-              The passionate individuals behind TurfBook
+              The passionate individuals behind KickOnTurf
             </p>
           </motion.div>
 
@@ -665,17 +663,6 @@ const About = () => {
                 </div>
                 <div className="p-6">
                   <p className="text-gray-700 dark:text-gray-300 mb-4">{member.bio}</p>
-                  <div className="flex justify-center space-x-4">
-                    <a href={member.social.twitter} className="text-blue-500 hover:text-blue-600">
-                      <FontAwesomeIcon icon={faTwitter} />
-                    </a>
-                    <a href={member.social.linkedin} className="text-blue-700 hover:text-blue-800">
-                      <FontAwesomeIcon icon={faLinkedin} />
-                    </a>
-                    <a href={member.social.instagram} className="text-pink-600 hover:text-pink-700">
-                      <FontAwesomeIcon icon={faInstagram} />
-                    </a>
-                  </div>
                 </div>
               </motion.div>
             ))}
@@ -683,9 +670,9 @@ const About = () => {
         </div>
       </section>
 
-      {/* Testimonial - Redesigned */}
+      {/* Testimonial section */}
       <section className="py-16 md:py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-90"></div>
+        <div className="absolute inset-0 bg-blue-300 dark:bg-gray-700 opacity-90"></div>
         <div className="absolute inset-0 bg-[url('https://source.unsplash.com/1600x900/?football,match')] bg-cover bg-center mix-blend-overlay"></div>
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -704,7 +691,7 @@ const About = () => {
             <div className="flex items-center justify-center">
               <img
                 src="https://source.unsplash.com/100x100/?portrait,man"
-                alt="Testimonial"
+                alt=""
                 className="w-20 h-20 rounded-full object-cover border-4 border-blue-500 mr-4"
               />
               <div className="text-left">
@@ -716,7 +703,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* CTA Section - Redesigned */}
+      {/* CTA Section */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -726,7 +713,7 @@ const About = () => {
             viewport={{ once: true }}
             className="relative rounded-3xl shadow-xl overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-[#5886a7]"></div>
             <div className="absolute inset-0 bg-[url('https://source.unsplash.com/1600x900/?football,stadium')] bg-cover bg-center opacity-20"></div>
 
             <div className="relative z-10 p-8 md:p-16 text-center">
@@ -758,7 +745,7 @@ const About = () => {
               >
                 <Link
                   to="/turf"
-                  className="inline-flex items-center px-8 py-4 bg-white text-blue-600 font-bold rounded-full shadow-lg hover:bg-blue-50 transition duration-300 transform hover:scale-105"
+                  className="inline-flex items-center px-8 py-4 bg-white text-green-600 font-bold rounded-full shadow-lg hover:bg-blue-50 transition duration-300 transform hover:scale-105"
                 >
                   Book a Turf Now
                   <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
@@ -772,10 +759,7 @@ const About = () => {
   )
 }
 
-// Import these icons to fix the error
-const faTwitter = { prefix: "fab", iconName: "twitter" }
-const faLinkedin = { prefix: "fab", iconName: "linkedin" }
-const faInstagram = { prefix: "fab", iconName: "instagram" }
+
 
 export default About
 

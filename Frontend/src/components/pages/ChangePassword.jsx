@@ -17,7 +17,6 @@ const ChangePassword = () => {
   const user = useSelector((state)=>state.auth.user)
   console.log("token",token);
   const dispatch = useDispatch();
-  // Handle password visibility toggle for each input
   const togglePasswordVisibility = (field) => {
     if (field === "current") {
       setCurrentPasswordVisible(!currentPasswordVisible);

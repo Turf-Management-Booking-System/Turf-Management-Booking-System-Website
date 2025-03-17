@@ -341,7 +341,6 @@ const BookingDetailsModal = ({ booking, onClose }) => {
           </button>
         </div>
       </div>
-
       {/* Policy Section */}
       <div className="max-w-6xl mx-auto mb-8 grid gap-4 sm:grid-cols-2">
         <div className="bg-red-50 dark:bg-red-900 p-4 rounded-lg border border-red-200 dark:border-red-500">
@@ -363,7 +362,6 @@ const BookingDetailsModal = ({ booking, onClose }) => {
           </p>
         </div>
       </div>
-
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-wrap gap-2 mb-6">
           {["Upcoming Bookings", "Cancelled Bookings"].map((tab) => (
@@ -380,7 +378,6 @@ const BookingDetailsModal = ({ booking, onClose }) => {
             </button>
           ))}
         </div>
-
         {/* Search Bar */}
         <div className="mb-6">
           <div className="relative">
@@ -397,7 +394,6 @@ const BookingDetailsModal = ({ booking, onClose }) => {
             />
           </div>
         </div>
-
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {activeTab === "Cancelled Bookings"
             ? filteredCanceledBookings.map((booking) => (

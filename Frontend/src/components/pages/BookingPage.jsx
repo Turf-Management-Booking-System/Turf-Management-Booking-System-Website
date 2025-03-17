@@ -18,7 +18,7 @@ import {
 import { useSelector } from "react-redux";
 
 const BookingPage = () => {
-  const {turfId} = useParams();
+  const { turfId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { darkMode } = useContext(DarkModeContext);
@@ -27,19 +27,19 @@ const BookingPage = () => {
   const { bookingIdRescheduled, turf } = location.state || {};
   const [slots, setSlots] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
-   const selectedTurfName = location.state?.turfName || location.state?.turf?.turfName  ;
-  const token = useSelector((state)=>state.auth.token);
-  const [priceTurf,setPriceTurf] = useState(0);
-  const [userId,setUserId]= useState(0);
-  const user = useSelector((state)=>state.auth.user);
+  const selectedTurfName =
+    location.state?.turfName || location.state?.turf?.turfName;
+  const token = useSelector((state) => state.auth.token);
+  const [priceTurf, setPriceTurf] = useState(0);
+  const [userId, setUserId] = useState(0);
+  const user = useSelector((state) => state.auth.user);
   const [isRescheduled, setIsRescheduled] = useState(false);
   const weatherInfo = {
     temperature: 28,
     condition: "Partly Cloudy",
     icon: faCloud,
   };
-  // api call for turf slots details
-  const fetchTurfSlots = async ()=>{
+  const fetchTurfSlots = async () => {
     try {
       const response = await axios.get(
         `http://localhost:4000/api/v1/turf/${turfId}/slots`,
@@ -56,47 +56,44 @@ const BookingPage = () => {
         if (user && user._id) {
           setUserId(user._id);
         }
-        
-
       }
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
           "Something went wrong while fetching the slots details"
       );
-      console.log("error",error)
-  }
-}
-  useEffect(()=>{
-   fetchTurfSlots();
-  },[turfId])
+      console.log("error", error);
+    }
+  };
+  useEffect(() => {
+    fetchTurfSlots();
+  }, [turfId]);
 
   const toggleSlot = (slot) => {
     if (slot.status === "booked") return;
-  
+
     setSelectedSlots((prevSlots) => {
       let newSlots;
-  
+
       if (prevSlots.includes(slot.time)) {
         newSlots = prevSlots.filter((s) => s !== slot.time);
       } else {
         newSlots = [...prevSlots, slot.time];
       }
-  
 
       const newTotalPrice = newSlots.length * priceTurf;
       setTotalPrice(newTotalPrice);
-  
+
       return newSlots;
     });
-  }
-  const handleProceedToPayment =async  () => {
+  };
+  const handleProceedToPayment = async () => {
     if (!selectedDate || selectedSlots.length === 0) {
       toast.error("Please select a date and at least one slot.");
       return;
     }
-    console.log("rescheduleId",bookingIdRescheduled)
-    navigate(`/confirmBooking/${turfId}/${userId}` , {
+    console.log("rescheduleId", bookingIdRescheduled);
+    navigate(`/confirmBooking/${turfId}/${userId}`, {
       state: {
         bookingIdRescheduled,
         selectedTurfName,
@@ -104,19 +101,17 @@ const BookingPage = () => {
         selectedSlots,
         totalPrice,
         isRescheduled: !!bookingIdRescheduled,
-
       },
     });
   };
-  
 
   return (
     <div
-  style={{
-            backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
-          }}
-  className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 mt-12"
->
+      style={{
+        backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+      }}
+      className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 mt-12"
+    >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -155,7 +150,7 @@ const BookingPage = () => {
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                min={new Date().toISOString().split("T")[0]} 
+                min={new Date().toISOString().split("T")[0]}
                 className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>

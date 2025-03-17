@@ -7,43 +7,45 @@ import { DarkModeContext } from "../../context/DarkModeContext";
 import { setNotification } from "../../slices/notificationSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { loadNotification } from "../../slices/notificationSlice";
 import { FaKey } from "react-icons/fa";
-import { BiHistory } from "react-icons/bi";
 import Chatbot from "../pages/Chatbot";
-import logo from "../../assets/Images/Logo.png"
+import logo from "../../assets/Images/Logo.png";
 import { FaFutbol } from "react-icons/fa";
 import { motion } from "framer-motion";
-
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { darkMode, setDarkMode } = useContext(DarkModeContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showChatbot, setShowChatbot] = useState(false);
-  const [openModal, closeModal] = useState(false);
-
+  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false)
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  const notifications = useSelector((state) => state.notification.notifications);
+  const notifications = useSelector(
+    (state) => state.notification.notifications
+  );
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-
   const handleChatbotToggle = () => {
     setShowChatbot((prev) => !prev);
   };
-
   const handleMenu = () => setMenuOpen((prev) => !prev);
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
-
-  const handleLogoutClick = (event) => {
+  
+  const handleLogoutClick = () => {
     setDropdownOpen(false);
+    setShowLogoutConfirmation(true)
+  };
+
+  const handleLogout = (event) => {
     event.preventDefault();
     dispatch(logout());
     navigate("/login");
-  };
-
+    // localStorage.removeItem("token")
+    // localStorage.removeItem("userData")
+    toast.success("Logged out successfully!")
+  }
   useEffect(() => {
     const fetchNotification = async () => {
       if (user && user._id) {
@@ -51,7 +53,10 @@ function Navbar() {
           const response = await axios.get(
             `http://localhost:4000/api/v1/notify/getNotifications/${user._id}`,
             {
-              headers: { "Content-Type": "application/json", withCredentials: true },
+              headers: {
+                "Content-Type": "application/json",
+                withCredentials: true,
+              },
             }
           );
           if (response.data.success) {
@@ -71,38 +76,30 @@ function Navbar() {
   console.log("unreadCount", unreadCount);
 
   return (
-    <nav className="p-3 flex bg-[#5886a7] dark:bg-gray-900 text-white justify-between items-center fixed top-0 left-0 right-0 z-50 shadow-md">
-      {/* Logo */}
-      <img 
-    src={logo} 
-    alt="KickOnTurf Logo"
-    className="w-12 h-12 rounded-full object-cover"
-  />
-      <div className="flex flex-1 ml-5 items-center gap-2"> 
+    <nav className="p-3 flex bg-[#5886a7] dark:bg-gray-900 text-white justify-between items-center fixed top-0 left-0 w-full z-50 shadow-md">
+      <img
+        src={logo}
+        alt="KickOnTurf Logo"
+        className="w-12 h-12 md:block hidden rounded-full object-cover"
+      />
+      <div className="flex flex-1 ml-5 items-center gap-2">
         <Link to="/" className="text-xl font-orbitron font-bold">
           KickOnTurf
         </Link>
-
-        {/* Animated Ball (Now properly positioned) */}
         <motion.div
-  animate={{
-    x: [0, 10, -10, 0], // Moves left & right smoothly
-    rotate: [0, 15, -15, 0] // Small rotation effect
-  }}
-  transition={{
-    duration: 2,
-    repeat: Infinity,
-    ease: "easeInOut"
-  }}
->
-  <FaFutbol className="text-2xl ml-2 text-white" />
-</motion.div>
-
-
-
+          animate={{
+            x: [0, 10, -10, 0],
+            rotate: [0, 15, -15, 0],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        >
+          <FaFutbol className="text-2xl ml-2 text-white" />
+        </motion.div>
       </div>
-
-      {/* Mobile Menu Toggle */}
       <button className="p-2 lg:hidden" onClick={handleMenu}>
         {menuOpen ? (
           <i className="bx bx-x text-3xl"></i>
@@ -110,14 +107,11 @@ function Navbar() {
           <i className="bx bx-menu text-3xl"></i>
         )}
       </button>
-
-      {/* Navbar Links (Mobile and Desktop) */}
       <div
         className={`${
           menuOpen ? "block" : "hidden"
         } lg:flex lg:items-center lg:gap-12 absolute lg:static top-16 left-0 right-0 bg-[#5886a7] dark:bg-gray-900 lg:bg-transparent lg:dark:bg-transparent p-4 lg:p-0`}
       >
-        {/* Home Link */}
         <Link
           to="/"
           className={`block lg:inline text-[20px] font-medium font-serif pb-2 relative ${
@@ -138,24 +132,17 @@ function Navbar() {
             Turf Panel
           </Link>
         )}
-
-        {/* Turf Link (Visible to All Users) */}
-  
-     {/* Turf Link (Visible to All Users except Admin) */}
-     {(!isAuthenticated || (isAuthenticated && user.role !== "Admin")) && (
-  <Link
-    to="/turf"
-    className={`block lg:inline text-[20px] font-medium font-serif pb-2 relative ${
-      location.pathname === "/turf" ? "after:w-full" : "after:w-0"
-    } after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-white after:transition-all after:duration-300`}
-  >
-    Turf
-  </Link>
-)}
-
-
-        {/* Other Links */}
-        {["/about","/contact"].map((path, index) => (
+        {(!isAuthenticated || (isAuthenticated && user.role !== "Admin")) && (
+          <Link
+            to="/turf"
+            className={`block lg:inline text-[20px] font-medium font-serif pb-2 relative ${
+              location.pathname === "/turf" ? "after:w-full" : "after:w-0"
+            } after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-white after:transition-all after:duration-300`}
+          >
+            Turf
+          </Link>
+        )}
+        {["/about", "/contact"].map((path, index) => (
           <Link
             key={index}
             to={path}
@@ -167,8 +154,6 @@ function Navbar() {
           </Link>
         ))}
       </div>
-
-      {/* Desktop-only elements (Chatbot, Dark Mode, Profile, etc.) */}
       <div className="hidden lg:flex flex-1 items-center justify-end gap-4 mr-5">
         <div className="text-4xl">
           <button onClick={handleChatbotToggle}>
@@ -187,7 +172,6 @@ function Navbar() {
             <i className="bx bx-sun text-2xl"></i>
           )}
         </button>
-
         {/* When Auth then Notification */}
         {isAuthenticated ? (
           <div className="relative flex items-center gap-4">
@@ -202,7 +186,6 @@ function Navbar() {
                 </span>
               )}
             </button>
-
             {/* Profile Dropdown when authenticated */}
             <div className="relative">
               <button
@@ -239,15 +222,16 @@ function Navbar() {
                     </div>
                     <i className="bx bx-chevron-right text-2xl"></i>
                   </Link>
-
-                  {/* Redirect to /admindashboard if user is admin, else /dashboard */}
                   <Link
-                    to={user.role === "Admin" ? "/admindashboard" : "/dashboard"}
+                    to={
+                      user.role === "Admin" ? "/admindashboard" : "/dashboard"
+                    }
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition"
                   >
                     <div className="flex items-center gap-5">
-                      <i className="bx bxs-calendar-check text-2xl"></i>Dashboard
+                      <i className="bx bxs-calendar-check text-2xl"></i>
+                      Dashboard
                     </div>
                     <i className="bx bx-chevron-right text-2xl"></i>
                   </Link>
@@ -262,7 +246,6 @@ function Navbar() {
                     </div>
                     <i className="bx bx-chevron-right text-2xl"></i>
                   </Link>
-
                   {/* Logout Button */}
                   <button
                     onClick={handleLogoutClick}
@@ -287,6 +270,50 @@ function Navbar() {
           </button>
         )}
       </div>
+      {showLogoutConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-8 max-w-md w-full shadow-2xl transform transition-all animate-fadeIn">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-8 w-8"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Confirm Logout</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Are you sure you want to log out of your account? You'll need to log back in to access your profile and
+                bookings.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+              <button
+                onClick={() => setShowLogoutConfirmation(false)}
+                className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-colors font-medium shadow-md"
+              >
+                Yes, Log Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
