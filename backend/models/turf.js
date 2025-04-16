@@ -11,7 +11,6 @@ const SlotSchema = new mongoose.Schema({
                 default:null,
             },
       });
-// create the schema
 const turfSchema = mongoose.Schema({
   turfName :{
     type:String,
@@ -65,7 +64,6 @@ const turfSchema = mongoose.Schema({
   },
   turfAvailability:{
           type:Boolean,
-          // be default all turf are available
           default:true, 
 
   },
@@ -90,5 +88,4 @@ const turfSchema = mongoose.Schema({
         ref:"Sport"
   }]
 })
-// export the module
 module.exports = mongoose.model("Turf",turfSchema)

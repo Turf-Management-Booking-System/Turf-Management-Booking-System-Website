@@ -227,9 +227,14 @@ const BookingHistory = () => {
                       >
                         {booking.status}
                       </p>
-                      <p className="text-2xl font-bold text-gray-800 dark:text-white">
-                        ₹{booking.turf?.turfPricePerHour}
-                      </p>
+                      <div className="mb-1">
+    <p className="text-sm text-gray-600 dark:text-gray-400">
+      {booking.timeSlot.length} slot{booking.timeSlot.length > 1 ? 's' : ''} × ₹{booking.turf?.turfPricePerHour}
+    </p>
+    <p className="text-2xl font-bold text-gray-800 dark:text-white">
+      ₹{booking.timeSlot.length * booking.turf?.turfPricePerHour}
+    </p>
+  </div>
                       {booking.turf?.comments?.[0]?.rating && (
                         <div className="flex items-center justify-end mt-2">
                           <FontAwesomeIcon

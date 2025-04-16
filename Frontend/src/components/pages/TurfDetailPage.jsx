@@ -184,10 +184,7 @@ const TurfDetailsPage = () => {
           </p>
           <p className="mt-2 flex items-center">Turf Size: {turf?.turfSize}</p>
           <p className="mt-2">Description: {turf?.turfDescription}</p>
-          <p className="mt-2 flex items-center">
-            <FaStar className="text-yellow-300" />
-            Average Rating: {averageRating}
-          </p>
+          
           <p
             className={`font-semibold ${
               turf?.turfAvailability ? "text-green-600" : "text-red-600"

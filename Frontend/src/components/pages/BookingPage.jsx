@@ -14,6 +14,9 @@ import {
   faCloud,
   faExclamationCircle,
   faInfoCircle,
+  faCloudRain,
+  faSnowflake,
+  faSun 
 } from "@fortawesome/free-solid-svg-icons";
 import { useSelector } from "react-redux";
 
@@ -25,6 +28,7 @@ const BookingPage = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlots, setSelectedSlots] = useState([]);
   const { bookingIdRescheduled, turf } = location.state || {};
+  const [locationTUrf,setLocationTurf] = useState("");
   const [slots, setSlots] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const selectedTurfName =
@@ -34,11 +38,25 @@ const BookingPage = () => {
   const [userId, setUserId] = useState(0);
   const user = useSelector((state) => state.auth.user);
   const [isRescheduled, setIsRescheduled] = useState(false);
-  const weatherInfo = {
-    temperature: 28,
-    condition: "Partly Cloudy",
+  const [weatherInfo, setWeatherInfo] = useState({
+    temperature: null,
+    condition: "Loading...",
     icon: faCloud,
+  });
+  const [loadingWeather, setLoadingWeather] = useState(true);
+  const getWeatherIcon = (condition) => {
+    const conditionLower = condition.toLowerCase();
+    if (conditionLower.includes("rain")) {
+      return faCloudRain;
+    } else if (conditionLower.includes("sun") || conditionLower.includes("clear")) {
+      return faSun;
+    } else if (conditionLower.includes("snow")) {
+      return faSnowflake;
+    } else {
+      return faCloud;
+    }
   };
+
   const fetchTurfSlots = async () => {
     try {
       const response = await axios.get(
@@ -51,6 +69,8 @@ const BookingPage = () => {
       );
       if (response.data.success) {
         console.log("resposne from slots data", response.data.turf);
+        setLocationTurf(response.data.turf.turfLocation);
+        console.log("location",locationTUrf)
         setSlots(response.data.turf.slots);
         setPriceTurf(response.data.turf.turfPricePerHour);
         if (user && user._id) {
@@ -68,6 +88,74 @@ const BookingPage = () => {
   useEffect(() => {
     fetchTurfSlots();
   }, [turfId]);
+   // Function to fetch coordinates from location name
+   const fetchLocationCoordinates = async (location) => {
+    try {
+      const response = await axios.get(
+        `https://api.openweathermap.org/geo/1.0/direct?q=${location},IN&limit=1&appid=40e263f2c4b1c9ae342a0d3e68c80491`
+      );
+
+      if (!response.data || response.data.length === 0) {
+        throw new Error('Location not found');
+      }
+
+      return response.data[0];
+    } catch (error) {
+      console.error('Error fetching coordinates:', error);
+      throw error;
+    }
+  };
+
+  // Fetch weather data using coordinates
+  const fetchWeatherData = async (lat, lon) => {
+    try {
+      const response = await axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=40e263f2c4b1c9ae342a0d3e68c80491&units=metric`
+      );
+
+      if (response.data) {
+        const weatherData = response.data;
+        setWeatherInfo({
+          temperature: Math.round(weatherData.main.temp),
+          condition: weatherData.weather[0].main,
+          icon: getWeatherIcon(weatherData.weather[0].main),
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching weather data:", error);
+      setWeatherInfo({
+        temperature: null,
+        condition: "Weather unavailable",
+        icon: faCloud,
+      });
+    } finally {
+      setLoadingWeather(false);
+    }
+  };
+
+  useEffect(() => {
+    const loadWeatherData = async () => {
+      try {
+       
+        if (locationTUrf ) {
+          const locationData = await fetchLocationCoordinates(locationTUrf);
+          await fetchWeatherData(locationData.lat, locationData.lon);
+        } else {
+          throw new Error("Turf location not available");
+        }
+      } catch (error) {
+        console.error("Failed to load weather data:", error);
+        setWeatherInfo({
+          temperature: null,
+          condition: "Weather data unavailable",
+          icon: faCloud,
+        });
+        setLoadingWeather(false);
+      }
+    };
+
+    loadWeatherData();
+  }, [locationTUrf]);
 
   const toggleSlot = (slot) => {
     if (slot.status === "booked") return;
@@ -212,20 +300,28 @@ const BookingPage = () => {
               <h3 className="font-serif text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
                 Today's Weather
               </h3>
-              <div className="flex items-center justify-center">
-                <FontAwesomeIcon
-                  icon={weatherInfo.icon}
-                  className="text-4xl text-yellow-500 mr-3"
-                />
-                <div>
-                  <p className="text-gray-700 dark:text-gray-300">
-                    {weatherInfo.temperature}°C
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    {weatherInfo.condition}
-                  </p>
+              {loadingWeather ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-pulse">Loading weather...</div>
                 </div>
-              </div>
+              ) : (
+                <div className="flex items-center justify-center">
+                  <FontAwesomeIcon
+                    icon={weatherInfo.icon}
+                    className="text-4xl text-yellow-500 mr-3"
+                  />
+                  <div>
+                    <p className="text-gray-700 dark:text-gray-300">
+                      {weatherInfo.temperature !== null
+                        ? `${weatherInfo.temperature}°C`
+                        : "N/A"}
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {weatherInfo.condition}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Cancellation and Reschedule Info */}
@@ -286,6 +382,6 @@ const BookingPage = () => {
       </motion.div>
     </div>
   );
-};
+}
 
 export default BookingPage;
