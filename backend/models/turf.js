@@ -5,11 +5,19 @@ const SlotSchema = new mongoose.Schema({
            ref:"Turf"
         },
         time: { type: String, required: true }, 
+        date:{
+                type:Date,
+        },
         status: { type: String, enum: ["available", "booked"], default: "available" },
         bookingEndTime: {
                 type: Date, 
                 default:null,
             },
+            bookingId: { 
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Booking",
+                default: null
+              }
       });
 const turfSchema = mongoose.Schema({
   turfName :{
@@ -78,6 +86,7 @@ const turfSchema = mongoose.Schema({
      ref:"Comment"
   }],
   slots:[SlotSchema],
+  
 
   ratings:[{
     type:mongoose.Schema.Types.ObjectId,

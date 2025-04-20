@@ -18,7 +18,7 @@ import {
   faSnowflake,
   faSun 
 } from "@fortawesome/free-solid-svg-icons";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const BookingPage = () => {
   const { turfId } = useParams();
@@ -35,14 +35,15 @@ const BookingPage = () => {
     location.state?.turfName || location.state?.turf?.turfName;
   const token = useSelector((state) => state.auth.token);
   const [priceTurf, setPriceTurf] = useState(0);
-  const [userId, setUserId] = useState(0);
   const user = useSelector((state) => state.auth.user);
   const [isRescheduled, setIsRescheduled] = useState(false);
+  const loading = useSelector((state)=>state.auth.loading)
   const [weatherInfo, setWeatherInfo] = useState({
     temperature: null,
     condition: "Loading...",
     icon: faCloud,
   });
+  const dispatch = useDispatch();
   const [loadingWeather, setLoadingWeather] = useState(true);
   const getWeatherIcon = (condition) => {
     const conditionLower = condition.toLowerCase();
@@ -57,37 +58,7 @@ const BookingPage = () => {
     }
   };
 
-  const fetchTurfSlots = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:4000/api/v1/turf/${turfId}/slots`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (response.data.success) {
-        console.log("resposne from slots data", response.data.turf);
-        setLocationTurf(response.data.turf.turfLocation);
-        console.log("location",locationTUrf)
-        setSlots(response.data.turf.slots);
-        setPriceTurf(response.data.turf.turfPricePerHour);
-        if (user && user._id) {
-          setUserId(user._id);
-        }
-      }
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-          "Something went wrong while fetching the slots details"
-      );
-      console.log("error", error);
-    }
-  };
-  useEffect(() => {
-    fetchTurfSlots();
-  }, [turfId]);
+  
    // Function to fetch coordinates from location name
    const fetchLocationCoordinates = async (location) => {
     try {
@@ -157,41 +128,90 @@ const BookingPage = () => {
     loadWeatherData();
   }, [locationTUrf]);
 
-  const toggleSlot = (slot) => {
-    if (slot.status === "booked") return;
-
-    setSelectedSlots((prevSlots) => {
-      let newSlots;
-
-      if (prevSlots.includes(slot.time)) {
-        newSlots = prevSlots.filter((s) => s !== slot.time);
-      } else {
-        newSlots = [...prevSlots, slot.time];
+  const fetchTurfSlotsByDate = async (date) => {
+    try {
+      if (!date) {
+        console.error("No date provided");
+        setSlots([]);
+        return;
       }
-
-      const newTotalPrice = newSlots.length * priceTurf;
-      setTotalPrice(newTotalPrice);
-
-      return newSlots;
-    });
-  };
-  const handleProceedToPayment = async () => {
-    if (!selectedDate || selectedSlots.length === 0) {
-      toast.error("Please select a date and at least one slot.");
-      return;
+  
+      const response = await axios.get(
+        `http://localhost:4000/api/v1/turf/getTurfSlotByDate/${turfId}/${date}`
+      );
+      console.log(response.data.slots)
+      if (!response.data || !Array.isArray(response.data?.slots)) {
+        console.error("Invalid response format - slots array missing");
+        setSlots([]);
+        return;
+      }
+  
+      setSlots(response.data.slots);
+      setPriceTurf(response.data.turfDetails?.turfPricePerHour || 0);
+      setLocationTurf(response.data.turfDetails?.turfLocation)
+  
+    } catch (error) {
+      console.error("Error in fetchTurfSlotsByDate:", error);
+      toast.error(error.response?.data?.message || "Error fetching slots");
+      setSlots([]);
     }
-    console.log("rescheduleId", bookingIdRescheduled);
-    navigate(`/confirmBooking/${turfId}/${userId}`, {
-      state: {
-        bookingIdRescheduled,
-        selectedTurfName,
-        selectedDate,
-        selectedSlots,
-        totalPrice,
-        isRescheduled: !!bookingIdRescheduled,
-      },
-    });
   };
+  
+  // Update the useEffect to watch selectedDate
+  useEffect(() => {
+    fetchTurfSlotsByDate(selectedDate);
+  }, [selectedDate]);
+  
+  
+  const handleDateChange = (e) => {
+    const selectedDate = e.target.value;
+    setSelectedDate(selectedDate);
+    
+    // Clear previous selections when date changes
+    setSelectedSlots([]);
+    setTotalPrice(0);
+  
+  };
+ // Update the toggleSlot function to work with slot objects
+const toggleSlot = (slot) => {
+  if (slot.status === "booked") return;
+
+  setSelectedSlots((prevSlots) => {
+    // Use slot._id if available, otherwise fall back to slot.time
+    const slotIdentifier = slot._id || slot.time;
+    let newSlots;
+
+    if (prevSlots.some(s => (s._id || s.time) === slotIdentifier)) {
+      newSlots = prevSlots.filter((s) => (s._id || s.time) !== slotIdentifier);
+    } else {
+      newSlots = [...prevSlots, slot];
+    }
+
+    const newTotalPrice = newSlots.length * priceTurf;
+    setTotalPrice(newTotalPrice);
+
+    return newSlots;
+  });
+};
+
+// Update the handleProceedToPayment to use slot objects correctly
+const handleProceedToPayment = async () => {
+  if (!selectedDate || selectedSlots.length === 0) {
+    toast.error("Please select a date and at least one slot.");
+    return;
+  }
+  
+  navigate(`/confirmBooking/${turfId}/${user._id}`, {
+    state: {
+      bookingIdRescheduled,
+      selectedTurfName,
+      selectedDate,
+      selectedSlots: selectedSlots.map(slot => slot.time), // Send just the time strings
+      totalPrice,
+      isRescheduled: !!bookingIdRescheduled,
+    },
+  });
+};
 
   return (
     <div
@@ -235,43 +255,68 @@ const BookingPage = () => {
                 Select Date:
               </label>
               <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                min={new Date().toISOString().split("T")[0]}
-                className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
+  type="date"
+  value={selectedDate}
+  onChange={handleDateChange}
+  min={new Date().toISOString().split("T")[0]}
+  className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+/>
             </div>
 
             {/* Slot Selection */}
-            <div className="mb-6">
-              <label className="block text-gray-700 dark:text-gray-300 mb-2">
-                <FontAwesomeIcon icon={faClock} className="mr-2" />
-                Select Time Slot:
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-                {slots.map((slot, index) => (
-                  <motion.button
-                    key={index}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`p-3 rounded-lg transition-colors ${
-                      selectedSlots.includes(slot.time)
-                        ? "bg-green-500 text-white"
-                        : slot.status === "available"
-                        ? "bg-green-100 dark:bg-green-800 text-gray-900 dark:text-white"
-                        : "bg-yellow-100 dark:bg-yellow-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                    }`}
-                    onClick={() => toggleSlot(slot)}
-                    disabled={slot.status === "booked"}
-                  >
-                    <div>{slot.time}</div>
-                    <div className="text-sm">₹{priceTurf}</div>
-                  </motion.button>
-                ))}
-              </div>
-            </div>
+            {/* Slot Selection */}
+<div className="mb-6">
+  <label className="block text-gray-700 dark:text-gray-300 mb-2">
+    <FontAwesomeIcon icon={faClock} className="mr-2" />
+    Select Time Slot:
+  </label>
+  
+  {!selectedDate ? (
+    <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg text-center">
+      <FontAwesomeIcon icon={faInfoCircle} className="text-xl mb-2" />
+      <p>Please select a date to view available slots</p>
+    </div>
+  ) : loading ? (
+    <div className="flex justify-center items-center p-4">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
+    </div>
+  ) : slots.length === 0 ? (
+    <div className="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg text-center">
+      <FontAwesomeIcon icon={faExclamationCircle} className="text-xl mb-2" />
+      <p>No slots available for the selected date</p>
+    </div>
+  ) : (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+      {slots.map((slot, index) => (
+  <motion.button
+    key={slot._id || slot.time}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    className={`p-3 rounded-lg transition-colors ${
+      selectedSlots.some(s => (s._id || s.time) === (slot._id || slot.time))
+        ? "bg-green-500 text-white"
+        : slot.status === "available"
+        ? "bg-green-100 dark:bg-green-800 text-gray-900 dark:text-white"
+        : "bg-yellow-100 dark:bg-yellow-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+    }`}
+    onClick={() => toggleSlot(slot)}
+    disabled={slot.status === "booked"}
+  >
+    <div>
+  {new Date(slot.time).toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  })}
+</div>
 
+    <div className="text-sm">₹{priceTurf}</div>
+  </motion.button>
+))}
+
+    </div>
+  )}
+</div>
             {/* Slot Availability*/}
             <div className="mb-6 flex justify-center space-x-4">
               <div className="flex items-center">
@@ -357,8 +402,28 @@ const BookingPage = () => {
                   Slot:
                 </span>{" "}
                 {selectedSlots.length > 0
-                  ? selectedSlots.join(", ")
-                  : "No slots selected"}
+  ? selectedSlots
+      .map(slot => {
+        const time = new Date(slot.time); // Ensure the time is parsed as a Date object
+
+        // Get the hours and minutes
+        let hours = time.getHours();
+        const minutes = time.getMinutes();
+
+        // Determine AM/PM
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+
+        // Convert 24-hour format to 12-hour format
+        hours = hours % 12;
+        hours = hours ? hours : 12; // If hours is 0, set it to 12 for 12 AM
+
+        // Format minutes to always show two digits
+        const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+        return formattedTime;
+      })
+      .join(", ")
+  : "No slots selected"}
+
               </p>
               <p className="text-lg font-medium font-poppins text-gray-700 dark:text-gray-300 mb-4">
                 <span className="font-serif font-semibold text-gray-900 dark:text-white">
