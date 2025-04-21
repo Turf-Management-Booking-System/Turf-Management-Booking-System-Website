@@ -674,3 +674,55 @@ exports.getMonthlyBookingsTrend = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch monthly bookings for user" });
   }
 };
+
+exports.getTopBookedTurfs = async (req, res) => {
+  try {
+    const bookings = await Booking.find().limit(5).populate("turf");
+console.log("Sample Bookings:", bookings.map(b => ({
+  bookingId: b._id,
+  turfId: b.turf?._id,
+  turfName: b.turf?.turfName
+})));
+    const topTurfs = await Booking.aggregate([
+      { $group: { _id: "$turf", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 3 },
+      {
+        $lookup: {
+          from: "turves", // CONFIRM THIS NAME!
+          localField: "_id",
+          foreignField: "_id",
+          as: "turfDetails"
+        }
+      },
+      { $unwind: "$turfDetails" },
+      {
+        $project: {
+          turfId: "$_id",
+          bookingsCount: "$count",
+          turfName: "$turfDetails.turfName",
+          location: "$turfDetails.turfLocation",
+          pricePerHour:"$turfDetails.turfPricePerHour",
+          image:"$turfDetails.turfImages",
+          _id: 0
+        }
+      }
+    ]);
+
+    if (topTurfs.length === 0) {
+      return res.status(200).json({
+        success: false,
+        message: "No booking data available or no matching turfs found."
+      });
+    }
+
+    res.status(200).json({ success: true, data: topTurfs });
+  } catch (error) {
+    console.error("ERROR:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message
+    });
+  }
+};

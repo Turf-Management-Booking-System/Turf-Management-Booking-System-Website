@@ -1,8 +1,11 @@
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { motion, useScroll, useTransform, } from "framer-motion"
 import { DarkModeContext } from "../../context/DarkModeContext"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useDispatch } from "react-redux"
+import { setLoader } from "../../slices/authSlice"
 import logo from "../../assets/Images/Logo.png";
+import axios from "axios"
 import {
   faUsers,
   faTrophy,
@@ -31,8 +34,9 @@ const About = () => {
   const { scrollYProgress } = useScroll()
   const opacity = useTransform(scrollYProgress, [0, 0.2], [0, 1])
   const scale = useTransform(scrollYProgress, [0, 0.2], [0.8, 1])
-
-
+  const dispatch = useDispatch();
+  const [feedBack,setFeedBack] = useState([])
+  
   // Team members data
   const teamMembers = [
     {
@@ -205,7 +209,26 @@ const About = () => {
     { name: "Hockey", icon: faHockeyPuck, color: "bg-red-500" },
     { name: "Volleyball", icon: faVolleyball, color: "bg-purple-500" },
   ]
-
+  const fetchFeedBack = async ()=>{
+    try{
+      dispatch(setLoader(true));
+      const response = await axios.get(
+        `http://localhost:4000/api/v1/comment/displayFeedBack`
+      )
+      if(response.data){
+        dispatch(setLoader(false));
+        setFeedBack(response.data.feedBack);
+        console.log("response",feedBack)
+      }
+    }catch(error){
+      console.log("error",error)
+    }finally{
+      dispatch(setLoader(false))
+    }
+  }
+  useEffect(()=>{
+     fetchFeedBack()
+  },[])
   return (
     <div
       style={{
@@ -672,36 +695,39 @@ const About = () => {
 
       {/* Testimonial section */}
       <section className="py-16 md:py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-blue-300 dark:bg-gray-700 opacity-90"></div>
-        <div className="absolute inset-0 bg-[url('https://source.unsplash.com/1600x900/?football,match')] bg-cover bg-center mix-blend-overlay"></div>
+  <div className="absolute inset-0 bg-blue-300 dark:bg-gray-700 opacity-90"></div>
+  <div className="absolute inset-0 bg-[url('https://source.unsplash.com/1600x900/?football,match')] bg-cover bg-center mix-blend-overlay"></div>
 
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 md:p-12 text-center backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90"
-          >
-            <FontAwesomeIcon icon={faQuoteLeft} className="text-5xl text-blue-500 dark:text-blue-400 mb-6 opacity-30" />
-            <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 leading-relaxed mb-8 italic">
-              TurfBook has completely transformed how we organize our weekly football matches. The ease of booking,
-              quality of turfs, and excellent customer service make it our go-to platform for all our sporting needs.
-            </p>
-            <div className="flex items-center justify-center">
-              <img
-                src="https://source.unsplash.com/100x100/?portrait,man"
-                alt=""
-                className="w-20 h-20 rounded-full object-cover border-4 border-blue-500 mr-4"
-              />
-              <div className="text-left">
-                <p className="font-bold text-xl text-gray-900 dark:text-white">Vikram Mehta</p>
-                <p className="text-blue-600 dark:text-blue-400">Football Club Captain</p>
-              </div>
-            </div>
-          </motion.div>
+  <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    {feedBack.map((item, index) => (
+      <motion.div
+        key={index}
+        initial={{ opacity: 0, scale: 0.9 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 md:p-12 text-center backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90 mb-8"
+      >
+        <FontAwesomeIcon icon={faQuoteLeft} className="text-5xl text-blue-500 dark:text-blue-400 mb-6 opacity-30" />
+        <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 leading-relaxed mb-8 italic">
+          {item.thought}
+        </p>
+        <div className="flex items-center justify-center">
+          <img
+            src={item.user.image || "https://source.unsplash.com/100x100/?portrait"} // fallback image
+            alt=""
+            className="w-20 h-20 rounded-full object-cover border-4 border-blue-500 mr-4"
+          />
+          <div className="text-left">
+            <p className="font-bold text-xl text-gray-900 dark:text-white">{item.user.firstName}{item.user.lastName}</p>
+            <p className="text-blue-600 dark:text-blue-400">{item.user.role || "User"}</p>
+          </div>
         </div>
-      </section>
+      </motion.div>
+    ))}
+  </div>
+</section>
+
 
       {/* CTA Section */}
       <section className="py-16 md:py-24">
