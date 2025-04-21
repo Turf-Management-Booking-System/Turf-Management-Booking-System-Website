@@ -196,8 +196,18 @@ const BookingHistory = () => {
                             icon={faClock}
                             className="mr-2 font-sans text-green-500"
                           />
-                          {new Date(booking.date).toLocaleDateString()} |{" "}
-                          {booking.timeSlot.join(", ")}
+  {new Date(booking.date).toLocaleDateString()} |{" "}
+  {booking.timeSlot
+    .map((time) => {
+      const date = new Date(time);
+      const hours = date.getHours();
+      const minutes = "00"; // Assuming the time slots are on the hour
+      const ampm = hours >= 12 ? "PM" : "AM";
+      const formattedHour = hours % 12 || 12; // Converts 0 hours to 12
+      return `${formattedHour}:${minutes} ${ampm}`;
+    })
+    .join(", ")}
+
                         </p>
                         <p className="text-gray-600 font-montserrat dark:text-gray-300">
                           <FontAwesomeIcon
@@ -227,9 +237,14 @@ const BookingHistory = () => {
                       >
                         {booking.status}
                       </p>
-                      <p className="text-2xl font-bold text-gray-800 dark:text-white">
-                        ₹{booking.turf?.turfPricePerHour}
-                      </p>
+                      <div className="mb-1">
+    <p className="text-sm text-gray-600 dark:text-gray-400">
+      {booking.timeSlot.length} slot{booking.timeSlot.length > 1 ? 's' : ''} × ₹{booking.turf?.turfPricePerHour}
+    </p>
+    <p className="text-2xl font-bold text-gray-800 dark:text-white">
+      ₹{booking.timeSlot.length * booking.turf?.turfPricePerHour}
+    </p>
+  </div>
                       {booking.turf?.comments?.[0]?.rating && (
                         <div className="flex items-center justify-end mt-2">
                           <FontAwesomeIcon

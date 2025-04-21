@@ -7,6 +7,8 @@ import greenBg from "../../assets/Images/greenBg.png";
 import whiteBg from "../../assets/Images/whiteBg.png";
 import blackBg from "../../assets/Images/blackBg.png";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { setLoader } from "../../slices/authSlice";
 import {
   faTachometerAlt,
   faCalendarAlt,
@@ -44,7 +46,7 @@ const Dashboard = () => {
   const [filterStatus, setFilterStatus] = useState("All");
   const [sortBy, setSortBy] = useState("date");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-
+  
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleFilter = () => setIsFilterOpen(!isFilterOpen);
 
@@ -55,13 +57,43 @@ const Dashboard = () => {
   const allBookings = useSelector((state) => state.booking.allBookings);
   const currentBookings = useSelector((state) => state.booking.currentBookings);
   const cancelBooked = useSelector((state) => state.booking.cancelBooked);
+  const token = useSelector((state)=>state.auth.token)
   const rescheduledBookings = useSelector(
     (state) => state.booking.rescheduledBookings
   );
   const previousBookings = useSelector(
     (state) => state.booking.previousBookings
   );
-
+  const [trendData,setTrendData] = useState("")
+  useEffect(() => {
+    const fetchTrendData = async ()=>{
+         try {
+              dispatch(setLoader(true));
+        
+              const response = await axios.get(
+                `http://localhost:4000/api/v1/turf/getMonthlyBookingsTrend/${user._id}`,
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                  withCredentials: true,
+                }
+              );
+              console.log("Response from backend total monthly trend", response.data);
+              setTrendData(response.data);
+            } catch (error) {
+              console.log("Error", error.response?.data || error.message);
+              toast.error(
+                error.response?.data?.message || "Unable to fetch trend Data"
+              );
+            } finally {
+              dispatch(setLoader(false));
+            }
+          }
+    fetchTrendData();
+  }, [user._id]); // Add dependency
+  console.log("trendData",trendData)
   useEffect(() => {
     dispatch(loadNotification());
   }, [dispatch]);
@@ -93,7 +125,7 @@ const Dashboard = () => {
     { name: "Cancelled", value: cancelBooked.length },
   ];
 
-  const bookingTrendData = getBookingTrendData();
+  const bookingTrendData = trendData;
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
@@ -153,7 +185,7 @@ const Dashboard = () => {
       style={{
         backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
       }}
-      className={`min-h-screen mt-12 bg-gray-100 dark:bg-gray-900`}
+      className={`min-h-screen mt-12 bg-gray-100 dark:bg-gray-900 `}
     >
       <div className="flex">
         {/* Sidebar */}
@@ -236,7 +268,7 @@ const Dashboard = () => {
                 <div className="flex items-center space-x-4">
                   <div className="relative">
                     <img
-                      src={user?.avatar || ""}
+                      src={user?.image || ""}
                       alt={""}
                       className="w-10 h-10 rounded-full border-2 border-green-500 dark:border-green-400"
                     />
@@ -491,16 +523,6 @@ const getStatusColor = (status) => {
 
 const getMostBookedTurf = () => {
   return "Green Valley";
-};
-
-const getBookingTrendData = () => {
-  return [
-    { name: "Jan", bookings: 4 },
-    { name: "Feb", bookings: 3 },
-    { name: "Mar", bookings: 5 },
-    { name: "Apr", bookings: 7 },
-    { name: "May", bookings: 6 },
-  ];
 };
 
 export default Dashboard;

@@ -3,8 +3,8 @@ const User = require("../models/user");
 const Comment = require("../models/comment");
 const Turf = require("../models/turf");
 const Rating = require("../models/rating");
-const UserActivity = require("../models/userActivity")
-// create turf comment
+const UserActivity = require("../models/userActivity");
+const FeedBack = require("../models/feedBack");
 exports.createComment =async(req,res)=>{
    try{
     const {commentText} = req.body;
@@ -55,7 +55,6 @@ exports.createComment =async(req,res)=>{
     })
    }
 }
-// create turf comment update
 exports.updateComment =async(req,res)=>{
   try{
     const {commentId,commentText} = req.body;
@@ -91,7 +90,6 @@ exports.updateComment =async(req,res)=>{
     })
   }
 }
-// cereate turf comment delete
 exports.deleteComments =async(req,res)=>{
 try{
   const {turfId,userId,commentId}= req.params;
@@ -124,8 +122,6 @@ exports.addRating= async (req, res) => {
 
     const turf = await Turf.findById(turfId);
     if (!turf) return res.status(404).json({ message: "Turf not found" });
-
-    // Create new rating
     const newRating = new Rating({
        rating:value,
        user:userId,
@@ -194,8 +190,6 @@ exports.getCommentsWithRatings = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
-// get only comments for testimonals
 exports.getCommentWithTestimonals = async (req,res)=>{
   try{
      const testimonals = await Comment.find({})
@@ -223,6 +217,32 @@ exports.getCommentWithTestimonals = async (req,res)=>{
         message:"Error while fetching Testimonals",
         error:error.message
        })
+  }
+}
+exports.displayFeedback = async(req,res)=>{
+  try{
+    // get all the feedback 
+    const feedBack = await FeedBack.findOne().populate("user").sort({createdAt:-1})
+    // validate if there is no feedback
+    if(!feedBack) {
+      return res.status(404).json({
+        success:false,
+        message:"No Feedback Found!"
+      })
+    }
+    // return the response
+    return res.status(200).json({
+      success:true,
+      message:"Found The Feedback",
+      feedBack
+    })
+  }catch(error){
+    console.log("error",error)
+    return res.status(500).json({
+      success:false,
+      message:"Error while fetching Feedback",
+      error:error.message,
+    })
   }
 }
 

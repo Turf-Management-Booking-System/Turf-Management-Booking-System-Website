@@ -4,77 +4,89 @@ const Sport = require("../models/sports")
 const Booking = require("../models/booking");
 const mongoose = require("mongoose");
 const { ObjectId } = require('mongodb'); 
-// create turf
-exports.createTurf=async(req,res)=>{
-    try{
-    // get the data from the admin
-    const slots = [
-        { time: "9:00 AM", status: "available" },
-        { time: "10:00 AM", status: "available" },
-        { time: "11:00 AM", status: "available" },
-        { time: "12:00 PM", status: "available" },
-        { time: "1:00 PM", status: "available" },
-        { time: "2:00 PM", status: "available" },
-        { time: "3:00 PM", status: "available" },
-        { time: "4:00 PM", status: "available" },
-        { time: "5:00 PM", status: "available" },
-        { time: "6:00 PM", status: "available" },
-        { time: "7:00 PM", status: "available" },
-        { time: "8:00 PM", status: "available" },
-        { time: "9:00 PM", status: "available" },
-        { time: "10:00 PM", status: "available" }
-      ];
-    const{turfName,turfDescription,turfTitle,turfOwner,turfPricePerHour,turfLocation,turfImages,turfAddress,turfAmentities,turfRules,turfSize,turfAvailability,turfOwnerPhoneNumber,sports}= req.body;
-    // validate the data from the admin
-    if(!turfName||!turfDescription||!turfTitle||!turfOwner||!turfPricePerHour||!turfLocation||!turfImages||!turfAddress||!turfAmentities||!turfRules||!turfSize||!turfAvailability||!turfOwnerPhoneNumber||!sports){
-        return res.status(400).json({
-            success:false,
-            message:"please neter the turf details!"
-        })
-    }
-   
-    // store the data in the databse
-    const turfDeatils = await Turf.create({
-          turfName,turfDescription,turfTitle,turfOwner,turfPricePerHour,turfLocation,turfImages,turfAddress,turfAmentities,turfRules,turfSize,turfAvailability,turfOwnerPhoneNumber,slots,
-    });
-    console.log("turf details",turfDeatils);
-    const createSports = await Sport.create({
-        sports:sports,
-        turfId:turfDeatils._id,
-    })
-    turfDeatils.sports.push(createSports._id);
-    await turfDeatils.save()
-    // send email to the turf owner
-    // return the response
-    return res.status(200).json({
-        success:true,
-        message:"turf created successfully!",
-        turf:turfDeatils
-    })
+exports.createTurf = async (req, res) => {
+  try {
+    const {
+      turfName,
+      turfDescription,
+      turfTitle,
+      turfOwner,
+      turfPricePerHour,
+      turfLocation,
+      turfImages,
+      turfAddress,
+      turfAmentities,
+      turfRules,
+      turfSize,
+      turfAvailability,
+      turfOwnerPhoneNumber,
+      sports
+    } = req.body;
 
-    }catch(error){
-        console.log(error);
-         return res.status(500).json({
-            success:false,
-            message:"error while creating the turf",
-            error:error.message,
-        })
+    // Validation
+    if (
+      !turfName || !turfDescription || !turfTitle || !turfOwner ||
+      !turfPricePerHour || !turfLocation || !turfImages || !turfAddress ||
+      !turfAmentities || !turfRules || !turfSize || !turfOwnerPhoneNumber || !sports
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter all required turf details!"
+      });
     }
-}
+
+    // Create Turf without slots
+    const turfDetails = await Turf.create({
+      turfName,
+      turfDescription,
+      turfTitle,
+      turfOwner,
+      turfPricePerHour,
+      turfLocation,
+      turfImages,
+      turfAddress,
+      turfAmentities,
+      turfRules,
+      turfSize,
+      turfAvailability,
+      turfOwnerPhoneNumber,
+    });
+
+    // Create sports entry (if needed)
+    const createSports = await Sport.create({
+      sports: sports,
+      turfId: turfDetails._id,
+    });
+
+    turfDetails.sports.push(createSports._id);
+    await turfDetails.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Turf created successfully!",
+      turf: turfDetails
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Error while creating the turf",
+      error: error.message,
+    });
+  }
+};
+
 
 exports.updateTurf = async (req, res) => {
   try {
     const { turfId, sports, ...updateData } = req.body;
-
-    // Validate turfId
     if (!turfId) {
       return res.status(400).json({
         success: false,
         message: "Please provide a valid turfId",
       });
     }
-
-    // Find the turf in the database
     const findTurf = await Turf.findById(turfId);
     if (!findTurf) {
       return res.status(404).json({
@@ -82,36 +94,23 @@ exports.updateTurf = async (req, res) => {
         message: "Turf not found in the database",
       });
     }
-
-    // Update the turf fields (excluding sports)
     Object.keys(updateData).forEach((key) => {
       findTurf[key] = updateData[key];
     });
-
-    // Save the updated turf in the database
     const updatedTurf = await findTurf.save();
-
-    // Update the sports field in the Sport model
     if (sports && Array.isArray(sports)) {
-      // Find the Sport document associated with the turfId
       let sportDoc = await Sport.findOne({ turfId });
 
       if (!sportDoc) {
-        // If no Sport document exists, create a new one
         sportDoc = new Sport({
           turfId,
           sports,
         });
       } else {
-        // If a Sport document exists, update the sports field
         sportDoc.sports = sports;
       }
-
-      // Save the updated Sport document
       await sportDoc.save();
     }
-
-    // Return the response
     return res.status(200).json({
       success: true,
       message: "Turf and associated sports updated successfully!",
@@ -126,10 +125,8 @@ exports.updateTurf = async (req, res) => {
     });
   }
 };
-// delete turf
 exports.deleteTurf = async(req,res)=>{
     try{
-        // get the turf id from the user
         const {turfId}= req.body;
         if(!turfId){
             return res.status(400).json({
@@ -137,7 +134,6 @@ exports.deleteTurf = async(req,res)=>{
                 message:"please enter the turfId properly"
             })
         }
-        // check if user exits in the databse
         const findTurfId = await Turf.findById(turfId);
         if(!findTurfId){
             return res.status(400).json({
@@ -145,9 +141,7 @@ exports.deleteTurf = async(req,res)=>{
                 message:"error while finding the find by id"
             })
         }
-        // if exits delete the turf 
         const deleteTurf = await Turf.findByIdAndDelete(turfId);
-        // return the response
         return res.status(200).json({
             success:true,
             message:"deleted the turf !",
@@ -163,10 +157,8 @@ exports.deleteTurf = async(req,res)=>{
         })
     }
 }
-// get all turf
 exports.getAllTurf = async(req,res)=>{
     try{
-        // get all turf from the databse
         const fetchAllTurf = await Turf.find().populate("sports")
         if(fetchAllTurf.length===0){
             return res.status(400).json({
@@ -174,7 +166,6 @@ exports.getAllTurf = async(req,res)=>{
                 message:"no turf found in the database"
             })
         }
-        // return the response
         return res.status(200).json({
             success:true,
             message:"fetch the turf",
@@ -190,7 +181,6 @@ exports.getAllTurf = async(req,res)=>{
         })
     }
 }
-// get turf by ,location
 exports.getTurfSelectedLocation = async(req,res)=>{
     try{
       const {location} = req.params;
@@ -220,7 +210,6 @@ exports.getTurfSelectedLocation = async(req,res)=>{
         })
     }
 }
-// get turf by id 
 exports.getTurfById =async (req,res)=>{
     try{
      const {id} = req.params;
@@ -258,7 +247,6 @@ exports.getTurfById =async (req,res)=>{
             message:"Not Found With The Particular Id"
         })
      }
-      // Calculate average rating
       const ratings = fetchTurfById.ratings;
       const averageRating = ratings.length
           ? ratings.reduce((sum, rating) => sum + rating.rating, 0) / ratings.length
@@ -279,10 +267,8 @@ exports.getTurfById =async (req,res)=>{
         })
     }
 }
-// view all users
 exports.viewAllUsers= async(req,res)=>{
     try{
-        // get all users from the databse
         const fetchAllUsers= await User.find();
         if(fetchAllUsers.length===0){
             return res.status(400).json({
@@ -290,7 +276,6 @@ exports.viewAllUsers= async(req,res)=>{
                 message:"no user find in the database"
             })
         }
-        // return the response
         return res.status(200).json({
             success:true,
             message:"all user fetch",
@@ -306,8 +291,6 @@ exports.viewAllUsers= async(req,res)=>{
       })
     }
 }
-
-// view all bookings details and search particular turf bookings
 exports.allBookings = async(req,res)=>{
     try{
 
@@ -315,7 +298,6 @@ exports.allBookings = async(req,res)=>{
 
     }
 }
-// view particular search bookings with the booking id
 exports.viewBookingById = async(req,res)=>{
     try{
 
@@ -323,8 +305,6 @@ exports.viewBookingById = async(req,res)=>{
 
     }
 }
-// cancel booking
-// confirmation booking
 exports.getAllTurfLocations = async(req,res)=>{
     try{
       const turfLocations = await Turf.aggregate([
@@ -349,7 +329,6 @@ exports.getAllTurfLocations = async(req,res)=>{
         })
     }
 }
-// getTurfSlots
 exports.getTurfSlots = async(req,res)=>{
     try{
         const {turfId}= req.params;
@@ -383,37 +362,90 @@ exports.getTurfSlots = async(req,res)=>{
 exports.getTurfSlotsByDate = async (req, res) => {
   try {
     const { turfId, date } = req.params;
-    const selectedDate = new Date(date);
 
-    if (isNaN(selectedDate.getTime())) {
-      return res.status(400).json({ message: "Invalid Date" });
+    // Validate date format (ensure it follows yyyy-mm-dd format)
+    const queryDate = new Date(date);
+    if (isNaN(queryDate.getTime())) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid date format"
+      });
     }
 
-    const turf = await Turf.findById(turfId);
+    const turf = await Turf.findById(turfId).select('+slots');
+
     if (!turf) {
-      return res.status(404).json({ message: "Turf not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Turf not found"
+      });
     }
 
-    // Poore slots return karo
-    const slots = turf.slots.map((slot) => {
-      if (slot.bookingEndTime) {
-        const slotDate = new Date(slot.bookingEndTime);
-        if (
-          !isNaN(slotDate.getTime()) &&
-          slotDate.toISOString().split("T")[0] === selectedDate.toISOString().split("T")[0]
-        ) {
-          return { ...slot, status: "booked" }; // Agar date match kare toh status booked rakho
-        }
-      }
-      return slot; // Baaki slots waise hi return karo
+    // Check if slots exist
+    if (!turf.slots || !Array.isArray(turf.slots)) {
+      turf.slots = []; // Ensure it's an array
+    }
+
+    // Filter slots for specific date
+    const slotsForDate = turf.slots.filter(slot => {
+      if (!slot.date) return false;
+      return new Date(slot.date).toDateString() === queryDate.toDateString();
     });
 
-    res.status(200).json(slots);
+    // If no slots found for that date, return default ones and update the database
+    if (slotsForDate.length === 0) {
+      const defaultSlots = [
+        "6:00 AM", "7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM",
+        "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM",
+        "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM"
+      ].map(time => {
+        const timeString = `${queryDate.toISOString().split('T')[0]} ${time}`;
+        const timeDate = new Date(timeString);
+         console.log("date",queryDate)
+        return {
+          time: timeDate,
+          date: queryDate, // Set the date properly
+          status: "available",
+          bookingEndTime: null,
+          bookingId: null
+        };
+      });
+
+      // Update the turf with new slots for the selected date
+      turf.slots.push(...defaultSlots);
+      await turf.save();
+
+      return res.status(200).json({
+        success: true,
+        slots: defaultSlots,
+        turfDetails: {
+          turfName: turf.turfName,
+          turfPricePerHour: turf.turfPricePerHour
+        }
+      });
+    }
+    
+    // Return existing slots for the specific date
+    return res.status(200).json({
+      success: true,
+      slots: slotsForDate,
+      turfDetails: {
+        turfName: turf.turfName,
+        turfPricePerHour: turf.turfPricePerHour,
+        turfLocation:turf.turfLocation
+      }
+    });
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server Error" });
+    console.error("Error in getTurfSlotsByDate:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while fetching slots",
+      error: error.message
+    });
   }
 };
+
 
 
 exports.getAllSports = async (req, res) => {
@@ -451,11 +483,11 @@ exports.getMonthlyRevenue = async (req, res) => {
     const monthlyRevenue = await Booking.aggregate([
       {
         $group: {
-          _id: { $month: "$date" }, // Group by month
-          revenue: { $sum: "$totalPrice" } // Sum of revenue
+          _id: { $month: "$date" }, 
+          revenue: { $sum: "$totalPrice" }
         }
       },
-      { $sort: { _id: 1 } }, // Sort months by number (1 = Jan, 2 = Feb, etc.)
+      { $sort: { _id: 1 } }, 
       {
         $project: {
           _id: 0, 
@@ -573,31 +605,25 @@ exports.getSportsUtilization = async (req, res) => {
 exports.getMonthlyBookingsForUser = async (req, res) => {
   try {
     const { userId } = req.params;
-
-    // Convert userId to ObjectId
     const objectUserId = new mongoose.Types.ObjectId(userId);
-
-    // Aggregate bookings by status
     const statusBookings = await Booking.aggregate([
       {
-        $match: { user: objectUserId }, // Filter by user
+        $match: { user: objectUserId }, 
       },
       {
         $group: {
-          _id: "$status", // Group by status
-          bookings: { $sum: 1 }, // Count bookings per status
+          _id: "$status", 
+          bookings: { $sum: 1 }, 
         },
       },
       {
         $project: {
-          _id: 0, // Exclude the default _id field
-          name: "$_id", // Use status as the name
-          bookings: 1, // Include the bookings count
+          _id: 0, 
+          name: "$_id", 
+          bookings: 1, 
         },
       },
     ]);
-
-    // Send the response
     res.status(200).json(statusBookings);
   } catch (error) {
     console.error("Error fetching monthly bookings for user:", error);
@@ -612,7 +638,7 @@ exports.getMonthlyBookingsTrend = async (req, res) => {
 
     const monthlyBookings = await Booking.aggregate([
       {
-        $match: { user: objectUserId }, // Ensure ObjectId matching
+        $match: { user: objectUserId }, 
       },
       {
         $group: {
@@ -646,5 +672,57 @@ exports.getMonthlyBookingsTrend = async (req, res) => {
   } catch (error) {
     console.error("Error fetching monthly bookings for user:", error);
     res.status(500).json({ message: "Failed to fetch monthly bookings for user" });
+  }
+};
+
+exports.getTopBookedTurfs = async (req, res) => {
+  try {
+    const bookings = await Booking.find().limit(5).populate("turf");
+console.log("Sample Bookings:", bookings.map(b => ({
+  bookingId: b._id,
+  turfId: b.turf?._id,
+  turfName: b.turf?.turfName
+})));
+    const topTurfs = await Booking.aggregate([
+      { $group: { _id: "$turf", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 3 },
+      {
+        $lookup: {
+          from: "turves", // CONFIRM THIS NAME!
+          localField: "_id",
+          foreignField: "_id",
+          as: "turfDetails"
+        }
+      },
+      { $unwind: "$turfDetails" },
+      {
+        $project: {
+          turfId: "$_id",
+          bookingsCount: "$count",
+          turfName: "$turfDetails.turfName",
+          location: "$turfDetails.turfLocation",
+          pricePerHour:"$turfDetails.turfPricePerHour",
+          image:"$turfDetails.turfImages",
+          _id: 0
+        }
+      }
+    ]);
+
+    if (topTurfs.length === 0) {
+      return res.status(200).json({
+        success: false,
+        message: "No booking data available or no matching turfs found."
+      });
+    }
+
+    res.status(200).json({ success: true, data: topTurfs });
+  } catch (error) {
+    console.error("ERROR:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message
+    });
   }
 };

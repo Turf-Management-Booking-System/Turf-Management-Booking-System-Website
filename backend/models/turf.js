@@ -5,13 +5,20 @@ const SlotSchema = new mongoose.Schema({
            ref:"Turf"
         },
         time: { type: String, required: true }, 
+        date:{
+                type:Date,
+        },
         status: { type: String, enum: ["available", "booked"], default: "available" },
         bookingEndTime: {
                 type: Date, 
                 default:null,
             },
+            bookingId: { 
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Booking",
+                default: null
+              }
       });
-// create the schema
 const turfSchema = mongoose.Schema({
   turfName :{
     type:String,
@@ -65,7 +72,6 @@ const turfSchema = mongoose.Schema({
   },
   turfAvailability:{
           type:Boolean,
-          // be default all turf are available
           default:true, 
 
   },
@@ -80,6 +86,7 @@ const turfSchema = mongoose.Schema({
      ref:"Comment"
   }],
   slots:[SlotSchema],
+  
 
   ratings:[{
     type:mongoose.Schema.Types.ObjectId,
@@ -90,5 +97,4 @@ const turfSchema = mongoose.Schema({
         ref:"Sport"
   }]
 })
-// export the module
 module.exports = mongoose.model("Turf",turfSchema)

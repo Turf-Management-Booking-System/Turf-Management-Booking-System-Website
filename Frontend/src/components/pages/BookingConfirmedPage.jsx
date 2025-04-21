@@ -94,6 +94,16 @@ const BookingConfirmedPage = () => {
       console.error("Cancellation error:", error);
     }
   };
+  function convertTo24Hour(time12h) {
+    const [time, modifier] = time12h.split(" ");
+    let [hours, minutes] = time.split(":");
+  
+    if (hours === "12") hours = "00";
+    if (modifier.toLowerCase() === "PM") hours = parseInt(hours, 10) + 12;
+  
+    return `${hours.padStart(2, "0")}:${minutes}`;
+  }
+  
   return (
     <div
       style={{
@@ -149,8 +159,18 @@ const BookingConfirmedPage = () => {
                   className="mr-3 text-yellow-500 text-xl"
                 />
                 <div>
-                  <span className="font-semibold block">Time Slots</span>
-                  <span className="text-lg">{selectedSlots.join(", ")}</span>
+                <span className="font-semibold block">Time Slots</span>
+<span className="text-lg">
+  {selectedSlots.map(time => {
+    const date = new Date(`1970-01-01T${convertTo24Hour(time)}:00`);
+    return date.toLocaleTimeString([], {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    }).toLowerCase().replace(" ", "");
+  }).join(", ")}
+</span>
+
                 </div>
               </div>
               <div className="flex items-center text-gray-700 dark:text-gray-300">

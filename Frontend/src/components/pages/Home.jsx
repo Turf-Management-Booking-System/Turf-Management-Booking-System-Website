@@ -44,6 +44,7 @@ function Home() {
   const [openIndex, setOpenIndex] = useState(null);
   const [email, setEmail] = useState("");
   const [testimonials, setTestimonials] = useState([]);
+  const [featuredTurfs,setFeaturedTurfs] = useState([]);
   const notifications = useSelector(
     (state) => state.notification.notifications
   );
@@ -117,32 +118,7 @@ function Home() {
     },
   ];
 
-  const featuredTurfs = [
-    {
-      id: 1,
-      name: "Green Valley Turf",
-      location: "Mumbai",
-      pricePerHour: "1500",
-      rating: 4.8,
-      image: "",
-    },
-    {
-      id: 2,
-      name: "City Central Arena",
-      location: "Delhi",
-      pricePerHour: "1400",
-      rating: 4.2,
-      image: "",
-    },
-    {
-      id: 3,
-      name: "Sunset Sports Complex",
-      location: "Bangalore",
-      rating: 4.5,
-      pricePerHour: "1100",
-      image: "",
-    },
-  ];
+ 
   const sportsCategories = [
     { name: "Football", icon: faFutbol, color: "bg-green-500" },
     { name: "Cricket", icon: faFutbol, color: "bg-blue-500" },
@@ -296,7 +272,24 @@ function Home() {
     }
     setEmail("");
   };
-
+   const fetchFetauredTurfs = async ()=>{
+    try{
+        dispatch(setLoader(true))
+        const response =await  axios.get(`http://localhost:4000/api/v1/turf/getTopBookedTurfs`)
+        if(response.data.success && response.data.data){
+          dispatch(setLoader(false))
+          setFeaturedTurfs((response.data.data))
+          console.log(featuredTurfs)
+        }
+    }catch(error){
+      console.log("error",error)
+    }finally{
+       dispatch(setLoader(false))
+    }
+   }
+   useEffect(()=>{
+          fetchFetauredTurfs()
+   },[])
   return (
     <>
       {/* Hero Section */}
@@ -553,13 +546,13 @@ function Home() {
                 className="bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg"
               >
                 <img
-                  src={turf.image || ""}
+                  src={turf.image[0] || ""}
                   alt={""}
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-4">
                   <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-                    {turf.name}
+                    {turf.turfName}
                   </h2>
                   <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
                     <i className="bx bx-map text-red-500"></i> {turf.location}
@@ -568,14 +561,17 @@ function Home() {
                     <p className="text-green-600 dark:text-green-400 font-bold mt-2">
                       ₹{turf.pricePerHour}/hr
                     </p>
-                    <div className="flex items-center mt-4">
-                      <span className="text-yellow-400 mr-1">
-                        <FontAwesomeIcon icon={faStar} />
-                      </span>
-                      <span className="font-bold dark:text-white">
-                        {turf.rating}
-                      </span>
-                    </div>
+                    <div className="flex items-center mt-4 group relative">
+  <span className="text-purple-500 mr-2">
+    <FontAwesomeIcon icon={faUsers} /> {/* People icon for bookings */}
+  </span>
+  <span className="font-bold dark:text-white">
+    {turf.bookingsCount}
+  </span>
+  <span className="absolute -bottom-6 left-0 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">
+    Total bookings
+  </span>
+</div>
                   </div>
                 </div>
               </motion.div>

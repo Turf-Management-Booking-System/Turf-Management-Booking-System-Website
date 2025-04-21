@@ -28,7 +28,7 @@ const BookedConfirmPage = () => {
     const capitalize = e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1).toLowerCase()
     setPaymentMode(capitalize)
   }
-
+  
   const handleConfirmBooking = async () => {
     if (!paymentMode) {
       toast.error("Please select a payment mode.")
@@ -38,6 +38,24 @@ const BookedConfirmPage = () => {
       toast.error("Online Mode is not available right now!")
       return
     }
+    // Format time slots consistently
+  const formattedSlots = selectedSlots.map(slot => {
+    const time = new Date(slot);
+    let hours = time.getHours();
+    const minutes = time.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+  });
+
+  // Validate date format
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!dateRegex.test(selectedDate)) {
+    toast.error("Invalid date format");
+    return;
+  }
+
      const data ={
           "newTimeSlot":selectedSlots,
           "bookingId":bookingIdRescheduled
@@ -105,16 +123,18 @@ const BookedConfirmPage = () => {
             dispatch(setLoader(false))
           }
         }
-       try {
-        dispatch(setLoader(true))
-      const response = await axios.post(
-        `http://localhost:4000/api/v1/booking/bookingTurf/${turfId}/${userId}`,
-        {
+        const bookingData = {
           date: selectedDate,
-          timeSlot: selectedSlots,
+          timeSlot: formattedSlots,
           price: totalPrice,
           paymentMode: paymentMode,
-        },
+        };
+       try {
+        dispatch(setLoader(true));
+        console.log("userId",userId)
+      const response = await axios.post(
+        `http://localhost:4000/api/v1/booking/bookingTurf/${turfId}/${userId}`,
+       bookingData,
         {
           headers: {
             "Content-Type": "application/json",
@@ -131,7 +151,7 @@ const BookedConfirmPage = () => {
             bookingId: response.data.newBookings._id,
             selectedTurfName,
             selectedDate,
-            selectedSlots,
+            selectedSlots:formattedSlots,
             totalPrice,
             paymentMode,
           },
@@ -197,7 +217,32 @@ const BookedConfirmPage = () => {
                   </p>
                   <p className="flex items-center text-gray-600 dark:text-gray-300">
                     <FaClock className="mr-2 text-yellow-500" />
-                    <span className="font-semibold mr-2">Time Slots:</span> {selectedSlots.join(", ")}
+                    <span className="font-semibold mr-2">Time Slots:</span>
+{
+  selectedSlots.length > 0
+    ? selectedSlots
+        .map(slot => {
+          const time = new Date(slot); // Ensure the slot is a Date object
+          
+          // Get the hours and minutes
+          let hours = time.getHours();
+          const minutes = time.getMinutes();
+
+          // Determine AM/PM
+          const ampm = hours >= 12 ? 'PM' : 'AM';
+
+          // Convert 24-hour format to 12-hour format
+          hours = hours % 12;
+          hours = hours ? hours : 12; // If hours is 0, set it to 12 for 12 AM
+
+          // Format minutes to always show two digits
+          const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+          return formattedTime;
+        })
+        .join(", ")
+    : "No slots selected"
+}
+
                   </p>
                   <p className="flex items-center text-gray-600 dark:text-gray-300">
                     <FaMoneyBillWave className="mr-2 text-red-500" />
