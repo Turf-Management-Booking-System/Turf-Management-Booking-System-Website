@@ -209,23 +209,24 @@ const About = () => {
     { name: "Hockey", icon: faHockeyPuck, color: "bg-red-500" },
     { name: "Volleyball", icon: faVolleyball, color: "bg-purple-500" },
   ]
-  const fetchFeedBack = async ()=>{
-    try{
+  const fetchFeedBack = async () => {
+    try {
       dispatch(setLoader(true));
       const response = await axios.get(
         `http://localhost:4000/api/v1/comment/displayFeedBack`
-      )
-      if(response.data){
-        dispatch(setLoader(false));
-        setFeedBack(response.data.feedBack);
-        console.log("response",feedBack)
+      );
+      if (response.data.success) {
+        dispatch(setLoader(false))
+        // Convert the single feedback object to an array with one element
+        setFeedBack(response.data.feedBack ? [response.data.feedBack] : []);
       }
-    }catch(error){
-      console.log("error",error)
-    }finally{
-      dispatch(setLoader(false))
+    } catch (error) {
+      console.log("error", error);
+      setFeedBack([]); // Set to empty array on error
+    } finally {
+      dispatch(setLoader(false));
     }
-  }
+  };
   useEffect(()=>{
      fetchFeedBack()
   },[])
