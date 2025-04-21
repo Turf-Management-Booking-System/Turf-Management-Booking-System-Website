@@ -422,6 +422,8 @@ export default function AdminDashboard() {
         return <BookingManagement />;
       case "Turf management":
         return <AdminPanel />;
+        case "Settings":
+          return <SettingsSection user={user} />;  
       default:
         return null;
     }
@@ -567,6 +569,29 @@ const SettingsSection = ({ user }) => (
             readOnly
           />
         </div>
+        <div>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Gender</p>
+            <p className="text-lg text-gray-800 dark:text-white mt-1 capitalize">
+              {user?.additionalFields.gender || 'Not specified'}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Date of Birth</p>
+            <p className="text-lg text-gray-800 dark:text-white mt-1">
+              {user?.additionalFields?.dateOfBirth  || 'Not specified'}
+            </p>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+          About You
+        </h3>
+        <div>
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Description</p>
+          <p className="text-gray-800 dark:text-white whitespace-pre-line">
+            {user?.additionalFields.description || 'No description provided'}
+          </p>
+        </div>
+      </div>
       </div>
     </div>
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">

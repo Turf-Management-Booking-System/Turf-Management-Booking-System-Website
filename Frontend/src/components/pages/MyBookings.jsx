@@ -181,7 +181,9 @@ const BookingDetailsModal = ({ booking, onClose }) => {
           <button
            onClick={() => {
             navigate(`/booking/${booking.turf._id}/slots`, { 
-                state: { turf: booking.turf, bookingIdRescheduled: booking._id } 
+                state: { turf: booking.turf, bookingIdRescheduled: booking._id ,        
+                  turfLocation: booking.turf.turfLocation 
+                } 
             });
          }}         
             className="bg-[#5c9bc9] text-white px-6 py-3 rounded-lg hover:bg-[#2873a8] transition duration-300 font-semibold"

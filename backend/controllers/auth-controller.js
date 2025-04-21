@@ -13,7 +13,9 @@ const {sendChangePasswordEmail} = require("../mail/templates/sendChangePasswordE
 const Subscription = require("../models/subscription");
 const { subscriptionEmail } = require("../mail/templates/subscriptionEmail");
 const cloudinary= require("cloudinary").v2;
-const UserActivity = require("../models/userActivity")
+const UserActivity = require("../models/userActivity");
+const Comment = require("../models/comment");
+const Booking = require("../models/booking")
 
 require("dotenv").config();
 const adminPassword = "admin7860@"
@@ -600,50 +602,67 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
-exports.deleteProfile = async(req,res)=>{
-    try{
-      const {id} = req.params;
-      const {email} = req.body;
-      if (!id){
-        return res.status(400).json({
-            success:false,
-            message:"Please provide the fields!"
-        })
-      }
-      const user = await User.findById(id);
-      if(!user){
-        return res.status(400).json({
-            success:false,
-            message:"User doest not found!"
-        })
-      }
-      const deleteProfile = await Profile.findOneAndDelete({ user: id });
-      const deletedUser = await User.findByIdAndDelete(id);
-      try{
-        const emailContent = sendAccountDeletionEmail(user.firstName,user.lastName);
-        await sendEmail(email,"Account Deleted From Kick On Turf!",emailContent);
-       }catch(error){
-       console.log("error",error);
-       return res.status(500).json({
-           success:false,
-           message:error.message
-       })
-       }
-      console.log("deleted account",user);
-      return res.status(200).json({
-        success:true,
-        message:"Account Deleted Successfully!",
-        deletedUser,
-        deleteProfile,
-      })
-    }catch(error){
+exports.deleteProfile = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { email } = req.body;
+        
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "User ID is required!"
+            });
+        }
+
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found!"
+            });
+        }
+
+        // Prepare deletion operations that won't fail if collections don't exist
+        const deletionOperations = [
+            Profile.findOneAndDelete({ user: id }).catch(() => null),
+            Comment.deleteMany({ userId: id }).catch(() => ({ deletedCount: 0 })),
+            Booking.deleteMany({ userId: id }).catch(() => ({ deletedCount: 0 }))
+        ];
+
+        // Execute all deletions in parallel (won't fail if any operation fails)
+        const [deleteProfile, deletedComments, deletedBookings] = await Promise.all(deletionOperations);
+
+        // Delete user (main operation)
+        const deletedUser = await User.findByIdAndDelete(id);
+
+        // Send email (non-critical operation)
+        try {
+            const emailContent = sendAccountDeletionEmail(user.firstName, user.lastName);
+            await sendEmail(email, "Account Deleted From Kick On Turf!", emailContent);
+        } catch (emailError) {
+            console.log("Email sending failed (non-critical):", emailError);
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Account deleted successfully",
+            details: {
+                userDeleted: !!deletedUser,
+                profileDeleted: !!deleteProfile,
+                commentsDeleted: deletedComments?.deletedCount || 0,
+                bookingsDeleted: deletedBookings?.deletedCount || 0
+            }
+        });
+
+    } catch (error) {
+        console.error("Account deletion error:", error);
         return res.status(500).json({
-            success:false,
-            message:"Error while deleting Profile! Please try again later!",
-            error:error.message
-        })
+            success: false,
+            message: "Error during account deletion",
+            error: error.message
+        });
     }
-}
+};
 
 exports.subscription = async(req,res)=>{
     try{

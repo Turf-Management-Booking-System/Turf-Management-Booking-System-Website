@@ -420,7 +420,9 @@ exports.getTurfSlotsByDate = async (req, res) => {
         slots: defaultSlots,
         turfDetails: {
           turfName: turf.turfName,
-          turfPricePerHour: turf.turfPricePerHour
+          turfPricePerHour: turf.turfPricePerHour,
+          turfLocation:turf.turfLocation
+
         }
       });
     }
