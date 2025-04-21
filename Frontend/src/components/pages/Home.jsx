@@ -358,7 +358,7 @@ function Home() {
         }}
         className="py-16 flex flex-col items-center relative"
       >
-        <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">
+        <h2 className="text-3xl font-bold mb-12 text-center dark:text-green-600">
           How It Works
         </h2>
         <div className="w-1 mt-10 h-[88rem] md:h-[61rem] absolute left-1/2 transform -translate-x-1/2 bg-gray-300 dark:bg-gray-600"></div>
@@ -531,7 +531,7 @@ function Home() {
         className="py-16 "
       >
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center dark:text-white">
+          <h2 className="text-3xl font-bold mb-8 text-center dark:text-green-600">
             Featured Turfs
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ml-7 mr-7">
@@ -597,7 +597,7 @@ function Home() {
         className="py-16"
       >
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">What Our Users Say</h2>
+          <h2 className="text-3xl font-bold mb-12 text-center dark:text-green-600">What Our Users Say</h2>
           {/* Testimonials Grid */}
           <div className="relative w-full max-w-6xl mx-auto px-4">
             {/* Left Arrow - Hidden on small screens, visible on medium and up */}
@@ -726,7 +726,7 @@ function Home() {
         className="py-16 bg-gray-100 dark:bg-gray-800"
       >
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center dark:text-white">Frequently Asked Questions</h2>
+          <h2 className="text-3xl font-bold mb-8 text-center dark:text-green-600">Frequently Asked Questions</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
             {faqs.map((faq, index) => (
@@ -769,7 +769,7 @@ function Home() {
       }}
       className="py-16 bg-green-600 dark:bg-green-800">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4 dark:text-white text-black">
+          <h2 className="text-3xl font-bold mb-4 dark:text-green-600 text-black">
             Ready to Book Your Perfect Turf?
           </h2>
           <p className="text-xl mb-8 dark:text-white text-black">
@@ -779,7 +779,8 @@ function Home() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-white text-black border border-black font-bold rounded-lg shadow-lg hover:bg-blue-50 transition duration-300"
+            onClick={() => navigate("/turf")}
+            className="px-8 py-4 bg-white text-black border border-black dark:border-green-500 font-bold rounded-lg shadow-lg hover:bg-blue-50 transition duration-300"
           >
             Get Started Now
           </motion.button>
@@ -789,12 +790,12 @@ function Home() {
       {/* Newsletter */}
       <section  className="py-16 bg-[#5886a7] dark:bg-black">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4 text-white">Stay Updated</h2>
+          <h2 className="text-3xl font-bold mb-4 text-white dark:text-green-600">Stay Updated</h2>
           <p className="text-xl mb-8 text-blue-100">
             Subscribe to our newsletter for the latest turf news and exclusive offers!
           </p>
           <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-            <div className="flex flex-col sm:flex-row">
+            <div className="flex border border-green-500 rounded-lg flex-col sm:flex-row">
               <input
                 type="email"
                 placeholder="Enter your email"

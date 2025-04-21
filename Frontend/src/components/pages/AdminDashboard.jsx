@@ -434,14 +434,14 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen mt-16 dark:bg-gray-900 flex relative">
-      {/* Sidebar - now with conditional classes for responsive behavior */}
+      {/* Sidebar*/}
       <aside
         style={{
           backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
         }}
         className={`w-72 h-[93vh] fixed sm:sticky sm:top-16 top-12 bottom-0 z-30 transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0`}
+        } md:translate-x-0 border-r border-gray-200 dark:border-gray-700 flex-shrink-0`}
       >
         <div className="flex items-center justify-between p-4">
           <h2 className="text-2xl pt-3 pl-3 font-serif font-bold text-green-500">
@@ -532,4 +532,67 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
+  
 }
+
+const SettingsSection = ({ user }) => (
+  <div className="space-y-6">
+    <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+      Settings
+    </h2>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+        Profile Information
+      </h3>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Name
+          </label>
+          <input
+            type="text"
+            value={`${user?.firstName} ${user?.lastName}`}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50"
+            readOnly
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Email
+          </label>
+          <input
+            type="email"
+            value={user?.email}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50"
+            readOnly
+          />
+        </div>
+      </div>
+    </div>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+        Preferences
+      </h3>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-gray-700 dark:text-gray-300">
+            Enable Notifications
+          </span>
+          <input
+            type="checkbox"
+            className="form-checkbox h-5 w-5 text-green-600"
+            checked
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-gray-700 dark:text-gray-300">Dark Mode</span>
+          <input
+            type="checkbox"
+            className="form-checkbox h-5 w-5 text-green-600"
+            checked
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+);

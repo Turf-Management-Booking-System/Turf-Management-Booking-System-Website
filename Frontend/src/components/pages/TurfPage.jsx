@@ -148,7 +148,7 @@ const TurfPage = () => {
     >
       {/* Mobile Filter Button */}
       <button
-        className="md:hidden fixed top-4 right-14 z-50 bg-white text-black py-2 px-3 rounded-full shadow-lg"
+        className="md:hidden fixed top-4 right-24 z-50 bg-white text-black py-2 px-3 rounded-full shadow-lg"
         onClick={() => setIsFilterOpen(!isFilterOpen)}
       >
         <i className="bx bx-filter-alt"></i>

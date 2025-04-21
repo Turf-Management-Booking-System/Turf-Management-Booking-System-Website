@@ -1,5 +1,3 @@
-"use client";
-
 import { useContext, useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,16 +10,7 @@ import axios from "axios";
 import { FaKey, FaRobot } from "react-icons/fa";
 import Chatbot from "../pages/Chatbot";
 import logo from "../../assets/Images/Logo.png";
-import {
-  FaFutbol,
-  FaHome,
-  FaInfoCircle,
-  FaEnvelope,
-  FaUser,
-  FaCalendarAlt,
-  FaUsersCog,
-  FaPlus,
-} from "react-icons/fa";
+import { FaFutbol, FaHome, FaInfoCircle, FaEnvelope } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
 function Navbar() {
@@ -380,7 +369,7 @@ function Navbar() {
                   </Link>
                 </motion.div>
               )}
-              </div>
+            </div>
             {/* </div> */}
           </motion.div>
         )}
@@ -460,6 +449,7 @@ function Navbar() {
                       </div>
                     </div>
                     <Link
+                      key="profile"
                       to="/profile"
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition-colors"
@@ -470,6 +460,7 @@ function Navbar() {
                       <i className="bx bx-chevron-right text-2xl"></i>
                     </Link>
                     <Link
+                      key="dashboard"
                       to={
                         user.role === "Admin" ? "/admindashboard" : "/dashboard"
                       }
@@ -477,13 +468,13 @@ function Navbar() {
                       className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition-colors"
                     >
                       <div className="flex items-center gap-5">
-                        <i className="bx bxs-calendar-check text-2xl"></i>
+                        <i className="bx bxs-calendar-check text-2xl"></i>{" "}
                         Dashboard
                       </div>
                       <i className="bx bx-chevron-right text-2xl"></i>
                     </Link>
-
                     <Link
+                      key="changepassword"
                       to="/changepassword"
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center justify-between px-5 py-5 hover:bg-gray-200 transition-colors"
@@ -494,9 +485,8 @@ function Navbar() {
                       </div>
                       <i className="bx bx-chevron-right text-2xl"></i>
                     </Link>
-
-                    {/* Logout Button */}
                     <button
+                      key="logout"
                       onClick={handleLogoutClick}
                       className="flex items-center justify-between w-full text-left px-5 py-5 hover:bg-gray-200 transition-colors"
                     >
@@ -522,87 +512,90 @@ function Navbar() {
       </div>
 
       {/* Mobile Auth Profile or Login */}
-<div className="lg:hidden flex items-center">
-  {isAuthenticated ? (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-2"
-        aria-label="Open profile menu"
-      >
-        <img
-          src={user.image || "/placeholder.svg"}
-          alt="Profile"
-          className="w-10 h-10 rounded-full border-2 border-white"
-        />
-      </button>
-
-      <AnimatePresence>
-        {dropdownOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="absolute right-0 mt-4 w-80 bg-white text-black rounded-lg shadow-lg z-50"
-          >
-            <div className="flex items-center gap-4 px-4 py-4 border-b">
+      <div className="lg:hidden flex items-center">
+        {isAuthenticated ? (
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center gap-2"
+              aria-label="Open profile menu"
+            >
               <img
                 src={user.image || "/placeholder.svg"}
-                alt=""
-                className="w-12 h-12 rounded-full border-black"
+                alt="Profile"
+                className="w-10 h-10 rounded-full border-2 border-white"
               />
-              <div>
-                <p className="font-semibold text-lg capitalize">
-                  {user.firstName} {user.lastName}
-                </p>
-              </div>
-            </div>
-
-            {/* All Profile Options */}
-            <Link
-              to="/profile"
-              onClick={() => setDropdownOpen(false)}
-              className="flex items-center gap-4 px-5 py-5 hover:bg-gray-200 transition-colors"
-            >
-              <i className="bx bx-user text-xl"></i> Edit Profile
-            </Link>
-            <Link
-              to={user.role === "Admin" ? "/admindashboard" : "/dashboard"}
-              onClick={() => setDropdownOpen(false)}
-              className="flex items-center gap-4 px-5 py-5 hover:bg-gray-200 transition-colors"
-            >
-              <i className="bx bxs-calendar-check text-xl"></i> Dashboard
-            </Link>
-            <Link
-              to="/changepassword"
-              onClick={() => setDropdownOpen(false)}
-              className="flex items-center gap-4 px-5 py-5 hover:bg-gray-200 transition-colors"
-            >
-              <FaKey size={18} />
-              Change Password
-            </Link>
-            <button
-              onClick={handleLogoutClick}
-              className="flex items-center gap-4 w-full text-left px-5 py-5 hover:bg-gray-200 transition-colors"
-            >
-              <i className="bx bx-log-out text-xl"></i> Logout
             </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  ) : (
-    <Link
-      to="/login"
-      className="flex items-center gap-2 px-4 py-2 rounded-lg border"
-      onClick={handleLinkClick}
-    >
-      <span className="font-medium">Login</span>
-    </Link>
-  )}
-</div>
 
+            <AnimatePresence>
+              {dropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-4 w-80 bg-white text-black rounded-lg shadow-lg z-50"
+                >
+                  <div className="flex items-center gap-4 px-4 py-4 border-b">
+                    <img
+                      src={user.image || "/placeholder.svg"}
+                      alt=""
+                      className="w-12 h-12 rounded-full border-black"
+                    />
+                    <div>
+                      <p className="font-semibold text-lg capitalize">
+                        {user.firstName} {user.lastName}
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    key="profile"
+                    to="/profile"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-4 px-5 py-5 hover:bg-gray-200 transition-colors"
+                  >
+                    <i className="bx bx-user text-xl"></i> Edit Profile
+                  </Link>
+                  <Link
+                    key="dashboard"
+                    to={
+                      user.role === "Admin" ? "/admindashboard" : "/dashboard"
+                    }
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-4 px-5 py-5 hover:bg-gray-200 transition-colors"
+                  >
+                    <i className="bx bxs-calendar-check text-xl"></i> Dashboard
+                  </Link>
+                  <Link
+                    key="changepassword"
+                    to="/changepassword"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-4 px-5 py-5 hover:bg-gray-200 transition-colors"
+                  >
+                    <FaKey size={18} />
+                    Change Password
+                  </Link>
+                  <button
+                    key="logout"
+                    onClick={handleLogoutClick}
+                    className="flex items-center gap-4 w-full text-left px-5 py-5 hover:bg-gray-200 transition-colors"
+                  >
+                    <i className="bx bx-log-out text-xl"></i> Logout
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <Link
+            to="/login"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border"
+            onClick={handleLinkClick}
+          >
+            <span className="font-medium">Login</span>
+          </Link>
+        )}
+      </div>
 
       {/* Logout Confirmation Modal */}
       {showLogoutConfirmation && (

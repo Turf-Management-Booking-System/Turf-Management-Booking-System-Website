@@ -225,7 +225,7 @@ const handleProceedToPayment = async () => {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white  dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-7xl mx-auto"
       >
-        <h1 className="font-orbitron text-3xl font-bold text-gray-900 dark:text-white text-center mb-2">
+        <h1 className="font-orbitron text-3xl font-bold text-green-500 dark:text-green-500 text-center mb-2">
           Book Your Turf Slot
         </h1>
         <p className=" font-serif text-xl text-gray-600 dark:text-gray-400 text-center mb-6">

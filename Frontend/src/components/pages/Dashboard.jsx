@@ -190,7 +190,11 @@ const Dashboard = () => {
       <div className="flex">
         {/* Sidebar */}
         <aside
-          className={`sticky h-[93vh] w-[20vw] left-0 top-12 bottom-0 border-r-2 dark:border-gray-500 dark:bg-gray-800 transition-all duration-300 ease-in-out overflow-y-auto`}
+          className={`sticky h-[93vh] w-[20vw] left-0 top-12 bottom-0 dark:border-gray-500  transition-all duration-300
+             ease-in-out overflow-y-auto
+            ${
+              isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+            } md:translate-x-0  border-r border-gray-200 dark:border-gray-700 flex-shrink-0`}
         >
           <div
             style={{

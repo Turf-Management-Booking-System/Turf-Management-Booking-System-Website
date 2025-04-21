@@ -186,7 +186,7 @@ const LoginHandler = async (event) => {
                 <input
                   className="w-[100%] pl-[20px] pr-[50px] pt-[13px] pb-[13px] bg-[#eee] rounded-xl border-none outline-none text-[16px] text-[#333] font-medium"
                   type="text"
-                  placeholder="Username"
+                  placeholder="Email"
                   required
                   onChange={(e)=>setEmail(e.target.value)}
                   name="email"
