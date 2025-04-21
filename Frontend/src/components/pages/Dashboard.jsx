@@ -158,9 +158,7 @@ const Dashboard = () => {
       <div className="flex">
         {/* Sidebar */}
         <aside
-          className={`${
-            isSidebarOpen ? "w-64" : "w-20"
-          } fixed left-0 top-12 bottom-0 bg-white border-r-2 dark:border-gray-500 dark:bg-gray-800 transition-all duration-300 ease-in-out overflow-y-auto`}
+          className={`sticky h-[93vh] w-[20vw] left-0 top-12 bottom-0 border-r-2 dark:border-gray-500 dark:bg-gray-800 transition-all duration-300 ease-in-out overflow-y-auto`}
         >
           <div
             style={{
@@ -215,7 +213,7 @@ const Dashboard = () => {
 
         {/* Main Content */}
         <main
-          className={`flex-1 p-4 md:p-8 ${isSidebarOpen ? "ml-64" : "ml-20"} `}
+          className={`flex-1 p-4 md:p-8`}
         >
           <div
             className="overflow-y-auto"

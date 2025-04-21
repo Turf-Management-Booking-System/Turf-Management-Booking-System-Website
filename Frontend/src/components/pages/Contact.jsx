@@ -4,7 +4,6 @@ import { setLoader } from "../../slices/authSlice";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import ContactBg from "../../assets/Images/ContactBg.jpg";
 import { DarkModeContext } from "../../context/DarkModeContext";
 import { FaHeart } from "react-icons/fa";
 import { BiPhoneCall } from "react-icons/bi";
@@ -49,10 +48,10 @@ const ContactForm = () => {
                   backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
                 }} className="min-h-screen flex flex-col items-center justify-center  bg-cover bg-center text-white py-12 mt-12">
       <div className="text-center mb-12 relative z-10">
-        <h1 className="text-4xl font-orbitron font-bold text-black dark:text-white underline flex items-center gap-2">
-          <BiPhoneCall/> Let's Connect & Kick Off!
+        <h1 className="sm:text-4xl text-3xl font-orbitron font-bold text-green-800 dark:text-green-600 underline flex items-center gap-2">
+          <span className="pb-5 md:pb-4 sm:pb-0 ml-5 sm:ml-0"><BiPhoneCall/></span> Let's Connect & Kick Off!
         </h1>
-        <p className="text-lg font-poppins text-black dark:text-white mt-2 max-w-2xl mx-auto">
+        <p className=" font-poppins text-black dark:text-white mt-2 max-w-2xl mx-auto">
           Got questions about bookings, availability, or special events? We’re here to help! 
           Fill out the form below, and our team will get back to you as soon as possible.
         </p>
@@ -69,7 +68,7 @@ const ContactForm = () => {
           className="space-y-12 w-full md:w-1/2 relative z-10"
         >
         
-          <h1 className=" text-black dark:text-white font-orbitron text-3xl font-bold underline">Contact Information</h1>
+          <h1 className=" text-green-800 dark:text-green-600 font-orbitron text-3xl font-bold underline">Contact Information</h1>
           
           {/* Address */}
           <div className="flex items-start gap-4">

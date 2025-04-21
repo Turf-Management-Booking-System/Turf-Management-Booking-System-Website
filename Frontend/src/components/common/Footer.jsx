@@ -16,7 +16,7 @@ function footer() {
 
           {/* Quick Links Section */}
           <div>
-            <h4 className="font-semibold mb-4 font-serifa text-black text-2xl">Quick Links</h4>
+            <h4 className="font-semibold mb-4 font-serifa text-black dark:text-white text-2xl">Quick Links</h4>
             <ul className="space-y-2 text-lg">
               <li>
                 <a href="/" className="hover:underline">
@@ -43,7 +43,7 @@ function footer() {
 
           {/* Contact Section */}
           <div>
-            <h4 className="font-semibold mb-4 text-xl text-black">Contact Us</h4>
+            <h4 className="font-semibold mb-4 text-xl dark:text-white text-black">Contact Us</h4>
             <p className="text-lg">
               📞 <span className="font-medium">+91-9876543210</span>
             </p>
@@ -61,7 +61,7 @@ function footer() {
 
           {/* Social Media Links */}
           <div>
-            <h4 className="font-semibold mb-4 text-black text-2xl">Follow Us</h4>
+            <h4 className="font-semibold mb-4 dark:text-white text-black text-2xl">Follow Us</h4>
             <div className="flex space-x-4 ">
               <a
                 href="https://facebook.com"
@@ -108,7 +108,7 @@ function footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-10 border-t border-gray-200 pt-4 text-center text-lg font-poppins text-black">
+        <div className="mt-10 border-t border-gray-200 pt-4 text-center text-lg font-poppins dark:text-white text-black">
           <p>© 2025 KickOnTurf. All Rights Reserved.</p>
           <p>
             Built with 💚 by{" "}

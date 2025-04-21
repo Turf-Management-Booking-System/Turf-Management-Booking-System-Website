@@ -157,7 +157,7 @@ const TurfPage = () => {
       {/* Filters Section */}
       <div
         className={`w-full md:w-1/4 bg-white dark:bg-gray-800 p-4 shadow-lg md:h-screen md:sticky top-0 flex flex-col transition-all duration-300 ${
-          isFilterOpen ? "fixed inset-0 z-40" : "hidden md:flex"
+          isFilterOpen ? "fixed inset-0 z-40 mt-12" : "hidden md:flex"
         }`}
       >
         <div className="flex justify-between items-center mb-2">

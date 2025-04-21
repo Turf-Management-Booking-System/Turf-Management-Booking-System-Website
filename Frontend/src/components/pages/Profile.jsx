@@ -188,7 +188,7 @@ const EditProfile = () => {
       style={{
         backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
       }}
-      className="min-h-screen py-20 px-4 bg-[#587990] mt-16"
+      className="min-h-screen py-20 px-4 bg-[#587990] sm:mt-16"
     >
       <div className="max-w-7xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-xl overflow-hidden">
         {/* Header */}

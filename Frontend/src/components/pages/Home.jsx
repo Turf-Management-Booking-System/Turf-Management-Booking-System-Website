@@ -11,7 +11,6 @@ import {
   faChevronDown,
   faStar,
   faEnvelope,
-  faMapMarkerAlt,
   faUsers,
   faCheckCircle,
   faLightbulb,
@@ -20,16 +19,13 @@ import {
   faTableTennis,
   faVolleyballBall,
   faHockeyPuck,
-  faQuoteLeft,
-  faQuoteRight,
-  faInfoCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import TurfImageDay from "../../assets/images/TurfImageDay.jpg";
 import TurfImageNight from "../../assets/images/TurfImageNight.jpg";
 import { DarkModeContext } from "../../context/DarkModeContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import whiteBg from "../../assets/Images/whiteBg.png";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
@@ -42,6 +38,7 @@ import {
 } from "../../slices/notificationSlice";
 function Home() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { darkMode } = useContext(DarkModeContext);
   const [ref, inView] = useInView({ triggerOnce: false, threshold: 0.2 });
   const [openIndex, setOpenIndex] = useState(null);
@@ -310,7 +307,7 @@ function Home() {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 1.2 }}
-        className="relative min-h-screen mt-16 w-full bg-cover bg-center flex items-center justify-end overflow-hidden"
+        className="relative min-h-screen mt-12 w-full bg-cover bg-center flex items-center justify-end overflow-hidden"
       >
         <motion.div
           initial={{ opacity: 0, x: 50 }}
@@ -343,6 +340,7 @@ function Home() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => navigate("/turf")}
               className="px-6 py-3 font-semibold rounded-lg text-white border border-white bg-green-600 shadow-sm hover:bg-opacity-90"
             >
               Book Now
@@ -350,6 +348,7 @@ function Home() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => navigate("/about")}
               className="px-6 py-3 font-semibold rounded-lg bg-white text-black border border-gray-500 hover:border-gray-800"
             >
               Explore Features
@@ -373,7 +372,7 @@ function Home() {
         {timelineItems.map((item, index) => (
           <motion.div
             key={index}
-            initial={{ opacity: 0, x: item.position === "left" ? -150 : 150 }}
+            initial={{ opacity: 0}}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 2.5, delay: index * 0.5 }}
             className={`relative flex items-center w-full max-w-6xl my-8 ${
@@ -594,72 +593,69 @@ function Home() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section
+       {/* Testimonials */}
+       <section
         style={{
           backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
         }}
         className="py-16"
       >
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">
-            What Our Users Say
-          </h2>
-          <div className="relative w-full max-w-5xl mx-auto">
-            {/* Left Arrow */}
+          <h2 className="text-3xl font-bold mb-12 text-center dark:text-white">What Our Users Say</h2>
+          {/* Testimonials Grid */}
+          <div className="relative w-full max-w-6xl mx-auto px-4">
+            {/* Left Arrow - Hidden on small screens, visible on medium and up */}
             <button
               onClick={prevTestimonials}
-              className="absolute -left-20 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10"
+              className="hidden md:block absolute -left-4 lg:-left-12 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10 hover:bg-gray-800 transition-colors"
+              aria-label="Previous testimonial"
             >
-              <HiChevronLeft className="text-white text-2xl" />
+              <HiChevronLeft className="text-white text-xl" />
             </button>
 
-            {/* Testimonials Grid */}
-            <div className="overflow-hidden  w-[70vw]">
+            {/* Testimonials Container */}
+            <div className="overflow-hidden w-full">
               <div
                 className="flex transition-transform duration-300"
-                style={{ transform: `translateX(-${index * 33.33}%)` }}
+                style={{
+                  transform: `translateX(-${index * 100}%)`,
+                }}
               >
                 {testimonials.map((testimonial, i) => (
                   <div
                     key={testimonial._id}
-                    className={`w-[30vw] flex-shrink-0 p-4 transition-all duration-300 pt-20  // Middle testimonial is larger
-                  }`}
+                    className="w-full md:w-1/2 lg:w-1/3 flex-shrink-0 p-2 md:p-4 transition-all duration-300 pt-16 md:pt-20"
                   >
-                    <div className="relative bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg flex flex-col items-center text-center">
+                    <div className="relative bg-white dark:bg-gray-700 p-4 md:p-6 rounded-lg shadow-lg flex flex-col items-center text-center h-full">
                       <div className="absolute -top-7">
                         <img
-                          src={testimonial?.userId?.image}
-                          alt={testimonial.firstName}
-                          className="w-16 h-16 rounded-full border-4 border-gray-300 dark:border-gray-500 "
-                          style={{ zIndex: 1 }}
-                        ></img>
+                          src={testimonial?.userId?.image || "/placeholder.svg?height=64&width=64"}
+                          alt={`${testimonial?.userId?.firstName || "User"}'s profile`}
+                          className="w-14 h-14 md:w-16 md:h-16 rounded-full border-4 border-gray-300 dark:border-gray-500 object-cover"
+                        />
                       </div>
 
-                      <div className="pt-12">
+                      <div className="pt-8 md:pt-12">
                         {/* Comment */}
-                        <p className="text-gray-600 dark:text-gray-300 mb-4">
+                        <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm md:text-base line-clamp-4 md:line-clamp-none">
                           {testimonial.commentText}
                         </p>
 
                         {/* User Info */}
                         <div>
-                          <span className="block font-semibold capitalize  dark:text-white">{`${testimonial?.userId?.firstName} ${testimonial?.userId?.lastName}`}</span>
-                          <span className="block text-sm text-gray-500 dark:text-gray-400">
-                            {testimonial?.turfId?.turfName}
+                          <span className="block font-semibold capitalize dark:text-white text-sm md:text-base">{`${
+                            testimonial?.userId?.firstName || "User"
+                          } ${testimonial?.userId?.lastName || ""}`}</span>
+                          <span className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">
+                            {testimonial?.turfId?.turfName || "Turf User"}
                           </span>
                         </div>
 
                         {/* Star Rating */}
                         <div className="flex justify-center mt-2">
-                          {[...Array(testimonial?.rating?.rating)].map(
-                            (_, i) => (
-                              <HiStar
-                                key={i}
-                                className="text-yellow-500 text-lg"
-                              />
-                            )
-                          )}
+                          {[...Array(testimonial?.rating?.rating || 5)].map((_, i) => (
+                            <HiStar key={i} className="text-yellow-500 text-base md:text-lg" />
+                          ))}
                         </div>
                       </div>
                     </div>
@@ -668,24 +664,58 @@ function Home() {
               </div>
             </div>
 
-            {/* Right Arrow */}
+            {/* Right Arrow - Hidden on small screens, visible on medium and up */}
             <button
               onClick={nextTestimonials}
-              className="absolute -right-24 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10"
+              className="hidden md:block absolute -right-4 lg:-right-12 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10 hover:bg-gray-800 transition-colors"
+              aria-label="Next testimonial"
             >
-              <HiChevronRight className="text-white text-2xl" />
+              <HiChevronRight className="text-white text-xl" />
             </button>
+
+            {/* Mobile Navigation Dots and Arrows */}
+            <div className="md:hidden flex justify-center items-center mt-6 space-x-4">
+              <button
+                onClick={prevTestimonials}
+                className="bg-gray-800 dark:bg-gray-700 p-2 rounded-full shadow-md"
+                aria-label="Previous testimonial"
+              >
+                <HiChevronLeft className="text-white text-lg" />
+              </button>
+
+              <div className="flex space-x-2">
+                {testimonials.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setIndex(i)}
+                    className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                      i === index ? "bg-blue-600 scale-125" : "bg-gray-400"
+                    }`}
+                    aria-label={`Go to testimonial ${i + 1}`}
+                  />
+                ))}
+              </div>
+
+              <button
+                onClick={nextTestimonials}
+                className="bg-gray-800 dark:bg-gray-700 p-2 rounded-full shadow-md"
+                aria-label="Next testimonial"
+              >
+                <HiChevronRight className="text-white text-lg" />
+              </button>
+            </div>
           </div>
 
-          {/* Dots (Indicators) */}
-          <div className="flex justify-center mt-8 space-x-2">
+          {/* Desktop Dots (Indicators) - Hidden on mobile, visible on medium and up */}
+          <div className="hidden md:flex justify-center mt-8 space-x-2">
             {testimonials.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setIndex(i)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  i === index + 1 ? "bg-blue-600 scale-125" : "bg-gray-400"
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  i === index ? "bg-blue-600 scale-125" : "bg-gray-400"
                 }`}
+                aria-label={`Go to testimonial ${i + 1}`}
               />
             ))}
           </div>
@@ -700,11 +730,9 @@ function Home() {
         className="py-16 bg-gray-100 dark:bg-gray-800"
       >
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center dark:text-white">
-            Frequently Asked Questions
-          </h2>
+          <h2 className="text-3xl font-bold mb-8 text-center dark:text-white">Frequently Asked Questions</h2>
 
-          <div className=" ml-32 mr-32 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
             {faqs.map((faq, index) => (
               <motion.div
                 key={index}
@@ -715,17 +743,9 @@ function Home() {
                 onClick={() => toggleFAQ(index)}
               >
                 <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold dark:text-white">
-                    {faq.question}
-                  </h3>
-                  <motion.div
-                    animate={{ rotate: openIndex === index ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <FontAwesomeIcon
-                      icon={faChevronDown}
-                      className="text-blue-500"
-                    />
+                  <h3 className="text-lg font-semibold dark:text-white">{faq.question}</h3>
+                  <motion.div animate={{ rotate: openIndex === index ? 180 : 0 }} transition={{ duration: 0.3 }}>
+                    <FontAwesomeIcon icon={faChevronDown} className="text-blue-500" />
                   </motion.div>
                 </div>
 
@@ -747,19 +767,23 @@ function Home() {
       </section>
 
       {/* CAT */}
-      <section className="py-16 bg-green-600 dark:bg-green-800">
+      <section
+      style={{
+        backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
+      }}
+      className="py-16 bg-green-600 dark:bg-green-800">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4 text-white">
+          <h2 className="text-3xl font-bold mb-4 dark:text-white text-black">
             Ready to Book Your Perfect Turf?
           </h2>
-          <p className="text-xl mb-8 text-blue-100">
+          <p className="text-xl mb-8 dark:text-white text-black">
             Join thousands of sports enthusiasts and book your ideal playing
             field today!
           </p>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-white text-blue-600 font-bold rounded-lg shadow-lg hover:bg-blue-50 transition duration-300"
+            className="px-8 py-4 bg-white text-black border border-black font-bold rounded-lg shadow-lg hover:bg-blue-50 transition duration-300"
           >
             Get Started Now
           </motion.button>
@@ -767,28 +791,27 @@ function Home() {
       </section>
 
       {/* Newsletter */}
-      <section className="py-16 bg-[#5886a7] dark:bg-black">
+      <section  className="py-16 bg-[#5886a7] dark:bg-black">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4 text-white">Stay Updated</h2>
           <p className="text-xl mb-8 text-blue-100">
-            Subscribe to our newsletter for the latest turf news and exclusive
-            offers!
+            Subscribe to our newsletter for the latest turf news and exclusive offers!
           </p>
           <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-            <div className="flex">
+            <div className="flex flex-col sm:flex-row">
               <input
                 type="email"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-grow px-4 py-2 rounded-l-lg focus:outline-none"
+                className="flex-grow px-4 py-2 rounded-l-lg sm:rounded-r-none rounded-r-lg mb-2 sm:mb-0 focus:outline-none"
                 required
               />
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 type="submit"
-                className="bg-green-500 text-white px-6 py-2 rounded-r-lg hover:bg-green-600 transition duration-300"
+                className="bg-green-500 text-white px-6 py-2 rounded-r-lg sm:rounded-l-none rounded-l-lg hover:bg-green-600 transition duration-300"
               >
                 <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
                 Subscribe

@@ -25,6 +25,10 @@ import { Link } from "react-router-dom"
 import blackBg from "../../assets/Images/blackBg.png"
 import whiteBg from "../../assets/Images/whiteBg.png"
 import greenBg from "../../assets/Images/greenBg.png"
+import ladyPic from "../../assets/Images/ladypic.jpg"
+import boyPic from "../../assets/Images/boypic.jpg"
+import sabina from "../../assets/Images/sabina.jpg"
+import nagma from "../../assets/Images/nagma.jpg"
 
 const About = () => {
   const { darkMode } = useContext(DarkModeContext)
@@ -38,7 +42,7 @@ const About = () => {
     {
       name: "Sabina Shaikh",
       role: "Founder & CEO",
-      image: "https://source.unsplash.com/300x300/?portrait,man,1",
+      image: sabina,
       bio: "Former professional footballer with a passion for making sports accessible to everyone.",
       social: {
         twitter: "#",
@@ -49,7 +53,7 @@ const About = () => {
     {
       name: "Sarah Chen",
       role: "Operations Director",
-      image: "https://source.unsplash.com/300x300/?portrait,woman,1",
+      image: boyPic,
       bio: "10+ years experience in sports facility management and customer service excellence.",
       social: {
         twitter: "#",
@@ -60,7 +64,7 @@ const About = () => {
     {
       name: "Nagma Shaikh",
       role: "Tech Lead",
-      image: "https://source.unsplash.com/300x300/?portrait,man,2",
+      image: nagma,
       bio: "Software engineer who loves building innovative solutions for sports enthusiasts.",
       social: {
         twitter: "#",
@@ -71,7 +75,7 @@ const About = () => {
     {
       name: "Maria Rodriguez",
       role: "Marketing Head",
-      image: "https://source.unsplash.com/300x300/?portrait,woman,2",
+      image: ladyPic,
       bio: "Creative strategist with a background in sports marketing and community engagement.",
       social: {
         twitter: "#",
@@ -242,7 +246,7 @@ const About = () => {
                 <img
                         src={logo}
                         alt="Logo"
-                        className="w-16 h-16 md:block hidden rounded-full object-cover text-5xl text-gradient bg-gradient-to-r from-green-600 to-blue-500"
+                        className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover text-5xl text-gradient bg-gradient-to-r from-green-600 to-blue-500"
                       />
               </div>
             </div>

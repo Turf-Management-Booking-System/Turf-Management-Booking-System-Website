@@ -8,6 +8,7 @@ import { DarkModeContext } from "../../context/DarkModeContext";
 import whiteBg from "../../assets/Images/whiteBg.png";
 import blackBg from "../../assets/Images/blackBg.png";
 import greenBg from "../../assets/Images/greenBg.png";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Users,
   CalendarDays,
@@ -17,6 +18,7 @@ import {
   BarChart3,
   PieChart,
   Settings,
+  Menu,
 } from "lucide-react";
 import {
   BarChart,
@@ -32,6 +34,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import {faSignOutAlt} from "@fortawesome/free-solid-svg-icons";
 import { useSelector } from "react-redux";
 import AdminPanel from "./AdminPanel";
 import UserManagement from "./UserManagement";
@@ -42,7 +45,8 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 export default function AdminDashboard() {
   const dispatch = useDispatch();
   const { darkMode } = useContext(DarkModeContext);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default closed on mobile
+  const [isMobile, setIsMobile] = useState(false);
   const [monthlyBookings, setMonthlyBookings] = useState(false);
   const [monthlyRevenue, setMonthlyRevenue] = useState(false);
   const [totalRevenue, setTotalRevenue] = useState("");
@@ -56,6 +60,28 @@ export default function AdminDashboard() {
   const user = useSelector((state) => state.auth.user);
   const [recentActivities, setRecentActivities] = useState([]);
   const [turfUtilization, setTurfUtilization] = useState([]);
+
+  // Check if screen is mobile
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      // On larger screens, sidebar should be open by default
+      if (window.innerWidth >= 768) {
+        setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    // Initial check
+    checkIsMobile();
+
+    // Add event listener for window resize
+    window.addEventListener("resize", checkIsMobile);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
 
   useEffect(() => {
     if (allUsers && allUsers.length > 0) {
@@ -309,7 +335,7 @@ export default function AdminDashboard() {
             </div>
             {/* Bottom Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+              <div className="bg-white h-[75vh] sm:h-[65vh] dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                 <h3 className="text-2xl font-serif font-semibold mb-4 text-gray-900 dark:text-white">
                   Turf Utilization
                 </h3>
@@ -335,14 +361,14 @@ export default function AdminDashboard() {
                       <Tooltip />
                     </RePieChart>
                   </ResponsiveContainer>
-                  <div className="flex justify-center space-x-4 mt-4">
+                  <div className="grid grid-cols-2 sm:flex sm:justify-center sm:space-x-3 gap-2 mt-6">
                     {turfUtilization.map((entry, index) => (
                       <div
                         key={`legend-${index}`}
-                        className="flex items-center"
+                        className="flex items-center space-x-2"
                       >
                         <div
-                          className="w-3 h-3 rounded-full mr-2"
+                          className="w-3 h-3 rounded-full"
                           style={{
                             backgroundColor: COLORS[index % COLORS.length],
                           }}
@@ -401,24 +427,29 @@ export default function AdminDashboard() {
     }
   };
 
+  // Toggle sidebar function
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
-    <div className="min-h-screen mt-16 dark:bg-gray-900 flex">
-      {/* Sidebar */}
+    <div className="min-h-screen mt-16 dark:bg-gray-900 flex relative">
+      {/* Sidebar - now with conditional classes for responsive behavior */}
       <aside
         style={{
           backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
         }}
-        className={`w-72 h-50 transition-transform ${
+        className={`w-72 h-[93vh] fixed sm:sticky sm:top-16 top-12 bottom-0 z-30 transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0`}
+        } md:translate-x-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0`}
       >
         <div className="flex items-center justify-between p-4">
           <h2 className="text-2xl pt-3 pl-3 font-serif font-bold text-green-500">
             TurfAdmin
           </h2>
           <button
-            onClick={() => setIsSidebarOpen(false)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            onClick={toggleSidebar}
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <X className="h-6 w-6 text-gray-500 dark:text-gray-400" />
           </button>
@@ -433,8 +464,11 @@ export default function AdminDashboard() {
           ].map((item) => (
             <button
               key={item.label}
-              onClick={() => setSelectedItem(item.label)}
-              className={`flex items-center w-full p-3 rounded-lg text-left  space-x-3 ${
+              onClick={() => {
+                setSelectedItem(item.label);
+                if (isMobile) toggleSidebar(); // Close sidebar on mobile after selection
+              }}
+              className={`flex items-center w-full p-3 rounded-lg text-left space-x-3 ${
                 selectedItem === item.label
                   ? "bg-gray-100 dark:bg-gray-700 text-green-600 dark:text-green-400"
                   : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -448,17 +482,35 @@ export default function AdminDashboard() {
             </button>
           ))}
         </nav>
+        <div className="p-4 sm:mt-44 mt-36 border-t dark:border-gray-700">
+                      <button
+                        onClick={() => {}}
+                        className="flex  items-center w-full p-2 rounded-lg text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900 transition-colors duration-200"
+                      >
+                        <FontAwesomeIcon icon={faSignOutAlt} className="w-5 h-5 mr-3" />
+                        <span className={isSidebarOpen ? "" : "hidden"}>Logout</span>
+                      </button>
+                    </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main Content - with padding adjustment for sidebar */}
       <div
         style={{
           backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
         }}
-        className="flex-1 p-4"
+        className={`flex-1 p-4 transition-all duration-300 ${
+          isSidebarOpen && !isMobile ? "" : ""
+        }`}
       >
         <header className="bg-white dark:bg-gray-800 shadow-lg p-4 rounded-lg flex justify-between items-center mb-2">
-          <div className="flex items-center">
+          <div className="flex items-center gap-3">
+            {/* Mobile sidebar toggle button in header */}
+            <button
+              onClick={toggleSidebar}
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              <Menu className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+            </button>
             <h1 className="text-2xl font-bold font-orbitron text-gray-800 dark:text-white">
               Welcome,{" "}
               <span className="capitalize text-green-500 font-serif">
@@ -469,7 +521,7 @@ export default function AdminDashboard() {
           <div className="flex items-center space-x-4">
             <div className="relative">
               <img
-                src={user.image}
+                src={user.image || "/placeholder.svg"}
                 alt={""}
                 className="w-10 h-10 rounded-full border-2 border-green-500 dark:border-green-400"
               />
