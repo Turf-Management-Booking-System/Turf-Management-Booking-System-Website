@@ -1,4 +1,3 @@
-"use client";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -23,8 +22,6 @@ import {
   faMapMarkerAlt,
   faMoneyBillWave,
   faCreditCard,
-  faQrcode,
-  faExclamationTriangle,
   faDownload,
 } from "@fortawesome/free-solid-svg-icons";
 import { useContext } from "react";

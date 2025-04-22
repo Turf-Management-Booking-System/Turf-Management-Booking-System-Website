@@ -76,10 +76,8 @@ export default function AdminDashboard() {
     // Initial check
     checkIsMobile();
 
-    // Add event listener for window resize
+    // Adding event listener for window resize
     window.addEventListener("resize", checkIsMobile);
-
-    // Cleanup
     return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
 
@@ -493,7 +491,7 @@ export default function AdminDashboard() {
                     </div>
       </aside>
 
-      {/* Main Content - with padding adjustment for sidebar */}
+      {/* Main Content*/}
       <div
         style={{
           backgroundImage: `url(${darkMode ? blackBg : greenBg})`,
