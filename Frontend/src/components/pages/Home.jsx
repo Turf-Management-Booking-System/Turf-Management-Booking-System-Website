@@ -226,7 +226,7 @@ function Home() {
       console.log("response", response.data.success);
 
       if (response.data.success) {
-        toast.success(response?.data?.message);
+        toast.success("Thanks For Subscribing!");
         if (user?._id) {
           dispatch(loadNotification());
           try {
@@ -591,132 +591,84 @@ function Home() {
 
        {/* Testimonials */}
        <section
-        style={{
-          backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
-        }}
-        className="py-16"
+  style={{
+    backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
+  }}
+  className="py-16"
+>
+  <div className="container mx-auto px-4">
+    <h2 className="text-3xl font-bold mb-12 text-center dark:text-green-600">What Our Users Say</h2>
+    
+    <div className="relative w-full max-w-6xl mx-auto">
+      {/* Left Arrow */}
+      <button
+        onClick={prevTestimonials}
+        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10 hover:bg-gray-800 transition-colors"
+        aria-label="Previous testimonial"
       >
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-12 text-center dark:text-green-600">What Our Users Say</h2>
-          {/* Testimonials Grid */}
-          <div className="relative w-full max-w-6xl mx-auto px-4">
-            {/* Left Arrow - Hidden on small screens, visible on medium and up */}
-            <button
-              onClick={prevTestimonials}
-              className="hidden md:block absolute -left-4 lg:-left-12 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10 hover:bg-gray-800 transition-colors"
-              aria-label="Previous testimonial"
+        <HiChevronLeft className="text-white text-xl" />
+      </button>
+
+      {/* Testimonials Container */}
+      <div className="overflow-hidden w-full px-12"> {/* Adjusted padding for arrows */}
+        <div
+          className="flex transition-transform duration-500 ease-in-out"
+          style={{
+            transform: `translateX(-${index * 40}vw)`, // Changed to vw units
+          }}
+        >
+          {testimonials.map((testimonial, i) => (
+            <div
+              key={testimonial._id}
+              className="flex-shrink-0 p-2 md:p-4"
+              style={{ width: '40vw' }} // Set each card to 40vw
             >
-              <HiChevronLeft className="text-white text-xl" />
-            </button>
-
-            {/* Testimonials Container */}
-            <div className="overflow-hidden w-full">
-              <div
-                className="flex transition-transform duration-300"
-                style={{
-                  transform: `translateX(-${index * 100}%)`,
-                }}
-              >
-                {testimonials.map((testimonial, i) => (
-                  <div
-                    key={testimonial._id}
-                    className="w-full md:w-1/2 lg:w-1/3 flex-shrink-0 p-2 md:p-4 transition-all duration-300 pt-16 md:pt-20"
-                  >
-                    <div className="relative bg-white dark:bg-gray-700 p-4 md:p-6 rounded-lg shadow-lg flex flex-col items-center text-center h-full">
-                      <div className="absolute -top-7">
-                        <img
-                          src={testimonial?.userId?.image || "/placeholder.svg?height=64&width=64"}
-                          alt={`${testimonial?.userId?.firstName || "User"}'s profile`}
-                          className="w-14 h-14 md:w-16 md:h-16 rounded-full border-4 border-gray-300 dark:border-gray-500 object-cover"
-                        />
-                      </div>
-
-                      <div className="pt-8 md:pt-12">
-                        {/* Comment */}
-                        <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm md:text-base line-clamp-4 md:line-clamp-none">
-                          {testimonial.commentText}
-                        </p>
-
-                        {/* User Info */}
-                        <div>
-                          <span className="block font-semibold capitalize dark:text-white text-sm md:text-base">{`${
-                            testimonial?.userId?.firstName || "User"
-                          } ${testimonial?.userId?.lastName || ""}`}</span>
-                          <span className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">
-                            {testimonial?.turfId?.turfName || "Turf User"}
-                          </span>
-                        </div>
-
-                        {/* Star Rating */}
-                        <div className="flex justify-center mt-2">
-                          {[...Array(testimonial?.rating?.rating || 5)].map((_, i) => (
-                            <HiStar key={i} className="text-yellow-500 text-base md:text-lg" />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Right Arrow - Hidden on small screens, visible on medium and up */}
-            <button
-              onClick={nextTestimonials}
-              className="hidden md:block absolute -right-4 lg:-right-12 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10 hover:bg-gray-800 transition-colors"
-              aria-label="Next testimonial"
-            >
-              <HiChevronRight className="text-white text-xl" />
-            </button>
-
-            {/* Mobile Navigation Dots and Arrows */}
-            <div className="md:hidden flex justify-center items-center mt-6 space-x-4">
-              <button
-                onClick={prevTestimonials}
-                className="bg-gray-800 dark:bg-gray-700 p-2 rounded-full shadow-md"
-                aria-label="Previous testimonial"
-              >
-                <HiChevronLeft className="text-white text-lg" />
-              </button>
-
-              <div className="flex space-x-2">
-                {testimonials.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setIndex(i)}
-                    className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                      i === index ? "bg-blue-600 scale-125" : "bg-gray-400"
-                    }`}
-                    aria-label={`Go to testimonial ${i + 1}`}
+              <div className="relative bg-white dark:bg-gray-700 p-4 md:p-6 rounded-lg shadow-lg flex flex-col items-center text-center h-full">
+                <div className="absolute -top-4">
+                  <img
+                    src={testimonial?.userId?.image || "/placeholder.svg?height=64&width=64"}
+                    alt={`${testimonial?.userId?.firstName || "User"}'s profile`}
+                    className="w-14 h-14 md:w-16 md:h-16 rounded-full border-4 border-gray-300 dark:border-gray-500 object-cover"
                   />
-                ))}
+                </div>
+
+                <div className="pt-8 md:pt-12">
+                  <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm md:text-base line-clamp-4 md:line-clamp-none">
+                    {testimonial.commentText}
+                  </p>
+
+                  <div>
+                    <span className="block font-semibold capitalize dark:text-white text-sm md:text-base">
+                      {`${testimonial?.userId?.firstName || "User"} ${testimonial?.userId?.lastName || ""}`}
+                    </span>
+                    <span className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">
+                      {testimonial?.turfId?.turfName || "Turf User"}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-center mt-2">
+                    {[...Array(testimonial?.rating?.rating || 5)].map((_, i) => (
+                      <HiStar key={i} className="text-yellow-500 text-base md:text-lg" />
+                    ))}
+                  </div>
+                </div>
               </div>
-
-              <button
-                onClick={nextTestimonials}
-                className="bg-gray-800 dark:bg-gray-700 p-2 rounded-full shadow-md"
-                aria-label="Next testimonial"
-              >
-                <HiChevronRight className="text-white text-lg" />
-              </button>
             </div>
-          </div>
-
-          {/* Desktop Dots (Indicators) - Hidden on mobile, visible on medium and up */}
-          <div className="hidden md:flex justify-center mt-8 space-x-2">
-            {testimonials.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setIndex(i)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  i === index ? "bg-blue-600 scale-125" : "bg-gray-400"
-                }`}
-                aria-label={`Go to testimonial ${i + 1}`}
-              />
-            ))}
-          </div>
+          ))}
         </div>
-      </section>
+      </div>
+
+      {/* Right Arrow */}
+      <button
+        onClick={nextTestimonials}
+        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10 hover:bg-gray-800 transition-colors"
+        aria-label="Next testimonial"
+      >
+        <HiChevronRight className="text-white text-xl" />
+      </button>
+    </div>
+  </div>
+</section>
 
       {/*Faqs*/}
       <section

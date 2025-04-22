@@ -74,7 +74,7 @@ const TurfDetailsPage = () => {
   }, [id, dispatch]);
 
   const handleBooking = (turfId) => {
-    navigate(`/booking/${turfId}/slots`, { state: { turfName: turf.turfName } });
+    navigate(`/booking/${turfId}/slots`, { state: { turfName: turf.turfName ,turfLocation:turf.turfLocation} });
   };
 
   const handleReviewSubmit = async () => {

@@ -27,8 +27,8 @@ const BookingPage = () => {
   const { darkMode } = useContext(DarkModeContext);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlots, setSelectedSlots] = useState([]);
-  const { bookingIdRescheduled, turf } = location.state || {};
-  const [locationTUrf,setLocationTurf] = useState("");
+  const { bookingIdRescheduled, turfLocation } = location.state || {};
+  // const [locationTurf,setLocationTurf] = useState("");
   const [slots, setSlots] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const selectedTurfName =
@@ -58,7 +58,39 @@ const BookingPage = () => {
     }
   };
 
+  const fetchTurfSlotsByDate = async (date) => {
+    try {
+      if (!date) {
+        console.error("No date provided");
+        setSlots([]);
+        return;
+      }
   
+      const response = await axios.get(
+        `http://localhost:4000/api/v1/turf/getTurfSlotByDate/${turfId}/${date}`
+      );
+      console.log(response.data.slots)
+      if (!response.data || !Array.isArray(response.data?.slots)) {
+        console.error("Invalid response format - slots array missing");
+        setSlots([]);
+        return;
+      }
+  
+      setSlots(response.data.slots);
+      setPriceTurf(response.data.turfDetails?.turfPricePerHour || 0);
+      // setLocationTurf(response.data.turfDetails?.turfLocation)
+  
+    } catch (error) {
+      console.error("Error in fetchTurfSlotsByDate:", error);
+      toast.error(error.response?.data?.message || "Error fetching slots");
+      setSlots([]);
+    }
+  };
+  
+  // Update the useEffect to watch selectedDate
+  useEffect(() => {
+    fetchTurfSlotsByDate(selectedDate);
+  }, [selectedDate]);
    // Function to fetch coordinates from location name
    const fetchLocationCoordinates = async (location) => {
     try {
@@ -103,13 +135,13 @@ const BookingPage = () => {
       setLoadingWeather(false);
     }
   };
-
+ 
   useEffect(() => {
     const loadWeatherData = async () => {
       try {
        
-        if (locationTUrf ) {
-          const locationData = await fetchLocationCoordinates(locationTUrf);
+        if (turfLocation ) {
+          const locationData = await fetchLocationCoordinates(turfLocation);
           await fetchWeatherData(locationData.lat, locationData.lon);
         } else {
           throw new Error("Turf location not available");
@@ -126,41 +158,9 @@ const BookingPage = () => {
     };
 
     loadWeatherData();
-  }, [locationTUrf]);
+  }, [turfLocation]);
 
-  const fetchTurfSlotsByDate = async (date) => {
-    try {
-      if (!date) {
-        console.error("No date provided");
-        setSlots([]);
-        return;
-      }
-  
-      const response = await axios.get(
-        `http://localhost:4000/api/v1/turf/getTurfSlotByDate/${turfId}/${date}`
-      );
-      console.log(response.data.slots)
-      if (!response.data || !Array.isArray(response.data?.slots)) {
-        console.error("Invalid response format - slots array missing");
-        setSlots([]);
-        return;
-      }
-  
-      setSlots(response.data.slots);
-      setPriceTurf(response.data.turfDetails?.turfPricePerHour || 0);
-      setLocationTurf(response.data.turfDetails?.turfLocation)
-  
-    } catch (error) {
-      console.error("Error in fetchTurfSlotsByDate:", error);
-      toast.error(error.response?.data?.message || "Error fetching slots");
-      setSlots([]);
-    }
-  };
-  
-  // Update the useEffect to watch selectedDate
-  useEffect(() => {
-    fetchTurfSlotsByDate(selectedDate);
-  }, [selectedDate]);
+ 
   
   
   const handleDateChange = (e) => {
