@@ -290,6 +290,23 @@ function Home() {
    useEffect(()=>{
           fetchFetauredTurfs()
    },[])
+   const [slidesToShow, setSlidesToShow] = useState(1);
+
+useEffect(() => {
+  const handleResize = () => {
+    if (window.innerWidth >= 1024) {
+      setSlidesToShow(3);
+    } else if (window.innerWidth >= 768) {
+      setSlidesToShow(2);
+    } else {
+      setSlidesToShow(1);
+    }
+  };
+
+  handleResize();
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
+}, []);
   return (
     <>
       {/* Hero Section */}
@@ -594,46 +611,51 @@ function Home() {
   style={{
     backgroundImage: `url(${darkMode ? blackBg : whiteBg})`,
   }}
-  className="py-16"
+  className="py-8 md:py-16" // Responsive padding
 >
   <div className="container mx-auto px-4">
-    <h2 className="text-3xl font-bold mb-12 text-center dark:text-green-600">What Our Users Say</h2>
+    <h2 className="text-2xl md:text-3xl font-bold mb-8 md:mb-12 text-center dark:text-green-600">
+      What Our Users Say
+    </h2>
     
     <div className="relative w-full max-w-6xl mx-auto">
-      {/* Left Arrow */}
+      {/* Left Arrow - hidden on mobile */}
       <button
         onClick={prevTestimonials}
-        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10 hover:bg-gray-800 transition-colors"
+        className="hidden sm:block absolute left-0 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10 hover:bg-gray-800 transition-colors"
         aria-label="Previous testimonial"
       >
         <HiChevronLeft className="text-white text-xl" />
       </button>
 
       {/* Testimonials Container */}
-      <div className="overflow-hidden w-full px-12"> {/* Adjusted padding for arrows */}
+      <div className="overflow-hidden w-full px-2 sm:px-12"> {/* Adjusted padding */}
         <div
           className="flex transition-transform duration-500 ease-in-out"
           style={{
-            transform: `translateX(-${index * 40}vw)`, // Changed to vw units
+            transform: `translateX(-${index * (100 / slidesToShow)}%)`, // Percentage based
           }}
         >
           {testimonials.map((testimonial, i) => (
             <div
               key={testimonial._id}
-              className="flex-shrink-0 p-2 md:p-4"
-              style={{ width: '40vw' }} // Set each card to 40vw
+              className="flex-shrink-0 p-2"
+              style={{ 
+                width: `${100 / slidesToShow}%`, // Dynamic width based on slides to show
+                minWidth: '280px' // Minimum width for mobile
+              }}
             >
               <div className="relative bg-white dark:bg-gray-700 p-4 md:p-6 rounded-lg shadow-lg flex flex-col items-center text-center h-full">
                 <div className="absolute -top-4">
                   <img
                     src={testimonial?.userId?.image || "/placeholder.svg?height=64&width=64"}
                     alt={`${testimonial?.userId?.firstName || "User"}'s profile`}
-                    className="w-14 h-14 md:w-16 md:h-16 rounded-full border-4 border-gray-300 dark:border-gray-500 object-cover"
+                    className="w-12 h-12 md:w-16 md:h-16 rounded-full border-4 border-gray-300 dark:border-gray-500 object-cover"
                   />
                 </div>
 
-                <div className="pt-8 md:pt-12">
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm md:text-base line-clamp-4 md:line-clamp-none">
+                <div className="pt-10 md:pt-12">
+                  <p className="text-gray-600 dark:text-gray-300 mb-4 text-xs md:text-base line-clamp-3 md:line-clamp-none">
                     {testimonial.commentText}
                   </p>
 
@@ -648,7 +670,7 @@ function Home() {
 
                   <div className="flex justify-center mt-2">
                     {[...Array(testimonial?.rating?.rating || 5)].map((_, i) => (
-                      <HiStar key={i} className="text-yellow-500 text-base md:text-lg" />
+                      <HiStar key={i} className="text-yellow-500 text-sm md:text-lg" />
                     ))}
                   </div>
                 </div>
@@ -658,18 +680,29 @@ function Home() {
         </div>
       </div>
 
-      {/* Right Arrow */}
+      {/* Right Arrow - hidden on mobile */}
       <button
         onClick={nextTestimonials}
-        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10 hover:bg-gray-800 transition-colors"
+        className="hidden sm:block absolute right-0 top-1/2 transform -translate-y-1/2 bg-black dark:bg-gray-700 p-2 rounded-full shadow-md z-10 hover:bg-gray-800 transition-colors"
         aria-label="Next testimonial"
       >
         <HiChevronRight className="text-white text-xl" />
       </button>
+
+      {/* Mobile Indicators */}
+      <div className="sm:hidden flex justify-center mt-4 space-x-2">
+        {testimonials.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setIndex(i)}
+            className={`w-2 h-2 rounded-full ${index === i ? 'bg-green-600' : 'bg-gray-300'}`}
+            aria-label={`Go to testimonial ${i + 1}`}
+          />
+        ))}
+      </div>
     </div>
   </div>
 </section>
-
       {/*Faqs*/}
       <section
         style={{
