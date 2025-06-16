@@ -1,15 +1,12 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
-// Create a transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "kadarbishaikh56@gmail.com", // Your Gmail
-    pass:"hqwunynrpljhrfhx", // Use an App Password, not your Gmail password
+    user: "kadarbishaikh56@gmail.com", 
+    pass:"hqwunynrpljhrfhx", 
   },
 });
-
-// Function to send an email
 const sendEmail = async (to, subject, html) => {
   try {
     const mailOptions = {

@@ -25,7 +25,7 @@ exports.chatBot = async(req,res)=>{
           });
         }
 
-        // Default AI Response for other queries
+      
     const systemInstruction = `
     You are a chatbot for 'KickOnTurf'. You provide information about the website, booking details, pricing, and availability.
     If the user asks something unrelated, guide them back to turf-related queries.

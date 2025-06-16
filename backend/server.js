@@ -4,10 +4,8 @@ const cors = require("cors");
 const app = express();
 const cookieParser = require("cookie-parser")
 
-// defines the ports
 const PORT =  process.env.PORT || 4000;
   
-// for json data to accept
 app.use(express.json());
 app.use(cors({ origin: [
     "http://localhost:5175",
@@ -21,10 +19,10 @@ app.use(cookieParser());
 app.options("*", cors());
 const fileupload =require("express-fileupload");
 app.use(fileupload({
-    useTempFiles: true,       // Enable temp files
-    tempFileDir: '/tmp/'}      // Directory for temp files
+    useTempFiles: true,       
+    tempFileDir: '/tmp/'}      
 ));
-app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true })); 
 require("./cron/updateSlotsStatus")
 const {cloudinaryConnect} =require("./config/cloudinary");
 cloudinaryConnect();
@@ -41,17 +39,13 @@ app.use("/api/v1/turf",turfRoutes);
 app.use("/api/v1/notify",notifyRoutes);
 app.use("/api/v1/ai",chatBotRoutes);
 app.use("/api/v1/comment",commentRoutes);
-app.use("/api/v1/booking",bookingRoutes);
-// root route
+app.use("/api/v1/booking",bookingRoutes)
 app.get("/",(req,res)=>{
        res.send("hello jee kaise ho")
 })
-// connection to db
 connectDB();
-// activate the server
 app.listen(PORT,(req,res)=>{
     console.log(`server is running on port ${PORT}`)
 });
 
-// api think
 
