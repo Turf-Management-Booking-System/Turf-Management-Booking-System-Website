@@ -10,7 +10,7 @@ import { setUser } from "../../slices/authSlice";
 import { setNotification } from "../../slices/notificationSlice";
 import { loadNotification } from "../../slices/notificationSlice";
 import { DarkModeContext } from "../../context/DarkModeContext";
-import TurfLogin from "../../assets/images/TurfLogin.jpg";
+import LoginTurf from "../../assets/Images/TurfLogin.jpg"
 import TurfLoginPage from "../../assets/images/TurfLoginPage.jpg";
 
 
@@ -169,7 +169,7 @@ const LoginHandler = async (event) => {
   return (
     <>
       <div  style={{
-                backgroundImage: `url(${darkMode ? TurfLogin : TurfLoginPage})`,
+                backgroundImage: `url(${darkMode ? LoginTurf : TurfLoginPage})`,
               }} className="flex justify-center items-center min-h-screen bg-cover  mt-12">
         <div
           className={`relative ${

@@ -20,7 +20,7 @@ import {
   faVolleyballBall,
   faHockeyPuck,
 } from "@fortawesome/free-solid-svg-icons";
-import TurfImageDay from "../../assets/images/TurfImageDay.jpg";
+import TurfImage from "../../assets/Images/TurfImageDay.jpg"
 import TurfImageNight from "../../assets/images/TurfImageNight.jpg";
 import { DarkModeContext } from "../../context/DarkModeContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -312,7 +312,7 @@ useEffect(() => {
       {/* Hero Section */}
       <motion.div
         style={{
-          backgroundImage: `url(${darkMode ? TurfImageNight : TurfImageDay})`,
+          backgroundImage: `url(${darkMode ? TurfImageNight : TurfImage})`,
         }}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
