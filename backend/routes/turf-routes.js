@@ -12,7 +12,6 @@ router.get("/viewAllUser",auth,isAdmin,viewAllUsers);
 router.get("/getAllTurfLocations",getAllTurfLocations);
 router.get("/getAllTurfLocations/:location",getTurfSelectedLocation);
 router.get("/getTurfById/:id",getTurfById);
-router.get("/:turfId/slots",getTurfSlots);
 router.get("/getAllSports",getAllSports);
 router.get("/getTotalRevenue",auth,getTotalRevenue);
 router.get("/getMonthlyRevenue",auth,getMonthlyRevenue);
@@ -22,4 +21,7 @@ router.get("/getMonthlyBookingForUser/:userId",auth,getMonthlyBookingsForUser);
 router.get("/getMonthlyBookingsTrend/:userId",auth,getMonthlyBookingsTrend);
 router.get("/getTurfSlotByDate/:turfId/:date",getTurfSlotsByDate)
 router.get("/getTopBookedTurfs",getTopBookedTurfs)
+// Only allow turfId to be numbers
+router.get("/:turfId(\\d+)/slots", getTurfSlots);
+
 module.exports = router;
