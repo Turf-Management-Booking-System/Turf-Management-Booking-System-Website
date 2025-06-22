@@ -10,31 +10,42 @@ const profileSchema = mongoose.Schema({
        type:String,
        match: [/^\d{10}$/, "Please enter a valid 10-digit phone number!"], 
        default:null,
+              required:false,
+
     },
     gender:{
        type:String,
        default:null,
        enum:["Male","Female","TransGender"],
+       required:false,
     },
     about:{
         type:String,
         default:null,
         maxLength:30,
-        minLength:10
+        minLength:10,
+               required:false,
+
     },
     dateOfBirth:{
       type:String,
-      default:null
+      default:null,
+             required:false,
+
     },
     description:{
        type:String,
        default:null,
        maxLength:30,
        minLength:10,
+              required:false,
+
     },
     location:{
        type:String,
-       default:null
+       default:null,
+              required:false,
+
     },
 },{timestamps:true});
 // exports the model
