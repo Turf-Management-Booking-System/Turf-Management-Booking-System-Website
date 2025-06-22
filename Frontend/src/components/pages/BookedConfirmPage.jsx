@@ -65,7 +65,7 @@ const BookedConfirmPage = () => {
           dispatch(setLoader(true))
           try {
             const response = await axios.post(
-              `${VITE_API_BASE_URL}/api/v1/booking/rescheduleBooking`,data,
+              `${import.meta.env.VITE_API_BASE_URL}/api/v1/booking/rescheduleBooking`,data,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -91,7 +91,7 @@ const BookedConfirmPage = () => {
               dispatch(loadNotification());
               try {
                 const notificationResponse = await axios.get(
-                  `${VITE_API_BASE_URL}/api/v1/notify/getNotifications/${response.data.booking.user._id}`,
+                  `${import.meta.env.VITE_API_BASE_URL}/api/v1/notify/getNotifications/${response.data.booking.user._id}`,
                   {
                     headers: { "Content-Type": "application/json", withCredentials: true },
                   }
@@ -133,7 +133,7 @@ const BookedConfirmPage = () => {
         dispatch(setLoader(true));
         console.log("userId",userId)
       const response = await axios.post(
-        `${VITE_API_BASE_URL}/api/v1/booking/bookingTurf/${turfId}/${userId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/booking/bookingTurf/${turfId}/${userId}`,
        bookingData,
         {
           headers: {
@@ -159,7 +159,7 @@ const BookedConfirmPage = () => {
         dispatch(loadNotification());
         try {
           const notificationResponse = await axios.get(
-            `${VITE_API_BASE_URL}/api/v1/notify/getNotifications/${response.data.newBookings.user._id}`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/notify/getNotifications/${response.data.newBookings.user._id}`,
             {
               headers: { "Content-Type": "application/json", withCredentials: true },
             }

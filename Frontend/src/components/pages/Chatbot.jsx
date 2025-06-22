@@ -18,7 +18,7 @@ const Chatbot = ({ onClose }) => {
     setInput("");
 
     try {
-      const res = await axios.post(`${VITE_API_BASE_URL}/api/v1/ai/chatBot`, { message: input });
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/ai/chatBot`, { message: input });
       setMessages([...newMessages, { role: "assistant", content: res.data.reply }]);
     } catch (error) {
       console.error("Error:", error);

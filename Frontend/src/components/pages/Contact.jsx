@@ -24,7 +24,7 @@ const ContactForm = () => {
     try {
       dispatch(setLoader(true));
       const response = await axios.post(
-        `${VITE_API_BASE_URL}/api/v1/auth/contactMe`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/contactMe`,
         requestData,
         {
           headers: { "Content-Type": "application/json", withCredentials: true },

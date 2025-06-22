@@ -65,7 +65,7 @@ const EditProfile = () => {
     e.preventDefault()
     try {
       dispatch(setLoader(true))
-      const response = await axios.post(`${VITE_API_BASE_URL}/api/v1/auth/updateProfile/${user?._id}`, requestData, {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/updateProfile/${user?._id}`, requestData, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -91,7 +91,7 @@ const EditProfile = () => {
         dispatch(loadNotification())
         try {
           const notificationResponse = await axios.get(
-            `${VITE_API_BASE_URL}/api/v1/notify/getNotifications/${response.data.user._id}`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/notify/getNotifications/${response.data.user._id}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -121,7 +121,7 @@ const EditProfile = () => {
   const deleteProfileHandler = async () => {
     try {
       dispatch(setLoader(true))
-      const response = await axios.delete(`${VITE_API_BASE_URL}/api/v1/auth/deleteProfile/${user?._id}`, {
+      const response = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/deleteProfile/${user?._id}`, {
         data: dataToken,
         headers: {
           "Content-Type": "application/json",
@@ -160,7 +160,7 @@ const EditProfile = () => {
     try {
       dispatch(setLoader(true))
       const response = await axios.post(
-        `${VITE_API_BASE_URL}/api/v1/auth/upload-Profile-Image/${user?._id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/upload-Profile-Image/${user?._id}`,
         formData,
         {
           headers: {

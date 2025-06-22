@@ -158,7 +158,7 @@ function Home() {
     try {
       dispatch(setLoader(true));
       const url =
-        `${VITE_API_BASE_URL}/api/v1/comment/getCommentWithTestimonals`;
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/comment/getCommentWithTestimonals`;
 
       const response = await axios.get(url, {
         headers: {
@@ -212,7 +212,7 @@ function Home() {
     try {
       dispatch(setLoader(true));
       const response = await axios.post(
-        `${VITE_API_BASE_URL}/api/v1/auth/subscription`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/subscription`,
         {
           email: email,
         },
@@ -231,7 +231,7 @@ function Home() {
           dispatch(loadNotification());
           try {
             const notificationResponse = await axios.get(
-              `${VITE_API_BASE_URL}/api/v1/notify/getNotifications/${user._id}`,
+              `${import.meta.env.VITE_API_BASE_URL}/api/v1/notify/getNotifications/${user._id}`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -275,7 +275,7 @@ function Home() {
    const fetchFetauredTurfs = async ()=>{
     try{
         dispatch(setLoader(true))
-        const response =await  axios.get(`${VITE_API_BASE_URL}/api/v1/turf/getTopBookedTurfs`)
+        const response =await  axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/turf/getTopBookedTurfs`)
         if(response.data.success && response.data.data){
           dispatch(setLoader(false))
           setFeaturedTurfs((response.data.data))
