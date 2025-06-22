@@ -307,6 +307,7 @@ useEffect(() => {
   window.addEventListener('resize', handleResize);
   return () => window.removeEventListener('resize', handleResize);
 }, []);
+console.log('Full URL:', `${import.meta.env.VITE_API_BASE_URL}/api/v1/turf/getAllTurfLocations`);
   return (
     <>
       {/* Hero Section */}
