@@ -8,8 +8,10 @@ const PORT =  process.env.PORT || 4000;
   
 app.use(express.json());
 app.use(cors({ origin: [
+    "https://kick-on-turf.onrender.com/",
     "http://localhost:5175",
     "http://localhost:5173"
+
 ], 
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials:true,
