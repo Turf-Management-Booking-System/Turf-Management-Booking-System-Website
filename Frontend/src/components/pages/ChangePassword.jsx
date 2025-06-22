@@ -37,7 +37,7 @@ const ChangePassword = () => {
     e.preventDefault();
     try{
       dispatch(setLoader(true));
-      const response = await axios.post("http://localhost:4000/api/v1/auth/changePassword",
+      const response = await axios.post(`${VITE_API_BASE_URL}/api/v1/auth/changePassword`,
         requestData
       ,{
         headers:{

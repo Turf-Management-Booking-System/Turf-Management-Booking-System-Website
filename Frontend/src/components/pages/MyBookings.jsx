@@ -240,7 +240,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
     try {
       dispatch(setLoader(true));
       const response = await axios.delete(
-        `http://localhost:4000/api/v1/booking/cancelBooking/${bookingId}`,
+        `${VITE_API_BASE_URL}/api/v1/booking/cancelBooking/${bookingId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -256,7 +256,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
         console.log("response",response.data.user)
         try {
           const notificationResponse = await axios.get(
-            `http://localhost:4000/api/v1/notify/getNotifications/${response.data.user._id}`,
+            `${VITE_API_BASE_URL}/api/v1/notify/getNotifications/${response.data.user._id}`,
             {
               headers: { "Content-Type": "application/json", withCredentials: true },
             }
@@ -302,7 +302,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
     try {
       dispatch(setLoader(true))
       const response = await axios.post(
-        `http://localhost:4000/api/v1/booking/getUserFeedback`,data,
+        `${VITE_API_BASE_URL}/api/v1/booking/getUserFeedback`,data,
         {
           headers: {
             "Content-Type": "application/json",

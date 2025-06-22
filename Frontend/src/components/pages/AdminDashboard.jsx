@@ -102,7 +102,7 @@ export default function AdminDashboard() {
       dispatch(setLoader(true));
 
       const response = await axios.get(
-        `http://localhost:4000/api/v1/turf/getMonthlyBookings`,
+        `${VITE_API_BASE_URL}/api/v1/turf/getMonthlyBookings`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
       dispatch(setLoader(true));
 
       const response = await axios.get(
-        `http://localhost:4000/api/v1/turf/getMonthlyRevenue`,
+        `${VITE_API_BASE_URL}/api/v1/turf/getMonthlyRevenue`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -153,7 +153,7 @@ export default function AdminDashboard() {
       dispatch(setLoader(true));
 
       const response = await axios.get(
-        `http://localhost:4000/api/v1/turf/getTotalRevenue`,
+        `${VITE_API_BASE_URL}/api/v1/turf/getTotalRevenue`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -178,7 +178,7 @@ export default function AdminDashboard() {
       dispatch(setLoader(true));
 
       const response = await axios.get(
-        `http://localhost:4000/api/v1/turf/getSportsUtilization`,
+        `${VITE_API_BASE_URL}/api/v1/turf/getSportsUtilization`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -203,7 +203,7 @@ export default function AdminDashboard() {
       dispatch(setLoader(true));
 
       const response = await axios.get(
-        `http://localhost:4000/api/v1/booking/getAllBookings`,
+        `${VITE_API_BASE_URL}/api/v1/booking/getAllBookings`,
         {
           headers: {
             "Content-Type": "application/json",

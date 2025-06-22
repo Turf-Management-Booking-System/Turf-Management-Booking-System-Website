@@ -43,7 +43,7 @@ const TurfDetailsPage = () => {
       try {
         dispatch(setLoader(true));
         const response = await axios.get(
-          `http://localhost:4000/api/v1/turf/getTurfById/${id}`,
+          `${VITE_API_BASE_URL}/api/v1/turf/getTurfById/${id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -81,7 +81,7 @@ const TurfDetailsPage = () => {
     try {
       dispatch(setLoader(true));
       const response = await axios.post(
-        `http://localhost:4000/api/v1/comment/createCommentWithRating/${user?._id}/${id}`,
+        `${VITE_API_BASE_URL}/api/v1/comment/createCommentWithRating/${user?._id}/${id}`,
         {
           commentText: review,
           ratingValue: userRating,
@@ -125,7 +125,7 @@ const TurfDetailsPage = () => {
   const fetchTurfRatingAndReview = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:4000/api/v1/comment/getCommentWithRating/${id}`,
+        `${VITE_API_BASE_URL}/api/v1/comment/getCommentWithRating/${id}`,
         {
           headers: {
             "Content-Type": "application/json",

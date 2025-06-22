@@ -94,7 +94,7 @@ const Dashboard = () => {
       try {
         dispatch(setLoader(true))
 
-        const response = await axios.get(`http://localhost:4000/api/v1/turf/getMonthlyBookingsTrend/${user?._id}`, {
+        const response = await axios.get(`${VITE_API_BASE_URL}/api/v1/turf/getMonthlyBookingsTrend/${user?._id}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

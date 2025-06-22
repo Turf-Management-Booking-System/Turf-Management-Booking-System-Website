@@ -57,7 +57,7 @@ const BookingManagement = () => {
   const fetchBookings = async () => {
     try {
       dispatch(setLoader(true))
-      const response = await axios.get("http://localhost:4000/api/v1/booking/getAllBookings", {
+      const response = await axios.get(`${VITE_API_BASE_URL}/api/v1/booking/getAllBookings`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -136,7 +136,7 @@ const BookingManagement = () => {
       dispatch(setLoader(true))
       const formattedDate = new Date(editFormData.date).toISOString()
       const response = await axios.put(
-        `http://localhost:4000/api/v1/booking/updateBooking/${selectedBooking._id}`,
+        `${VITE_API_BASE_URL}/api/v1/booking/updateBooking/${selectedBooking._id}`,
         { ...editFormData, date: formattedDate },
         {
           headers: {
@@ -163,7 +163,7 @@ const BookingManagement = () => {
     if (window.confirm("Are you sure you want to delete this booking?")) {
       try {
         dispatch(setLoader(true))
-        const response = await axios.delete(`http://localhost:4000/api/v1/booking/deleteBooking/${id}`, {
+        const response = await axios.delete(`${VITE_API_BASE_URL}/api/v1/booking/deleteBooking/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

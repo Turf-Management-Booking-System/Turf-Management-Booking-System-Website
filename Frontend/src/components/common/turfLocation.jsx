@@ -8,7 +8,7 @@ export const fetchTurfLocations = () => async (dispatch) => {
     dispatch(setLoader(true));
 
     const response = await axios.get(
-      "http://localhost:4000/api/v1/turf/getAllTurfLocations",
+      `${VITE_API_BASE_URL}/api/v1/turf/getAllTurfLocations`,
       {
         headers: {
           "Content-Type": "application/json",

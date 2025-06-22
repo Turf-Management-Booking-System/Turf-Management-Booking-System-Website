@@ -71,7 +71,7 @@ const LoginHandler = async (event) => {
 
   try {
     dispatch(setLoader(true));
-    const response = await axios.post("http://localhost:4000/api/v1/auth/login", requestData, {
+    const response = await axios.post(`${VITE_API_BASE_URL}/api/v1/auth/login`, requestData, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -89,7 +89,7 @@ const LoginHandler = async (event) => {
       dispatch(loadNotification());
       try {
         const notificationResponse = await axios.get(
-          `http://localhost:4000/api/v1/notify/getNotifications/${response.data.user._id}`,
+          `${VITE_API_BASE_URL}/api/v1/notify/getNotifications/${response.data.user._id}`,
           {
             headers: { "Content-Type": "application/json", withCredentials: true },
           }
@@ -134,7 +134,7 @@ const LoginHandler = async (event) => {
     try {
       dispatch(setLoader(true));
       console.log("loading state",loader);
-      const response = await axios.post("http://localhost:4000/api/v1/auth/sendOtp", requestData, {
+      const response = await axios.post(`${VITE_API_BASE_URL}/api/v1/auth/sendOtp`, requestData, {
         headers: {
           "Content-Type": "application/json", 
         },

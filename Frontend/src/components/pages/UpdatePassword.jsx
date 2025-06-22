@@ -48,7 +48,7 @@ const UpdatePassword = () => {
   const resetPasswordUpdate =async ()=>{
     try{
       dispatch(setLoader(true));
-      const response = await axios.post("http://localhost:4000/api/v1/auth/resetPassword",
+      const response = await axios.post( `${VITE_API_BASE_URL}/api/v1/auth/resetPassword`,
         requestData,
         {
           headers: {

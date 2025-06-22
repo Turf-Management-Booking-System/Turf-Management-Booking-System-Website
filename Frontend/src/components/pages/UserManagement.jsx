@@ -57,7 +57,7 @@ const UserManagement = () => {
       try {
         dispatch(setLoader(true));
         const response = await axios.get(
-          "http://localhost:4000/api/v1/auth/fetchAllUsers",
+          `${VITE_API_BASE_URL}/api/v1/auth/fetchAllUsers`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -139,7 +139,7 @@ const UserManagement = () => {
       try {
         dispatch(setLoader(true));
         const response = await axios.delete(
-          `http://localhost:4000/api/v1/auth/deleteProfile/${id}`,
+          `${VITE_API_BASE_URL}/api/v1/auth/deleteProfile/${id}`,
           {
             headers: {
               "Content-Type": "application/json",

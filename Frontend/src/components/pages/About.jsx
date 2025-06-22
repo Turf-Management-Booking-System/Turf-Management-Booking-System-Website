@@ -217,7 +217,7 @@ const About = () => {
     try {
       dispatch(setLoader(true));
       const response = await axios.get(
-        `http://localhost:4000/api/v1/comment/displayFeedBack`
+        `${VITE_API_BASE_URL}/api/v1/comment/displayFeedBack`
       );
       if (response.data.success) {
         dispatch(setLoader(false))
