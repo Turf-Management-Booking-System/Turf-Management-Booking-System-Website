@@ -11,7 +11,7 @@ import { setNotification } from "../../slices/notificationSlice";
 import { loadNotification } from "../../slices/notificationSlice";
 import { DarkModeContext } from "../../context/DarkModeContext";
 import LoginTurf from "../../assets/Images/TurfLogin.jpg"
-import TurfLoginPage from "../../assets/images/TurfLoginPage.jpg";
+import TurfLoginPage from "../../assets/Images/TurfLoginPage.jpg";
 
 
 const Login = () => {
