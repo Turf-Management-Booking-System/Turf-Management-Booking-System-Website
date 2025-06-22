@@ -21,7 +21,7 @@ import {
   faHockeyPuck,
 } from "@fortawesome/free-solid-svg-icons";
 import TurfImage from "../../assets/Images/TurfImageDay.jpg"
-import TurfImageNight from "../../assets/images/TurfImageNight.jpg";
+import TurfImageNight from "../../assets/Images/TurfImageNight.jpg";
 import { DarkModeContext } from "../../context/DarkModeContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
