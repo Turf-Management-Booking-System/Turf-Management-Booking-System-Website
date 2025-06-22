@@ -14,7 +14,7 @@ export const useBookingsDetailsOfAUser = () => {
       dispatch(setLoader(true));
 
       const response = await axios.get(
-        `${VITE_API_BASE_URL}/api/v1/booking/getAllBookings/${user._id}}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/booking/getAllBookings/${user._id}}`,
         {
           headers: {
             "Content-Type": "application/json",
