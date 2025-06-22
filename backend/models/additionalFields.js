@@ -16,7 +16,7 @@ const profileSchema = mongoose.Schema({
     gender:{
        type:String,
        default:null,
-       enum:["Male","Female","TransGender"],
+       enum:["Male","Female","TransGender",null],
        required:false,
     },
     about:{
