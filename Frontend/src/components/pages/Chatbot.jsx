@@ -1,8 +1,8 @@
 import React, { useState,useContext } from "react";
 import axios from "axios";
 import { FaArrowUp, FaRobot } from "react-icons/fa";
-import ChatBg from "../../assets/images/ChatBg.png";
-import ChatBgDark from "../../assets/images/ChatBgDark.png";
+import ChatBg from "../../assets/Images/ChatBg.png";
+import ChatBgDark from "../../assets/Images/ChatBgDark.png";
 import { DarkModeContext } from "../../context/DarkModeContext";
 
 const Chatbot = ({ onClose }) => {
