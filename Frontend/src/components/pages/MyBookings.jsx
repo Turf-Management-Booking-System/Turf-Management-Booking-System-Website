@@ -340,7 +340,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
             Welcome to Your Bookings,
             <span className="capitalize font-orbitron text-green-500">
               {" "}
-              {user?.firstName} {user.lastName}
+              {user?.firstName} {user?.lastName}
             </span>
           </h1>
           <p className="text-black dark:text-gray-300 mb-4">Manage your reservations with ease.</p>

@@ -15,7 +15,8 @@ const { subscriptionEmail } = require("../mail/templates/subscriptionEmail");
 const cloudinary= require("cloudinary").v2;
 const UserActivity = require("../models/userActivity");
 const Comment = require("../models/comment");
-const Booking = require("../models/booking")
+const Booking = require("../models/booking");
+const mongoose = require("mongoose")
 
 require("dotenv").config();
 const adminPassword = "admin7860@"
@@ -57,7 +58,7 @@ exports.signup = async(req,res)=>{
             email,
             password:hashedPassword,
             role,
-            image:`https:api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
+             image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
             additionalFields:profile._id,
             isVerified:true,
         });
@@ -478,58 +479,80 @@ async function uploadFileToCloudinary(file, folder,quality) {
 exports.uploadProfileImage = async (req, res) => {
     try {
         const {id} = req.params;
-        if(!id ){
+        
+        // Validate ID
+        if(!id || !mongoose.Types.ObjectId.isValid(id)) {
             return res.status(401).json({
                 success:false,
-                message:"Id doesn't Exits Or Token is Missing!"
-            })
-        }
-        const user = await User.findById(id);
-        if(!user){
-            return res.status(401).json({
-                success:false,
-                message:"User Doesn't exit"
-            })
-        }
-        const file = req.files.imageUrl;
-        console.log("File details:", file);
-        const supportedFileTypes = ["png", "jpeg", "jpg"];
-        const fileType = file.name.split(".").pop().toLowerCase();
-        console.log("File type:", fileType);
-        if (!isSupported(supportedFileTypes, fileType)) {
-            return res.status(400).json({
-                success: false,
-                message: "File type is not supported"
+                message:"Invalid user ID"
             });
         }
+
+        // Check if file exists
+        if(!req.files || !req.files.imageUrl) {
+            return res.status(400).json({
+                success: false,
+                message: "No file uploaded"
+            });
+        }
+
+        const file = req.files.imageUrl;
+        const supportedFileTypes = ["png", "jpeg", "jpg"];
+        const fileType = file.name.split(".").pop().toLowerCase();
+
+        // Validate file type BEFORE processing
+        if (!supportedFileTypes.includes(fileType)) {
+            return res.status(400).json({
+                success: false,
+                message: `File type not supported. Only ${supportedFileTypes.join(", ")} are allowed`
+            });
+        }
+
+        // Validate file size (example: 5MB limit)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if(file.size > maxSize) {
+            return res.status(400).json({
+                success: false,
+                message: "File too large. Max size is 5MB"
+            });
+        }
+
+        const user = await User.findById(id);
+        if(!user){
+            return res.status(404).json({
+                success:false,
+                message:"User not found"
+            });
+        }
+
         const response = await uploadFileToCloudinary(file, "Turf-Management-System");
-        console.log("Cloudinary response:", response);
-        const filedata = await User.findByIdAndUpdate({
-            _id:id
-        },{
-            image:response.secure_url
-        },{
-            new:true
+        
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            {image: response.secure_url},
+            {new: true}
+        );
+
+        await Notification.create({
+            user: user._id,
+            message: "You have updated your profile image!"
         });
-        const message = await Notification.create({
-            user:user._id,
-            message:"You Have Recently Updated Profile Image!"
-        })
-        res.status(200).json({
+
+        return res.status(200).json({
             success: true,
             message: "Image uploaded successfully",
-            fileData: filedata
+            data: updatedUser
         });
+
     } catch (error) {
-        console.error("Error while uploading the image:", error);
-        res.status(400).json({
+        console.error("Error uploading image:", error);
+        return res.status(500).json({
             success: false,
-            message: "Error while uploading the file",
-            error: error.message
+            message: "Internal server error",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 }
-
 exports.updateProfile = async (req, res) => {
     try {
         const { firstName, lastName, email, gender, phoneNumber, dateOfBirth, location, description, about } = req.body;

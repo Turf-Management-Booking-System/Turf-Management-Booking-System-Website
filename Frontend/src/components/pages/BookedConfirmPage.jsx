@@ -12,6 +12,7 @@ import { addBooking, setRescheduledBookings } from "../../slices/bookingSlice";
 import { setLoader } from "../../slices/authSlice"
 import { loadNotification } from "../../slices/notificationSlice"
 import { setNotification } from "../../slices/notificationSlice"
+
 const BookedConfirmPage = () => {
   const {darkMode} = useContext(DarkModeContext);
   const { userId, turfId } = useParams()
@@ -20,7 +21,7 @@ const BookedConfirmPage = () => {
   const token = useSelector((state) => state.auth.token);
   const dispatch = useDispatch();
 
-  const { selectedTurfName, selectedDate, selectedSlots, totalPrice ,bookingIdRescheduled,isRescheduled} = location.state
+  const { selectedTurfName, selectedDate, selectedSlots, totalPrice, bookingIdRescheduled, isRescheduled } = location.state
 
   const [paymentMode, setPaymentMode] = useState("")
 
@@ -28,6 +29,33 @@ const BookedConfirmPage = () => {
     const capitalize = e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1).toLowerCase()
     setPaymentMode(capitalize)
   }
+
+  // Improved time formatting function
+  const formatTimeSlot = (timeInput) => {
+    // If the input is already in the correct format, return it
+    if (typeof timeInput === 'string' && /^\d{1,2}:\d{2} [AP]M$/i.test(timeInput)) {
+      return timeInput;
+    }
+
+    // Handle Date objects or ISO strings
+    try {
+      const time = new Date(timeInput);
+      if (isNaN(time.getTime())) {
+        console.error("Invalid time value:", timeInput);
+        return "Invalid Time";
+      }
+      
+      let hours = time.getHours();
+      const minutes = time.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // Convert 0 to 12
+      return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+    } catch (error) {
+      console.error("Time formatting error:", error);
+      return "Invalid Time";
+    }
+  };
   
   const handleConfirmBooking = async () => {
     if (!paymentMode) {
@@ -38,103 +66,105 @@ const BookedConfirmPage = () => {
       toast.error("Online Mode is not available right now!")
       return
     }
-    // Format time slots consistently
-  const formattedSlots = selectedSlots.map(slot => {
-    const time = new Date(slot);
-    let hours = time.getHours();
-    const minutes = time.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
-  });
 
-  // Validate date format
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  if (!dateRegex.test(selectedDate)) {
-    toast.error("Invalid date format");
-    return;
-  }
+    // Format all time slots consistently
+    const formattedSlots = selectedSlots.map(slot => {
+      // If slot is already formatted, use it directly
+      if (typeof slot === 'string' && /^\d{1,2}:\d{2} [AP]M$/i.test(slot)) {
+        return slot;
+      }
+      return formatTimeSlot(slot);
+    }).filter(time => time !== "Invalid Time");
 
-     const data ={
-          "newTimeSlot":selectedSlots,
-          "bookingId":bookingIdRescheduled
-        }
-        console.log("data",data)
-        if(isRescheduled){
-          dispatch(setLoader(true))
+    if (formattedSlots.length === 0) {
+      toast.error("No valid time slots selected");
+      return;
+    }
+
+    // Validate date format
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(selectedDate)) {
+      toast.error("Invalid date format");
+      return;
+    }
+
+    if(isRescheduled){
+      const data = {
+        "newTimeSlot": formattedSlots,
+        "bookingId": bookingIdRescheduled
+      }
+      
+      dispatch(setLoader(true))
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/api/v1/booking/rescheduleBooking`,
+          data,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        
+        if (response.data.success) {
+          toast.success("Booking rescheduled successfully!");
+          dispatch(setRescheduledBookings(response.data.booking))
+          navigate(`/booking-confirmation/${response.data.booking._id}`, {
+            state: {
+              bookingId: response.data.booking._id,
+              selectedTurfName,
+              selectedDate,
+              selectedSlots: formattedSlots,
+              totalPrice,
+              paymentMode,
+            },
+          })
+          dispatch(loadNotification());
           try {
-            const response = await axios.post(
-              `${import.meta.env.VITE_API_BASE_URL}/api/v1/booking/rescheduleBooking`,data,
+            const notificationResponse = await axios.get(
+              `${import.meta.env.VITE_API_BASE_URL}/api/v1/notify/getNotifications/${response.data.booking.user._id}`,
               {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
+                headers: { "Content-Type": "application/json", withCredentials: true },
               }
             );
-            
-            if (response.data.success) {
-              toast.success("Booking rescheduled successfully!");
-              console.log("response",response.data.booking)
-              dispatch(setRescheduledBookings(response.data.booking))
-              navigate(`/booking-confirmation/${response.data.booking._id}`, {
-                state: {
-                  bookingId: response.data.booking._id,
-                  selectedTurfName,
-                  selectedDate,
-                  selectedSlots,
-                  totalPrice,
-                  paymentMode,
-                },
-              })
-              dispatch(loadNotification());
-              try {
-                const notificationResponse = await axios.get(
-                  `${import.meta.env.VITE_API_BASE_URL}/api/v1/notify/getNotifications/${response.data.booking.user._id}`,
-                  {
-                    headers: { "Content-Type": "application/json", withCredentials: true },
-                  }
-                );
-                if (notificationResponse.data.success) {
-                  console.log("fetch notification",notificationResponse.data.currentMessage);
-                  dispatch(setNotification(notificationResponse.data.currentMessage || []));
-                  localStorage.setItem(
-                    "userNotification",
-                    JSON.stringify(notificationResponse.data.currentMessage || [])
-                  );
-              
-                }
-              } catch (error) {
-                toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!");
-                console.log(error.response?.data?.message)
-              }
-              return;
-            } else {
-              toast.error(response.data.message || "Failed to rescheduled booking.");
+            if (notificationResponse.data.success) {
+              dispatch(setNotification(notificationResponse.data.currentMessage || []));
+              localStorage.setItem(
+                "userNotification",
+                JSON.stringify(notificationResponse.data.currentMessage || [])
+              );
             }
           } catch (error) {
-            toast.error(
-              error.response?.data?.message ||
-                "Something went wrong during rescheduled."
-            );
-            console.error("Rescheduled error:", error);
-          }finally{
-            dispatch(setLoader(false))
+            toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!");
           }
+          return;
+        } else {
+          toast.error(response.data.message || "Failed to reschedule booking.");
         }
-        const bookingData = {
-          date: selectedDate,
-          timeSlot: formattedSlots,
-          price: totalPrice,
-          paymentMode: paymentMode,
-        };
-       try {
-        dispatch(setLoader(true));
-        console.log("userId",userId)
+      } catch (error) {
+        toast.error(
+          error.response?.data?.message ||
+            "Something went wrong during rescheduling."
+        );
+        console.error("Reschedule error:", error);
+      } finally {
+        dispatch(setLoader(false))
+      }
+    }
+
+    const bookingData = {
+      date: selectedDate,
+      timeSlot: formattedSlots,
+      price: totalPrice,
+      paymentMode: paymentMode,
+    };
+    console.log("booking Data",bookingData)
+    try {
+      dispatch(setLoader(true));
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/v1/booking/bookingTurf/${turfId}/${userId}`,
-       bookingData,
+        bookingData,
         {
           headers: {
             "Content-Type": "application/json",
@@ -151,7 +181,7 @@ const BookedConfirmPage = () => {
             bookingId: response.data.newBookings._id,
             selectedTurfName,
             selectedDate,
-            selectedSlots:formattedSlots,
+            selectedSlots: formattedSlots,
             totalPrice,
             paymentMode,
           },
@@ -165,17 +195,14 @@ const BookedConfirmPage = () => {
             }
           );
           if (notificationResponse.data.success) {
-            console.log("fetch notification",notificationResponse.data.currentMessage);
             dispatch(setNotification(notificationResponse.data.currentMessage || []));
             localStorage.setItem(
               "userNotification",
               JSON.stringify(notificationResponse.data.currentMessage || [])
             );
-        
           }
         } catch (error) {
           toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!");
-          console.log(error.response?.data?.message)
         }
       } else {
         toast.error(response.data.message || "Failed to confirm booking.")
@@ -183,16 +210,31 @@ const BookedConfirmPage = () => {
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong during booking.")
       console.error("Booking error:", error)
-    }finally{
+    } finally {
       dispatch(setLoader(false))
     }
   }
 
+  // Function to display time slots in the UI
+  const displayTimeSlots = () => {
+    if (selectedSlots.length === 0) return "No slots selected";
+    
+    return selectedSlots.map(slot => {
+      // If slot is already formatted, use it directly
+      if (typeof slot === 'string' && /^\d{1,2}:\d{2} [AP]M$/i.test(slot)) {
+        return slot;
+      }
+      return formatTimeSlot(slot);
+    }).join(", ");
+  };
+
   return (
     <div 
-    style={{
-              backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
-            }} className="min-h-screen mt-16 pt-28 py-12 px-4 sm:px-6 lg:px-8  transition-colors duration-300">
+      style={{
+        backgroundImage: `url(${darkMode ? blackBg : whiteBg})`
+      }} 
+      className="min-h-screen mt-16 pt-28 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300"
+    >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -218,31 +260,7 @@ const BookedConfirmPage = () => {
                   <p className="flex items-center text-gray-600 dark:text-gray-300">
                     <FaClock className="mr-2 text-yellow-500" />
                     <span className="font-semibold mr-2">Time Slots:</span>
-{
-  selectedSlots.length > 0
-    ? selectedSlots
-        .map(slot => {
-          const time = new Date(slot); // Ensure the slot is a Date object
-          
-          // Get the hours and minutes
-          let hours = time.getHours();
-          const minutes = time.getMinutes();
-
-          // Determine AM/PM
-          const ampm = hours >= 12 ? 'PM' : 'AM';
-
-          // Convert 24-hour format to 12-hour format
-          hours = hours % 12;
-          hours = hours ? hours : 12; // If hours is 0, set it to 12 for 12 AM
-
-          // Format minutes to always show two digits
-          const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
-          return formattedTime;
-        })
-        .join(", ")
-    : "No slots selected"
-}
-
+                    {displayTimeSlots()}
                   </p>
                   <p className="flex items-center text-gray-600 dark:text-gray-300">
                     <FaMoneyBillWave className="mr-2 text-red-500" />
@@ -293,7 +311,7 @@ const BookedConfirmPage = () => {
                 onClick={handleConfirmBooking}
                 className="bg-white text-green-500 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:bg-gray-100 transition duration-300"
               >
-                  {bookingIdRescheduled ? "Reschedule Booking" : "Confirm Booking"}
+                {bookingIdRescheduled ? "Reschedule Booking" : "Confirm Booking"}
               </motion.button>
             </div>
           </div>
@@ -304,4 +322,3 @@ const BookedConfirmPage = () => {
 }
 
 export default BookedConfirmPage
-

@@ -9,6 +9,8 @@ const sendEmail = require("../config/nodeMailer");
 const Notification = require("../models/notification");
 const {cancelBookingEmail} = require("../mail/templates/cancelBookingEmail");
 const {rescheduleBookingEmail} = require("../mail/templates/rescheduleBookingEmail")
+const mongoose = require('mongoose'); // Add this line at the top
+
 
 exports.bookingTurf = async (req, res) => {
   try {
@@ -17,7 +19,7 @@ exports.bookingTurf = async (req, res) => {
 
     // Validation
     if (!date || !timeSlot || !price || !paymentMode || !userId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Please provide all required fields",
       });
@@ -26,43 +28,105 @@ exports.bookingTurf = async (req, res) => {
     const timeSlotArray = Array.isArray(timeSlot) ? timeSlot : [timeSlot];
     const bookingDate = new Date(date);
 
-    // Convert each time slot to full Date object
-    const formattedTimeSlots = timeSlotArray.map(ts => new Date(`${date} ${ts}`));
+    // Debug logs
+    console.log("Booking request received:", {
+      userId,
+      turfId,
+      date,
+      timeSlotArray,
+      price,
+      paymentMode
+    });
 
-    // Find turf
-    const turf = await Turf.findById(turfId);
+    // Find turf by ID only first
+    const turf = await Turf.findOne({ _id: turfId })
+      .populate('sports')
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'rating',
+          model: 'Rating'
+        }
+      });
+
     if (!turf) {
+      console.error("Turf not found with ID:", turfId);
       return res.status(404).json({
         success: false,
-        message: "No turf found",
+        message: "Turf not found",
       });
     }
 
-    // Find available slots by comparing exact datetime
-    const availableSlots = turf.slots.filter(slot =>
-      formattedTimeSlots.some(ts =>
-        new Date(slot.time).getTime() === ts.getTime()
-      ) &&
-      slot.status === "available" &&
-      new Date(slot.date).toISOString().slice(0, 10) === bookingDate.toISOString().slice(0, 10)
-    );
+    // Format time helper
+    const formatTime = (time) => {
+      try {
+        const dateObj = new Date(time);
+        let hours = dateObj.getHours();
+        const minutes = dateObj.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+      } catch (error) {
+        console.error("Error formatting time:", time, error);
+        return null;
+      }
+    };
+
+    // Find available slots for the exact date
+    const availableSlots = turf.slots.filter(slot => {
+      try {
+        const slotDate = new Date(slot.time);
+        const slotDay = slotDate.toDateString();
+        const bookingDay = bookingDate.toDateString();
+        
+        if (slotDay !== bookingDay) return false;
+        
+        const slotTimeStr = formatTime(slot.time);
+        return timeSlotArray.includes(slotTimeStr) && slot.status === "available";
+      } catch (error) {
+        console.error("Error processing slot:", slot, error);
+        return false;
+      }
+    });
+
+    console.log("Available slots found:", availableSlots.map(s => formatTime(s.time)));
 
     if (availableSlots.length !== timeSlotArray.length) {
+      const availableTimes = turf.slots
+        .filter(slot => {
+          try {
+            const slotDate = new Date(slot.time);
+            return (
+              slotDate.toDateString() === bookingDate.toDateString() && 
+              slot.status === "available"
+            );
+          } catch (error) {
+            return false;
+          }
+        })
+        .map(slot => formatTime(slot.time))
+        .filter(time => time !== null);
+
       return res.status(400).json({
         success: false,
-        message: "Some slots are already booked or don't exist",
+        message: `Requested slots not available. Only ${availableSlots.length} of ${timeSlotArray.length} slots are available`,
+        availableSlots: availableTimes,
+        requestedSlots: timeSlotArray
       });
     }
 
     // Calculate booking end time (assuming 1 hour per slot)
-    const bookingEndTime = new Date(formattedTimeSlots[formattedTimeSlots.length - 1].getTime() + 60 * 60 * 1000);
+    const lastSlot = availableSlots[availableSlots.length - 1];
+    const bookingEndTime = new Date(lastSlot.time);
+    bookingEndTime.setHours(bookingEndTime.getHours() + 1);
 
     // Create booking
     const newBooking = await Booking.create({
       user: userId,
       turf: turfId,
       date: bookingDate,
-      timeSlot: formattedTimeSlots, // store full datetime
+      timeSlot: availableSlots.map(slot => slot.time),
       status: "Confirmed",
       totalPrice: price,
       paymentMode: paymentMode,
@@ -78,37 +142,51 @@ exports.bookingTurf = async (req, res) => {
     await turf.save();
 
     // Update user's history
+    const userActivity = await UserActivity.create({
+      userId: userId,
+      action: "Booked Turf",
+      details: {
+        turfName: turf.turfName,
+        date: bookingDate,
+        timeSlots: timeSlotArray,
+        price: price
+      }
+    });
+
     const user = await User.findByIdAndUpdate(
       userId,
       {
         $push: {
           previousBooked: newBooking._id,
-          recentActivity: (await UserActivity.create({
-            userId: userId,
-            action: "Booked Turf",
-          }))._id
+          recentActivity: userActivity._id
         }
       },
       { new: true }
     );
 
-    // Send notification and email
+    // Send notification
     await Notification.create({
       user: user._id,
-      message: `Booked ${turf.turfName} Turf`,
+      message: `Your booking for ${turf.turfName} on ${bookingDate.toDateString()} at ${timeSlotArray.join(', ')} was successful!`,
+      type: "booking_confirmation",
+      relatedBooking: newBooking._id
     });
 
+    // Send email
     try {
       const emailContent = bookedTurfEmail(
         user.firstName,
         user.lastName,
         turf.turfName,
-        newBooking.timeSlot,
-        newBooking.date
+        timeSlotArray,
+        date,
+        price,
+        paymentMode
       );
-      await sendEmail(user.email, "Turf Booked Successfully!", emailContent);
+      await sendEmail(user.email, "Turf Booking Confirmation", emailContent);
+      console.log("Confirmation email sent to:", user.email);
     } catch (emailError) {
-      console.error("Email error:", emailError);
+      console.error("Failed to send confirmation email:", emailError);
     }
 
     // Return populated booking
@@ -116,13 +194,11 @@ exports.bookingTurf = async (req, res) => {
       .populate({
         path: "turf",
         populate: [
-          { path: "sports", model: "Sport" },
+          { path: "sports" },
           {
             path: "comments",
-            model: "Comment",
             populate: {
               path: "rating",
-              model: "Rating",
               select: "rating",
             },
           },
@@ -134,15 +210,22 @@ exports.bookingTurf = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Booking successful!",
-      newBookings: populatedBooking,
+      booking: populatedBooking,
+      availableSlots: availableSlots.map(s => formatTime(s.time))
     });
 
   } catch (error) {
-    console.error("Booking error:", error);
+    console.error("Booking processing error:", {
+      message: error.message,
+      stack: error.stack,
+      requestBody: req.body,
+      params: req.params
+    });
+
     return res.status(500).json({
       success: false,
-      message: "Error while processing booking",
-      error: error.message,
+      message: "An error occurred while processing your booking",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 };
@@ -383,57 +466,73 @@ exports.getUserBookingDetails = async (req, res) => {
 };
 exports.getAllBookingsOfUser = async (req, res) => {
   try {
-      const { userId } = req.params;
-      if (!userId) {
-          return res.status(400).json({
-              success: false,
-              message: "Please check the data"
-          });
-      }
-      const user = await User.findById(userId).populate({
-        path: "previousBooked",
-        model: "Booking",
-        populate: [
-          {
-            path: "turf",
-            model: "Turf",
-            populate: [
-              {
-                path: "comments", 
-                model: "Comment",
-                populate:{
-                    path:"rating",
-                    model:"Rating",
-                    select:"rating"
-                }
-              },
-              {
-                path: "sports", 
-                model: "Sport",
-              },
-            ],
-          },
-        ],
+    const { userId } = req.params;
+    
+    // Validate userId exists and is a valid ObjectId
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID format"
       });
+    }
 
-      if (!user) {
-          return res.status(404).json({
-              success: false,
-              message: "Error! No user found."
-          });
-      }
-      return res.status(200).json({
-          success: true,
-          message: "User bookings found",
-          bookings: user.previousBooked 
+    // Clean the userId by removing any non-hex characters
+    const cleanedUserId = userId.replace(/[^a-f0-9]/g, '');
+
+    // Verify the cleaned ID is exactly 24 characters
+    if (cleanedUserId.length !== 24) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID length"
       });
+    }
+
+    const user = await User.findById(cleanedUserId).populate({
+      path: "previousBooked",
+      model: "Booking",
+      populate: [
+        {
+          path: "turf",
+          model: "Turf",
+          populate: [
+            {
+              path: "comments", 
+              model: "Comment",
+              populate: {
+                path: "rating",
+                model: "Rating",
+                select: "rating"
+              }
+            },
+            {
+              path: "sports", 
+              model: "Sport",
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User bookings found",
+      bookings: user.previousBooked 
+    });
+
   } catch (error) {
-      console.log("Error:", error);
-      return res.status(500).json({
-          success: false,
-          message: "Error while getting user's all bookings",
-          error: error.message
-      });
+    console.error("Error in getAllBookingsOfUser:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error while getting user's all bookings",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 exports.getUserFeedback =async (req,res)=>{
