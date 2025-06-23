@@ -16,7 +16,7 @@ const Notification = () => {
   const markAsRead = async (notificationId) => {
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/notify/markAsRead/${notificationId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/notify/markAsRead/${notificationId}`,
         {
           headers: { "Content-Type": "application/json", withCredentials: true },
         }
@@ -33,7 +33,7 @@ const Notification = () => {
   const deleteNotification = async (notificationId) => {
     try {
       const response = await axios.delete(
-        `http://localhost:4000/api/v1/notify/deleteNotification/${notificationId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/notify/deleteNotification/${notificationId}`,
         {
           headers: { "Content-Type": "application/json", withCredentials: true },
         }

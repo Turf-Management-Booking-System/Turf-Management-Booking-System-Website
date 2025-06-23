@@ -1,8 +1,8 @@
 import React, { useState,useContext } from "react";
 import axios from "axios";
 import { FaArrowUp, FaRobot } from "react-icons/fa";
-import ChatBg from "../../assets/images/ChatBg.png";
-import ChatBgDark from "../../assets/images/ChatBgDark.png";
+import ChatBg from "../../assets/Images/ChatBg.png";
+import ChatBgDark from "../../assets/Images/ChatBgDark.png";
 import { DarkModeContext } from "../../context/DarkModeContext";
 
 const Chatbot = ({ onClose }) => {
@@ -18,7 +18,7 @@ const Chatbot = ({ onClose }) => {
     setInput("");
 
     try {
-      const res = await axios.post("http://localhost:4000/api/v1/ai/chatBot", { message: input });
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/ai/chatBot`, { message: input });
       setMessages([...newMessages, { role: "assistant", content: res.data.reply }]);
     } catch (error) {
       console.error("Error:", error);

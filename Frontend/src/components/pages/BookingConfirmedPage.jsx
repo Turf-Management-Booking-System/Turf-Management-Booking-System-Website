@@ -46,7 +46,7 @@ const BookingConfirmedPage = () => {
     e.preventDefault();
     try {
       const response = await axios.delete(
-        `http://localhost:4000/api/v1/booking/cancelBooking/${bookingId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/booking/cancelBooking/${bookingId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -61,7 +61,7 @@ const BookingConfirmedPage = () => {
         dispatch(loadNotification());
         try {
           const notificationResponse = await axios.get(
-            `http://localhost:4000/api/v1/notify/getNotifications/${response.data.user._id}`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/notify/getNotifications/${response.data.user._id}`,
             {
               headers: { "Content-Type": "application/json", withCredentials: true },
             }

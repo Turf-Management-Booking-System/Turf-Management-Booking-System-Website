@@ -63,7 +63,7 @@ const AdminPanel = () => {
   const fetchTurfByLocationsOrAll = useCallback(async () => {
     try {
       dispatch(setLoader(true))
-      const url = "http://localhost:4000/api/v1/turf/getAllTurf"
+      const url = `${import.meta.env.VITE_API_BASE_URL}/api/v1/turf/getAllTurf`
 
       const response = await axios.get(url, {
         headers: {
@@ -103,7 +103,7 @@ const AdminPanel = () => {
   const addTurf = async (data) => {
     try {
       dispatch(setLoader(true))
-      const url = "http://localhost:4000/api/v1/turf/createTurf"
+      const url = `${import.meta.env.VITE_API_BASE_URL}/api/v1/turf/createTurf`
 
       const response = await axios.post(url, data, {
         headers: {
@@ -128,7 +128,7 @@ const AdminPanel = () => {
   const updateTurf = async (id, data) => {
     try {
       dispatch(setLoader(true))
-      const url = "http://localhost:4000/api/v1/turf/updateTurf"
+      const url = `${import.meta.env.VITE_API_BASE_URL}/api/v1/turf/updateTurf`
 
       const response = await axios.put(
         url,
@@ -160,7 +160,7 @@ const AdminPanel = () => {
   const handleDelete = async (id) => {
     try {
       dispatch(setLoader(true))
-      const url = "http://localhost:4000/api/v1/turf/deleteTurf"
+      const url = `${import.meta.env.VITE_API_BASE_URL}/api/v1/turf/deleteTurf`
 
       const response = await axios.delete(url, {
         data: { turfId: id },

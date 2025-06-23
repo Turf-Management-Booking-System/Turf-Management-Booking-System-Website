@@ -63,7 +63,7 @@ const Otp = () => {
 
     try {
       dispatch(setLoader(true));
-      const response = await axios.post("http://localhost:4000/api/v1/auth/verifyOtp", requestData, {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/verifyOtp`, requestData, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
@@ -90,7 +90,7 @@ const Otp = () => {
     try {
       dispatch(setLoader(true));
       const signupResponse = await axios.post(
-        "http://localhost:4000/api/v1/auth/signup",
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/signup`,
         { ...user }, // Ensure correct payload
         { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
@@ -117,7 +117,7 @@ const Otp = () => {
     }
     try {
       dispatch(setLoader(true));
-      const response = await axios.post("http://localhost:4000/api/v1/auth/sendOtp", requestData, {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/sendOtp`, requestData, {
         headers: {
           "Content-Type": "application/json", 
         },

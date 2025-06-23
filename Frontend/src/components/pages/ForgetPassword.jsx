@@ -22,7 +22,7 @@ const ForgetPassword = () => {
     try {
       dispatch(setLoader(true));
       const response = await axios.post(
-        "http://localhost:4000/api/v1/auth/forgetPassword",
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/forgetPassword`,
         requestData,
         {
           headers: {

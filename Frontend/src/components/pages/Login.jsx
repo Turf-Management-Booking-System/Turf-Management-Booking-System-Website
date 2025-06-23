@@ -10,8 +10,8 @@ import { setUser } from "../../slices/authSlice";
 import { setNotification } from "../../slices/notificationSlice";
 import { loadNotification } from "../../slices/notificationSlice";
 import { DarkModeContext } from "../../context/DarkModeContext";
-import TurfLogin from "../../assets/images/TurfLogin.jpg";
-import TurfLoginPage from "../../assets/images/TurfLoginPage.jpg";
+import LoginTurf from "../../assets/Images/TurfLogin.jpg"
+import TurfLoginPage from "../../assets/Images/TurfLoginPage.jpg";
 
 
 const Login = () => {
@@ -71,7 +71,7 @@ const LoginHandler = async (event) => {
 
   try {
     dispatch(setLoader(true));
-    const response = await axios.post("http://localhost:4000/api/v1/auth/login", requestData, {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/login`, requestData, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -89,7 +89,7 @@ const LoginHandler = async (event) => {
       dispatch(loadNotification());
       try {
         const notificationResponse = await axios.get(
-          `http://localhost:4000/api/v1/notify/getNotifications/${response.data.user._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/v1/notify/getNotifications/${response.data.user._id}`,
           {
             headers: { "Content-Type": "application/json", withCredentials: true },
           }
@@ -134,7 +134,7 @@ const LoginHandler = async (event) => {
     try {
       dispatch(setLoader(true));
       console.log("loading state",loader);
-      const response = await axios.post("http://localhost:4000/api/v1/auth/sendOtp", requestData, {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/sendOtp`, requestData, {
         headers: {
           "Content-Type": "application/json", 
         },
@@ -169,7 +169,7 @@ const LoginHandler = async (event) => {
   return (
     <>
       <div  style={{
-                backgroundImage: `url(${darkMode ? TurfLogin : TurfLoginPage})`,
+                backgroundImage: `url(${darkMode ? LoginTurf : TurfLoginPage})`,
               }} className="flex justify-center items-center min-h-screen bg-cover  mt-12">
         <div
           className={`relative ${

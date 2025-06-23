@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-
-// create the schema
 const userSchema = mongoose.Schema({
        firstName:{
         type:String,
@@ -47,7 +45,6 @@ const userSchema = mongoose.Schema({
         ref:"Booking"
        }],
        isVerified:{
-       //  after otp verification its become true
         type:Boolean,
         default:false
        },

@@ -34,7 +34,7 @@ const TurfPage = () => {
   const fetchSports = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:4000/api/v1/turf/getAllSports",
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/turf/getAllSports`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -60,8 +60,8 @@ const TurfPage = () => {
     try {
       dispatch(setLoader(true));
       const url = selectedlocations
-        ? `http://localhost:4000/api/v1/turf/getAllTurfLocations/${selectedlocations}`
-        : "http://localhost:4000/api/v1/turf/getAllTurf";
+        ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/turf/getAllTurfLocations/${selectedlocations}`
+        : `${import.meta.env.VITE_API_BASE_URL}/api/v1/turf/getAllTurf`;
 
       const response = await axios.get(url, {
         headers: {

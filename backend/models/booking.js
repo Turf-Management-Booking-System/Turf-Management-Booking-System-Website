@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-
-// create the schema
 const bookingSchema = mongoose.Schema({
     user:{
         type:mongoose.Schema.Types.ObjectId,
@@ -18,14 +16,12 @@ const bookingSchema = mongoose.Schema({
         default:Date.now,
     },
     timeSlot:{
-        // suppose if user select the multiple slots
         type:[String],
         required:[true,"Please enter the time slot!"]
     },
     status:{
        type:String,
        required:true,
-        //check again!
        enum:["Confirmed","Pending","ReScheduled"],
     },
     totalPrice:{
@@ -41,6 +37,4 @@ const bookingSchema = mongoose.Schema({
     }
 
 },{timestamps:true});
-
-// exporting the model
 module.exports = mongoose.model("Booking",bookingSchema);

@@ -3,9 +3,7 @@ const mongoose = require("mongoose")
 const User = require("../models/user")
 exports.createNotication =async (req,res)=>{
     try{
-    // insert the message to whom user
     const{userId,message}= req.body;
-    // validate
     if(!userId||!message){
         return res.status(401).json({
             success:false,
@@ -20,15 +18,11 @@ exports.createNotication =async (req,res)=>{
         message: "User not found",
       });
     }
-    
-    
-    // create a new notification 
     const newMessage = await Notification.create({
         user:userIdConvert,
         message
     });
     console.log("new message",newMessage);
-    // return response 
     return res.status(200).json({
         success:true,
         message:"Notification Created Successfully!",
@@ -45,21 +39,17 @@ exports.createNotication =async (req,res)=>{
 }
 exports.getNotifications=async (req,res)=>{
     try{
-    // get id
      const{userId} = req.params;
-    //  validate
      if(!userId){
         return res.status(401).json({
             success:false,
             message:"Please Enter The Data Properly"
         })
      }
-    //  fetch the message
      const messages = await Notification.find({
         user:userId
      }).sort({createdAt:-1});
     console.log("fetch messages",messages);
-    // return reponse
     return res.status(200).json({
         success:true,
         message:"Fetch The Current message!",
@@ -85,8 +75,6 @@ exports.markAsRead = async (req, res) => {
         message: "Please Provide The Data",
       });
     }
-
-    // Convert the notificationId to ObjectId
     const notificationObjectId = new mongoose.Types.ObjectId(notificationId);
 
     const markAsReads = await Notification.findByIdAndUpdate(
@@ -103,8 +91,6 @@ exports.markAsRead = async (req, res) => {
     }
 
     console.log("Read the message:", markAsReads);
-
-    // Return success response with updated notification
     return res.status(200).json({
       success: true,
       message: "Notification marked as read!",

@@ -67,7 +67,7 @@ const BookingPage = () => {
       }
   
       const response = await axios.get(
-        `http://localhost:4000/api/v1/turf/getTurfSlotByDate/${turfId}/${date}`
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/turf/getTurfSlotByDate/${turfId}/${date}`
       );
       console.log(response.data.slots)
       if (!response.data || !Array.isArray(response.data?.slots)) {
