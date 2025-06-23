@@ -5,4 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
     base: '/', // This ensures assets load correctly on Render
+    server: {
+    historyApiFallback: true, // For dev server
+  },
 })
