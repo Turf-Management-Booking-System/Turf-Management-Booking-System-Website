@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import axios from "axios";
 import toast from 'react-hot-toast';
@@ -11,15 +11,20 @@ const Otp = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector((state)=>state.auth.user);
-  console.log("user for otp",user)
+  const reduxUser = useSelector((state) => state.auth.user);
   const isForgetPassword = localStorage.getItem("isForgetPassword") === "true";
-
+  const storedEmail = localStorage.getItem("email");
   
-  if (!user?.email) {
-    toast.error("Email not found. Please ensure you are logged in.");
-    return;
-  }
+  // Get email from either Redux or localStorage
+  const email = reduxUser?.email || storedEmail;
+
+  // Redirect if no email is found
+  useEffect(() => {
+    if (!email) {
+      toast.error("Email not found. Please try again.");
+      navigate(isForgetPassword ? "/forget-password" : "/login");
+    }
+  }, [email, navigate, isForgetPassword]);
 
   // Handle input change
   const handleChange = (element, index) => {
@@ -40,8 +45,6 @@ const Otp = () => {
   const handleBackspace = (event, index) => {
     if (event.key === "Backspace") {
       const newOtp = [...otp];
-
-      // Clear the current box
       newOtp[index] = "";
       setOtp(newOtp);
 
@@ -56,17 +59,22 @@ const Otp = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const newOtp = otp.join("");
-    const requestData = {
-      otp: newOtp,
-      email: user?.email,
-    };
+    
+    if (newOtp.length !== 6) {
+      toast.error("Please enter a 6-digit OTP");
+      return;
+    }
 
     try {
       dispatch(setLoader(true));
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/verifyOtp`, requestData, {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/verifyOtp`,
+        { otp: newOtp, email },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
 
       if (response.data.success) {
         toast.success("OTP verified successfully!");
@@ -76,11 +84,11 @@ const Otp = () => {
           await signupVerification();
         }
       } else {
-        toast.error("Invalid OTP");
+        toast.error(response.data.message || "Invalid OTP");
       }
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Error sending data to backend");
+      toast.error(error.response?.data?.message || "Error verifying OTP");
     } finally {
       dispatch(setLoader(false));
     }
@@ -91,62 +99,67 @@ const Otp = () => {
       dispatch(setLoader(true));
       const signupResponse = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/signup`,
-        { ...user }, // Ensure correct payload
-        { headers: { "Content-Type": "application/json" }, withCredentials: true }
+        { ...reduxUser },
+        { 
+          headers: { "Content-Type": "application/json" }, 
+          withCredentials: true 
+        }
       );
 
       if (signupResponse.data?.success) {
         dispatch(setUser(signupResponse.data.user));
-        setTimeout(() => {
-          toast.success("User created successfully!");
-        }, 2000);
+        toast.success("User created successfully!");
         navigate("/login");
       } else {
-        toast.error(signupResponse.data.message);
+        toast.error(signupResponse.data.message || "Signup failed");
       }
     } catch (error) {
       console.error("Signup Error:", error.response?.data || error.message);
       toast.error(error.response?.data?.message || "Signup failed");
-    }finally{
+    } finally {
       dispatch(setLoader(false));
     }
   };
-   const resentOtp =async()=>{
-    const requestData={
-      email:user?.email
-    }
+
+  const resendOtp = async () => {
     try {
       dispatch(setLoader(true));
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/sendOtp`, requestData, {
-        headers: {
-          "Content-Type": "application/json", 
-        },
-        withCredentials: true 
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/sendOtp`,
+        { email },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true
+        }
+      );
 
-      });
-  
-      console.log("Response from backend:", response.data);
-  
       if (response.data.success) {
-        toast.success("OTP sent successfully!");
-        
+        toast.success("New OTP sent successfully!");
       } else {
-        toast.error(response.data.message || "Something went wrong");
+        toast.error(response.data.message || "Failed to resend OTP");
       }
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Error sending data to backend");
-    }
-    finally {
+      toast.error(error.response?.data?.message || "Error resending OTP");
+    } finally {
       dispatch(setLoader(false));
     }
-   }
+  };
+
+  if (!email) {
+    return null; // Already handled by useEffect redirect
+  }
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-[#8dabc1] to-[#1a527a] dark:from-gray-500 dark:to-gray-900 px-4">
-      <FloatingButton/>
+      <FloatingButton />
       <div className="bg-white dark:bg-black shadow-lg rounded-xl w-full max-w-md p-6 sm:p-8">
-        <h2 className="text-2xl font-bold text-[#1a527a] dark:text-white text-center mb-4">Enter OTP</h2>
-        <p className="text-gray-600 dark:text-gray-300 text-center mb-6">Please enter the 6-digit OTP sent to your email.</p>
+        <h2 className="text-2xl font-bold text-[#1a527a] dark:text-white text-center mb-4">
+          Enter OTP
+        </h2>
+        <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
+          Please enter the 6-digit OTP sent to {email}
+        </p>
 
         <form className="flex flex-col items-center" onSubmit={handleSubmit}>
           <div className="flex justify-center gap-2 sm:gap-3 mb-6">
@@ -173,7 +186,10 @@ const Otp = () => {
 
         <p className="text-sm text-gray-500 dark:text-gray-300 text-center mt-4">
           Didn't receive the OTP?{" "}
-          <button className="text-green-600 underline" onClick={resentOtp}>
+          <button 
+            className="text-green-600 underline focus:outline-none" 
+            onClick={resendOtp}
+          >
             Resend OTP
           </button>
         </p>

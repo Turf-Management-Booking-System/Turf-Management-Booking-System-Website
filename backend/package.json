@@ -26,16 +26,16 @@
     "express-fileupload": "1.5.1",
     "jsonwebtoken": "9.0.2",
     "mongodb": "5.9.0",
-  "mongoose": "7.6.5", 
-  "saslprep": "1.0.3",
+    "mongoose": "7.6.5",
     "node-cache": "5.1.2",
     "node-cron": "3.0.3",
     "nodemailer": "6.10.0",
     "openai": "4.83.0",
+    "path": "^0.12.7",
+    "saslprep": "1.0.3",
     "uuid": "11.1.0"
   },
   "devDependencies": {
     "nodemon": "3.1.9"
   }
-  
 }

@@ -3,6 +3,7 @@ const connectDB = require("./config/database");
 const cors = require("cors");
 const app = express();
 const cookieParser = require("cookie-parser")
+const path = require('path');
 
 const PORT =  process.env.PORT || 4000;
   
@@ -17,11 +18,16 @@ app.use(cors({ origin: [
     credentials:true,
     allowedHeaders:["Content-Type","Authorization","withCredentials" ,"Accept"]
 }));
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+});
 app.use(cookieParser());
 app.options("*", cors({
     origin: [
+         "https://kick-on-turf-player.onrender.com",
         "http://localhost:5175",
-        "http://localhost:5173"
+        "http://localhost:5173",
+
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,

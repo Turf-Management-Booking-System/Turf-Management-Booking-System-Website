@@ -525,11 +525,11 @@ const SettingsSection = ({ user }) => (
       <div className="space-y-3 sm:space-y-4">
         <div className="flex items-center justify-between">
           <span className="text-sm sm:text-base text-gray-700 dark:text-gray-300">Enable Notifications</span>
-          <input type="checkbox" className="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-green-600" checked />
+          <input type="checkbox" className="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-green-600" defaultChecked />
         </div>
         <div className="flex items-center justify-between">
           <span className="text-sm sm:text-base text-gray-700 dark:text-gray-300">Dark Mode</span>
-          <input type="checkbox" className="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-green-600" checked />
+          <input type="checkbox" className="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-green-600" defaultChecked />
         </div>
       </div>
     </div>

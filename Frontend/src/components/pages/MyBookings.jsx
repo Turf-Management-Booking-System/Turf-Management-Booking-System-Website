@@ -122,15 +122,17 @@ const BookingDetailsModal = ({ booking, onClose }) => {
               <FontAwesomeIcon icon={faCalendar} className="mr-3 text-black dark:text-white" />
               <span className="font-semibold">Date & Time:</span>
               <span className="ml-2">
-              {new Date(booking.date).toLocaleDateString()} | {booking.timeSlot.map(time => {
-  const date = new Date(time);
-  return date.toLocaleTimeString([], {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  }).toLowerCase().replace(" ", "");
-}).join(", ")}
-
+                {new Date(booking.date).toLocaleDateString()} |{" "}
+                {booking.timeSlot
+                  .map((time) => {
+                    const date = new Date(time);
+                    return date.toLocaleTimeString([], {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true,
+                    });
+                  })
+                  .join(", ")}
               </span>
             </div>
             <div className="flex items-center text-gray-700 dark:text-gray-300">
@@ -420,20 +422,19 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                   <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
                     <FontAwesomeIcon icon={faCalendar} className="mr-2" />
                     <span>
-                    <p className="text-gray-600 font-montserrat dark:text-gray-300">
-  {new Date(booking.date).toLocaleDateString()} |{" "}
-  {booking.timeSlot
-    .map((time) => {
-      const date = new Date(time);
-      const hours = date.getHours();
-      const minutes = "00"; // Assuming the time slots are on the hour
-      const ampm = hours >= 12 ? "PM" : "AM";
-      const formattedHour = hours % 12 || 12; // Converts 0 hours to 12
-      return `${formattedHour}:${minutes} ${ampm}`;
-    })
-    .join(", ")}
-</p>
-
+                      <p className="text-gray-600 font-montserrat dark:text-gray-300">
+                        {new Date(booking.date).toLocaleDateString()} |{" "}
+                        {booking.timeSlot
+                          .map((time) => {
+                            const date = new Date(time);
+                            return date.toLocaleTimeString([], {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                              hour12: true,
+                            });
+                          })
+                          .join(", ")}
+                      </p>
                     </span>
                   </div>
                   <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
@@ -470,20 +471,19 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                   <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
                     <FontAwesomeIcon icon={faCalendar} className="mr-2" />
                     <span>
-                    <p className="text-gray-600 font-montserrat dark:text-gray-300">
-  {new Date(booking.date).toLocaleDateString()} |{" "}
-  {booking.timeSlot
-    .map((time) => {
-      const date = new Date(time);
-      const hours = date.getHours();
-      const minutes = "00"; // Assuming the time slots are on the hour
-      const ampm = hours >= 12 ? "PM" : "AM";
-      const formattedHour = hours % 12 || 12; // Converts 0 hours to 12
-      return `${formattedHour}:${minutes} ${ampm}`;
-    })
-    .join(", ")}
-</p>
-
+                      <p className="text-gray-600 font-montserrat dark:text-gray-300">
+                        {new Date(booking.date).toLocaleDateString()} |{" "}
+                        {booking.timeSlot
+                          .map((time) => {
+                            const date = new Date(time);
+                            return date.toLocaleTimeString([], {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                              hour12: true,
+                            });
+                          })
+                          .join(", ")}
+                      </p>
                     </span>
                   </div>
                   <div className="flex items-center  text-gray-600 dark:text-gray-300 mb-2">
@@ -532,13 +532,13 @@ const BookingDetailsModal = ({ booking, onClose }) => {
               ))}
         </div>
         <AnimatePresence>
-  {selectedBooking && (
-    <BookingDetailsModal
-      booking={selectedBooking}
-      onClose={closeModal}
-    />
-  )}
-</AnimatePresence>
+          {selectedBooking && (
+            <BookingDetailsModal
+              booking={selectedBooking}
+              onClose={closeModal}
+            />
+          )}
+        </AnimatePresence>
       </div>
       {/* Special Offers Section */}
       <div className="bg-green-500 dark:bg-green-700 text-white p-6 rounded-lg my-8 mx-auto max-w-4xl text-center">
