@@ -73,6 +73,7 @@ const TurfPage = () => {
 
       if (response.data.success) {
         const fetchedTurfs = response.data.fetchAllTurf;
+        console.log("turf data",fetchedTurfs)
         dispatch(setTurfs(fetchedTurfs));
 
         if (fetchedTurfs.length > 0) {

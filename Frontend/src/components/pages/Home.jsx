@@ -173,7 +173,7 @@ function Home() {
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
-          "Something went wrong while deleting turf data!"
+          "Something went wrong fetching Testimonals Data!"
       );
       console.log(error.response?.data?.message);
     } finally {
@@ -307,7 +307,6 @@ useEffect(() => {
   window.addEventListener('resize', handleResize);
   return () => window.removeEventListener('resize', handleResize);
 }, []);
-console.log('Full URL:', `${import.meta.env.VITE_API_BASE_URL}/api/v1/turf/getAllTurfLocations`);
   return (
     <>
       {/* Hero Section */}

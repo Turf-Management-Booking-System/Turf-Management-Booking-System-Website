@@ -18,9 +18,7 @@ app.use(cors({ origin: [
     credentials:true,
     allowedHeaders:["Content-Type","Authorization","withCredentials" ,"Accept"]
 }));
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
-});
+
 app.use(cookieParser());
 app.options("*", cors({
     origin: [
