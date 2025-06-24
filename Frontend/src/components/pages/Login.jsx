@@ -358,7 +358,7 @@ const LoginHandler = async (event) => {
                 Register
               </button>
             </div>
-            <div className={`toggle-panel bg-gradient-to-r from-[#587990] via-lime-500 to-[#235980] rounded-t-[70px] max650:right-0 max650:bottom-[-30%] max650:w-[100%] max650:h-[30%] absolute w-[50%] h-[100%]  text-[#fff] flex flex-col justify-center items-center
+            <div className={`toggle-panel max650:right-0 max650:bottom-[-30%] max650:w-[100%] max650:h-[30%] absolute w-[50%] h-[100%]  text-[#fff] flex flex-col justify-center items-center
              z-[2] transition-all duration-[600ms] ease-in-out  ${isActive ? "right-[0] delay-[1200ms] max650:bottom-[0]" : "right-[-50%] delay-[600ms]"}`}>
               <h1 className="text-4xl -mt-[10px] -mb-[5px]">
                 <b className="font-orbitron">Welcome Back</b>
