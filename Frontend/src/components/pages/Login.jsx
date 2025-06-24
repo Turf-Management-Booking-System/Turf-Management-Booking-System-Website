@@ -335,12 +335,22 @@ const LoginHandler = async (event) => {
             </form>
           </div>
 
-          <div
-            className={`toggle-box  absolute w-[100%] h-[100%] before:max650:rounded-[20vw] before:content-[''] before:absolute before:w-[300%] before:h-full before:bg-gradient-to-r from-[#587990] via-lime-500 to-[#235980] before:rounded-[150px] 
-        before:z-[2] before:transition-all before:duration-[1800ms] before:ease-in-out 
-        max650:before:w-[100%] max650:before:h-[300%] max650:before:left-0 max650:before:top-[-270%]
-          ${isActive ? "before:left-[50%] before:max650:top-[72%] before:max650:left-0" : "before:left-[-250%]"}`}
-          >
+         <div
+  className={`toggle-box absolute w-full h-full 
+    before:content-[''] before:absolute before:w-[300%] before:h-full 
+    before:bg-gradient-to-r from-[#587990] via-lime-500 to-[#235980] 
+    before:rounded-[150px] before:z-[2] 
+    before:transition-all before:duration-[1800ms] before:ease-in-out 
+    before:max650:rounded-[20vw] 
+    max650:before:w-full max650:before:h-[280%] 
+    max650:before:left-0 max650:before:top-[-240%]
+    ${isActive 
+      ? "before:left-[50%] max650:before:top-[65%] before:max650:left-0" 
+      : "before:left-[-250%] max650:before:top-[-240%]"
+    }`}
+>
+
+
             <div
               className={`toggle-panel max650:w-[100%] max650:h-[30%] max650:top-0  absolute w-[50%] h-[100%]  text-[#fff] flex flex-col justify-center transition-all duration-[600ms] ease-in-out
            items-center z-[2] ${isActive ? "left-[-50%] delay-[600ms] max650:left-0 max650:top-[-30%]" : " left-0 delay-[1200ms]"}`}
