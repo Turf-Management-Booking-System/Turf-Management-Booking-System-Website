@@ -1,4 +1,5 @@
-import { useContext, useState } from "react";
+
+import { useContext, useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -36,11 +37,18 @@ const BookedConfirmPage = () => {
     setPaymentMode(capitalize);
   };
 
+  // Updated time formatting function to match backend exactly
   const formatTimeSlot = (timeInput) => {
+    // If already in correct format (e.g., "7:00 AM"), return as-is
     if (typeof timeInput === 'string' && /^\d{1,2}:\d{2} [AP]M$/i.test(timeInput)) {
-      return timeInput;
+      // Normalize to exact backend format: "H:MM AM/PM" with space and uppercase
+      const normalized = timeInput.replace(/(\d{1,2}):(\d{2})\s*([AP]M)/i, (match, h, m, ap) => {
+        return `${h}:${m.padStart(2, '0')} ${ap.toUpperCase()}`;
+      });
+      return normalized;
     }
 
+    // Handle Date objects or other formats
     try {
       const time = new Date(timeInput);
       if (isNaN(time.getTime())) {
@@ -53,7 +61,8 @@ const BookedConfirmPage = () => {
       const ampm = hours >= 12 ? 'PM' : 'AM';
       hours = hours % 12;
       hours = hours ? hours : 12;
-      return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+      // Format exactly as backend expects: "H:MM AM/PM" with space and uppercase
+      return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm.toUpperCase()}`;
     } catch (error) {
       console.error("Time formatting error:", error);
       return "Invalid Time";
@@ -84,7 +93,6 @@ const BookedConfirmPage = () => {
   };
 
   const handleConfirmBooking = async () => {
-    // Validate inputs
     if (!paymentMode) {
       toast.error("Please select a payment mode.");
       return;
@@ -94,14 +102,16 @@ const BookedConfirmPage = () => {
       return;
     }
 
-    // Format time slots
+    // Format time slots to exactly match backend format
     const formattedSlots = selectedSlots.map(slot => formatTimeSlot(slot)).filter(time => time !== "Invalid Time");
     if (formattedSlots.length === 0) {
       toast.error("No valid time slots selected");
       return;
     }
 
-    // Validate date format
+    // Debug log to verify the exact format being sent
+    console.log("Sending time slots to backend:", formattedSlots);
+
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (!dateRegex.test(selectedDate)) {
       toast.error("Invalid date format");
@@ -109,16 +119,16 @@ const BookedConfirmPage = () => {
     }
 
     dispatch(setLoader(true));
-
-    try {
-      if (isRescheduled && bookingIdRescheduled) {
-        // Handle rescheduling
-        const rescheduleResponse = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/api/v1/booking/rescheduleBooking`,
-          {
+    const data = {
             newTimeSlot: formattedSlots,
             bookingId: bookingIdRescheduled
-          },
+          }
+      console.log("data sending to backedn",data)
+    try {
+      if (isRescheduled && bookingIdRescheduled) {
+        const rescheduleResponse = await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/api/v1/booking/rescheduleBooking`,
+         data,
           {
             headers: {
               "Content-Type": "application/json",
@@ -200,9 +210,17 @@ const BookedConfirmPage = () => {
 
     } catch (error) {
       console.error("Booking error:", error);
-      const errorMessage = error.response?.data?.message || 
-                          error.message || 
-                          (isRescheduled ? "Failed to reschedule booking" : "Failed to create booking");
+      console.error("Error response:", error.response?.data);
+      
+      let errorMessage = error.response?.data?.message || 
+                       error.message || 
+                       (isRescheduled ? "Failed to reschedule booking" : "Failed to create booking");
+      
+      // Enhanced error message for slot availability
+      if (errorMessage.includes('not available')) {
+        errorMessage = `Slot not available. Please note: Time slots must be in exact format (e.g., "7:00 AM").`;
+      }
+      
       toast.error(errorMessage);
     } finally {
       dispatch(setLoader(false));
@@ -213,12 +231,18 @@ const BookedConfirmPage = () => {
     if (!selectedSlots || selectedSlots.length === 0) return "No slots selected";
     
     return selectedSlots.map(slot => {
-      if (typeof slot === 'string' && /^\d{1,2}:\d{2} [AP]M$/i.test(slot)) {
-        return slot;
-      }
-      return formatTimeSlot(slot);
+      const formatted = formatTimeSlot(slot);
+      return formatted === "Invalid Time" ? slot : formatted;
     }).join(", ");
   };
+
+  // Debug initial slots
+  useEffect(() => {
+    if (selectedSlots) {
+      console.log("Initial selected slots:", selectedSlots);
+      console.log("Formatted slots:", selectedSlots.map(slot => formatTimeSlot(slot)));
+    }
+  }, [selectedSlots]);
 
   return (
     <div 

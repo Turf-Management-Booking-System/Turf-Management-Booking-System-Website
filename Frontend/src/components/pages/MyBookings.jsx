@@ -58,6 +58,18 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
+// NEW TIME FORMATTING FUNCTION ADDED HERE
+const formatTime12Hour = (timeString) => {
+  const date = new Date(timeString);
+  let hours = date.getUTCHours();
+  const minutes = date.getUTCMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+  return `${hours}:${minutesStr} ${ampm}`;
+};
+
 const MyBookings = () => {
   const navigate = useNavigate();
   const { darkMode } = useContext(DarkModeContext);
@@ -122,16 +134,10 @@ const BookingDetailsModal = ({ booking, onClose }) => {
               <FontAwesomeIcon icon={faCalendar} className="mr-3 text-black dark:text-white" />
               <span className="font-semibold">Date & Time:</span>
               <span className="ml-2">
-                {new Date(booking.date).toLocaleDateString()} |{" "}
+                {new Date(booking.date).toUTCString().slice(0, 16)} |{" "}
+                {/* CHANGED TIME FORMATTING HERE */}
                 {booking.timeSlot
-                  .map((time) => {
-                    const date = new Date(time);
-                    return date.toLocaleTimeString([], {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true,
-                    });
-                  })
+                  .map(time => formatTime12Hour(time))
                   .join(", ")}
               </span>
             </div>
@@ -206,6 +212,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
     </motion.div>
   )
 }
+
   // caling the all booking api
   const currentAndPreviousBookings = useCurrentAndPreviousBooking();
   const fetchBookings = useBookingsDetailsOfAUser();
@@ -237,6 +244,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
 
     return turfName.includes(searchTerm) || bookingId.includes(searchTerm);
   });
+
   const handleCancelBooking = async (bookingId) => {
     console.log("booking", bookingId);
     try {
@@ -328,6 +336,13 @@ const BookingDetailsModal = ({ booking, onClose }) => {
       setFeedBack("")
     }
   }
+
+  // Helper function to format UTC date
+  const formatUTCDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toUTCString().slice(0, 16);
+  };
+
   return (
     <div
       style={{
@@ -423,16 +438,10 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                     <FontAwesomeIcon icon={faCalendar} className="mr-2" />
                     <span>
                       <p className="text-gray-600 font-montserrat dark:text-gray-300">
-                        {new Date(booking.date).toLocaleDateString()} |{" "}
+                        {formatUTCDate(booking.date)} |{" "}
+                        {/* CHANGED TIME FORMATTING HERE */}
                         {booking.timeSlot
-                          .map((time) => {
-                            const date = new Date(time);
-                            return date.toLocaleTimeString([], {
-                              hour: 'numeric',
-                              minute: '2-digit',
-                              hour12: true,
-                            });
-                          })
+                          .map(time => formatTime12Hour(time))
                           .join(", ")}
                       </p>
                     </span>
@@ -472,16 +481,10 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                     <FontAwesomeIcon icon={faCalendar} className="mr-2" />
                     <span>
                       <p className="text-gray-600 font-montserrat dark:text-gray-300">
-                        {new Date(booking.date).toLocaleDateString()} |{" "}
+                        {formatUTCDate(booking.date)} |{" "}
+                        {/* CHANGED TIME FORMATTING HERE */}
                         {booking.timeSlot
-                          .map((time) => {
-                            const date = new Date(time);
-                            return date.toLocaleTimeString([], {
-                              hour: 'numeric',
-                              minute: '2-digit',
-                              hour12: true,
-                            });
-                          })
+                          .map(time => formatTime12Hour(time))
                           .join(", ")}
                       </p>
                     </span>
