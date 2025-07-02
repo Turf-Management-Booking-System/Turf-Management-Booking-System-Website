@@ -51,7 +51,7 @@ const ChangePassword = () => {
         toast.success("Password Updated Successfully!")
       }
     }catch(error){
-      toast.error(error.response?.data?.message || "Something Went Wrong!");
+      toast.error(error.response?.data?.message || "Something Went Wrong while changing password!");
       console.error("Error:", error.response?.data || error.message);
 
     }finally{

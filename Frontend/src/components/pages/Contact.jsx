@@ -37,7 +37,7 @@ const ContactForm = () => {
         setMessage("");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something Went Wrong!");
+      toast.error(error.response?.data?.message || "Something Went Wrong while contacting!");
     } finally {
       dispatch(setLoader(false));
     }

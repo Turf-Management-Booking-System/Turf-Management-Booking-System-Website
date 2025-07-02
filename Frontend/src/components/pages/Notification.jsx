@@ -26,7 +26,7 @@ const Notification = () => {
         dispatch(markAsReadAction(notificationId));
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something Went Wrong!");
+      toast.error(error.response?.data?.message || "Something Went Wrongwhie marking read messages !");
     }
   };
 
@@ -43,7 +43,7 @@ const Notification = () => {
         dispatch(deleteNotificationAction(notificationId));
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something Went Wrong!");
+      toast.error(error.response?.data?.message || "Something Went Wrong while deleting the notifications!");
     }
   };
 

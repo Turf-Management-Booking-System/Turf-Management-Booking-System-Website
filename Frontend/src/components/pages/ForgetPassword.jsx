@@ -40,7 +40,7 @@ const ForgetPassword = () => {
         toast.success("Sent OTP Successfully!");
         navigate("/otp");
       } else {
-        toast.error(response.data.message || "Something went wrong");
+        toast.error(response.data.message || "Something went wrong while sending forget password api call");
       }
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);

@@ -135,7 +135,6 @@ const BookingDetailsModal = ({ booking, onClose }) => {
               <span className="font-semibold">Date & Time:</span>
               <span className="ml-2">
                 {new Date(booking.date).toUTCString().slice(0, 16)} |{" "}
-                {/* CHANGED TIME FORMATTING HERE */}
                 {booking.timeSlot
                   .map(time => formatTime12Hour(time))
                   .join(", ")}
@@ -281,7 +280,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
         
           }
         } catch (error) {
-          toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!");
+          toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications for cancel booking!");
           console.log(error.response?.data?.message)
         }
       } else {

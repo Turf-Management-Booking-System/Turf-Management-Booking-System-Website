@@ -76,19 +76,19 @@ function Navbar() {
       if (user && user._id) {
         try {
           const response = await axios.get(
-            `${VITE_API_BASE_URL}/api/v1/notify/getNotifications/${user._id}`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/notify/getNotifications/${user._id}`,
             {
               headers: {
                 "Content-Type": "application/json",
-                withCredentials: true,
               },
+                              withCredentials: true,
             }
           );
           if (response.data.success) {
             dispatch(setNotification(response.data.currentMessage || []));
           }
         } catch (error) {
-          toast.error(error.response?.data?.message || "Something Went Wrong!");
+          toast.error(error.response?.data?.message || "Something Went Wrong whie fetching notifications in navbar!");
         }
       }
     };

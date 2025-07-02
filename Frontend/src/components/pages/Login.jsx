@@ -105,7 +105,6 @@ const LoginHandler = async (event) => {
       
         }
       } catch (error) {
-        toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!");
         console.log(error.response?.data?.message)
       }
     } else {

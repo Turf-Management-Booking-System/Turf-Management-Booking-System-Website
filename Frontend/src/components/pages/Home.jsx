@@ -256,7 +256,7 @@ function Home() {
           } catch (error) {
             toast.error(
               error.response?.data?.message ||
-                "Something Went Wrong in fetching notifications!"
+                "Something Went Wrong in fetching notifications in handle submit !"
             );
             console.log(error.response?.data?.message);
           }

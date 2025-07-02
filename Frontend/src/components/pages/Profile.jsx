@@ -104,7 +104,7 @@ const EditProfile = () => {
             localStorage.setItem("userNotification", JSON.stringify(notificationResponse.data.currentMessage || []))
           }
         } catch (error) {
-          toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!")
+          toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications in updating profile !")
         }
       }
     } catch (error) {
@@ -141,7 +141,7 @@ const EditProfile = () => {
         navigate("/")
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something Went Wrong!")
+      toast.error(error.response?.data?.message || "Something Went Wrong while deleting profile !")
       console.error("Error:", error.response?.data || error.message)
     } finally {
       dispatch(setLoader(false))
@@ -176,7 +176,7 @@ const EditProfile = () => {
         setProfile({ ...profile, image: response.data.fileData.image })
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something Went Wrong!")
+      toast.error(error.response?.data?.message || "Something Went Wrong in updating image !")
       console.error("Error:", error.response?.data || error.message)
     } finally {
       dispatch(setLoader(false))

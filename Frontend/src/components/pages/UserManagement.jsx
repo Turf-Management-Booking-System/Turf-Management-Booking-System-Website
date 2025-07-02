@@ -158,7 +158,7 @@ const UserManagement = () => {
           setUsers(updatedUsers);
         }
       } catch (error) {
-        toast.error(error.response?.data?.message || "Something Went Wrong!");
+        toast.error(error.response?.data?.message || "Something Went Wrong in Deleting the user Profile!");
         console.error("Error:", error.response?.data || error.message);
       } finally {
         dispatch(setLoader(false));

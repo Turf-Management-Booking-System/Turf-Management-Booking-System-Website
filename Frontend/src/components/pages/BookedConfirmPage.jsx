@@ -88,7 +88,7 @@ const BookedConfirmPage = () => {
       }
     } catch (error) {
       console.error("Notification error:", error);
-      toast.error(error.response?.data?.message || "Failed to fetch notifications");
+      toast.error(error.response?.data?.message || "Failed to fetch notifications in payment handling");
     }
   };
 

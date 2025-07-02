@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useDispatch } from "react-redux"
 import { setLoader } from "../../slices/authSlice"
 import logo from "../../assets/Images/Logo.png";
+import toast from "react-hot-toast"
 import axios from "axios"
 import {
   faUsers,
@@ -226,6 +227,7 @@ const About = () => {
       }
     } catch (error) {
       console.log("error", error);
+      toast.error("error while displaying feedback")
       setFeedBack([]); // Set to empty array on error
     } finally {
       dispatch(setLoader(false));

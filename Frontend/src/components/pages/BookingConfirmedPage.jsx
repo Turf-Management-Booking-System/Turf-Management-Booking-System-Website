@@ -76,7 +76,7 @@ const BookingConfirmedPage = () => {
         
           }
         } catch (error) {
-          toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications!");
+          toast.error(error.response?.data?.message || "Something Went Wrong in fetching notifications in cancel booking!");
           console.log(error.response?.data?.message)
         }
         navigate("/myBookings");
