@@ -150,38 +150,58 @@ const EditProfile = () => {
   }
 
   const handleImageChangeHandler = async (e) => {
-    e.preventDefault()
-    if (!profileImage) {
-      toast.error("Please select an image!")
-      return
-    }
-    const formData = new FormData()
-    formData.append("imageUrl", profileImage)
-    try {
-      dispatch(setLoader(true))
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/upload-Profile-Image/${user?._id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            withCredentials: true,
-          },
-        },
-      )
+  e.preventDefault();
 
-      if (response.data.success) {
-        toast.success("Profile Image Updated Successfully!")
-        dispatch(updateProfileImage(response.data.fileData.image))
-        setProfile({ ...profile, image: response.data.fileData.image })
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Something Went Wrong in updating image !")
-      console.error("Error:", error.response?.data || error.message)
-    } finally {
-      dispatch(setLoader(false))
-    }
+  if (!profileImage) {
+    toast.error("Please select an image!");
+    return;
   }
+
+  const formData = new FormData();
+  formData.append("imageUrl", profileImage);
+
+  try {
+    dispatch(setLoader(true));
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/upload-Profile-Image/${user?._id}`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+          withCredentials: true,
+        },
+      }
+    );
+
+    // ✅ If image uploaded successfully
+     if (response.data.success) {
+  console.log("data", response.data);
+
+  const imageUrl = response.data.data?.image;
+
+  if (!imageUrl) {
+    toast.error("Image not returned from server!");
+    return;
+  }
+
+  dispatch(updateProfileImage(imageUrl));
+
+  const updatedUser = { ...user, image: imageUrl };
+  localStorage.setItem("userData", JSON.stringify(updatedUser));
+  dispatch(setUser(updatedUser));
+  toast.success("Profile Image Updated Successfully!");
+}
+
+  } catch (error) {
+    console.error("Image upload error:", error.response?.data || error.message);
+    toast.error(error.response?.data?.message || "Something went wrong while updating image!");
+  } finally {
+    dispatch(setLoader(false));
+  }
+};
+
 
   return (
     <div
