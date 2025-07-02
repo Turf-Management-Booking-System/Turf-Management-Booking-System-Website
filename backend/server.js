@@ -31,13 +31,6 @@ app.options("*", cors({
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization", "withCredentials", "Accept"]
 }));
-const frontendBuildPath = path.join(__dirname, "../Frontend/dist");
-app.use(express.static(frontendBuildPath));
-
-// 2. Handle React client-side routing
-app.get("*", (req, res) => {
-  res.sendFile(path.join(frontendBuildPath, "index.html"));
-});
 const fileupload =require("express-fileupload");
 app.use(fileupload({
     useTempFiles: true,       
